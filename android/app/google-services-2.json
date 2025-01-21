@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "750511308246",
+    "project_id": "autocaller-d413e",
+    "storage_bucket": "autocaller-d413e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750511308246:android:d5d4613baf439f04ccf877",
+        "android_client_info": {
+          "package_name": "com.example.autocaller"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPb2rdeAen_jP3dNPRw7TEPMGgcTJo2L8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
