@@ -1,6 +1,7 @@
 
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:autocaller/ResetPassword.dart';
 import 'package:flutter/material.dart';
 
 class SchoolAdminLoginPage extends StatefulWidget {
@@ -119,6 +120,10 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
   children: [
     GestureDetector(
       onTap: () {
+       Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ResetPasswordPage()),
+    );
         // Handle forgot password action
       },
       child: const Text(
