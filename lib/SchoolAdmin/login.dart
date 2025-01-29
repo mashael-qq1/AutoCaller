@@ -1,4 +1,3 @@
-
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
@@ -36,29 +35,27 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                 // Logo
                 Image.asset(
                   'assets/logo.png', // Replace with your logo path
-                 height: 100,
-               ),
+                  height: 100,
+                ),
                 const SizedBox(height: 16),
 
-                
                 const Text(
-                'Welcome Back!',
-                 style: TextStyle(
-                   fontSize: 32,
-                  fontWeight: FontWeight.w500,
-                   color: Colors.black, // Custom blue color
-                   ),
+                  'Welcome Back!',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black, // Custom blue color
                   ),
-                 const SizedBox(height: 8), // Add spacing between the texts
-                 const Text(
-                'Use ythe form below to access your account.',
-                style: TextStyle(
-                 fontSize: 14,
-                 fontWeight: FontWeight.normal,
-                  color: Color(0xFF57636C), // Custom blue color
                 ),
-               ),
-               
+                const SizedBox(height: 8), // Add spacing between the texts
+                const Text(
+                  'Use ythe form below to access your account.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF57636C), // Custom blue color
+                  ),
+                ),
 
                 const SizedBox(height: 24),
 
@@ -67,15 +64,15 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                   controller: _emailController,
                   decoration: InputDecoration(
                     labelText: "Email",
-                  labelStyle: TextStyle(
-                   color: Color(0xFF57636C), // Label color
-                   fontSize: 14, // Label font size
-                     ),
+                    labelStyle: TextStyle(
+                      color: Color(0xFF57636C), // Label color
+                      fontSize: 14, // Label font size
+                    ),
                     hintText: 'Enter your email here',
-                     hintStyle: TextStyle(
-                    color: Colors.grey, // Hint text color
-                    fontSize: 14, // Hint text font size
-                   fontStyle: FontStyle.italic, // Hint text style
+                    hintStyle: TextStyle(
+                      color: Colors.grey, // Hint text color
+                      fontSize: 14, // Hint text font size
+                      fontStyle: FontStyle.italic, // Hint text style
                     ),
                     filled: true,
                     fillColor: Colors.white,
@@ -83,7 +80,6 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                       borderRadius: BorderRadius.circular(40),
                       borderSide: BorderSide.none,
                     ),
-                   
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -93,16 +89,16 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                   controller: _passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                  labelText: "Password",
-                  labelStyle: TextStyle(
-                   color: Color(0xFF57636C), // Label color
-                   fontSize: 14, // Label font size
-                     ),
+                    labelText: "Password",
+                    labelStyle: TextStyle(
+                      color: Color(0xFF57636C), // Label color
+                      fontSize: 14, // Label font size
+                    ),
                     hintText: 'Enter your password here',
                     hintStyle: TextStyle(
-                    color: Colors.grey, // Hint text color
-                    fontSize: 14, // Hint text font size
-                   fontStyle: FontStyle.italic, // Hint text style
+                      color: Colors.grey, // Hint text color
+                      fontSize: 14, // Hint text font size
+                      fontStyle: FontStyle.italic, // Hint text style
                     ),
                     filled: true,
                     fillColor: Colors.white,
@@ -110,47 +106,47 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                       borderRadius: BorderRadius.circular(40),
                       borderSide: BorderSide.none,
                     ),
-                    
                   ),
                 ),
-                  const SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Adjust alignment
-  children: [
-    GestureDetector(
-      onTap: () {
-        // Handle forgot password action
-      },
-      child: const Text(
-        'Forgot Password?',
-        style: TextStyle(
-          fontSize: 14,
-          color: Color(0xFF57636C),
-        ),
-      ),
-    ),
-    SizedBox(
-      width: 130,
-      height: 50,
-      child: ElevatedButton(
-        onPressed: () {
-          // Handle sign-in action
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF23a8ff),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(40),
-          ),
-        ),
-        child: const Text(
-          'Sign In',
-          style: TextStyle(fontSize: 16, color: Colors.white),
-        ),
-      ),
-    ),
-  ],
-),
-  const SizedBox(height: 16),
+                  mainAxisAlignment:
+                      MainAxisAlignment.spaceBetween, // Adjust alignment
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        // Handle forgot password action
+                      },
+                      child: const Text(
+                        'Forgot Password?',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF57636C),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 130,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Handle sign-in action
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF23a8ff),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                        ),
+                        child: const Text(
+                          'Sign In',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
                 // Create Account Text
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -189,4 +185,3 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
     super.dispose();
   }
 }
-

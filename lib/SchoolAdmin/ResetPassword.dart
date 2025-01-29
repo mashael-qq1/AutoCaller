@@ -118,7 +118,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     ),
                     child: Text(
                       'Send Reset Link',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(
+                          color: const Color.fromARGB(255, 247, 245, 245),
+                          fontSize: 16),
                     ),
                   ),
                 ),
@@ -128,5 +130,5 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         ),
       ),
     );
-  }
+  } //t
 }
