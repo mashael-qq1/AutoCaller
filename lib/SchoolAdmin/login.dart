@@ -50,7 +50,7 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                 ),
                 const SizedBox(height: 8), // Add spacing between the texts
                 const Text(
-                  'Use ythe form below to access your account.',
+                  'Use the form below to access your account.',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
