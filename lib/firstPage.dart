@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 //import 'SchoolAdmin/login.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +72,7 @@ class WelcomeScreen extends StatelessWidget {
                 
             
               ),
-              child: Text(
+              child: const Text(
                 'Guardian',
                 style: TextStyle(fontSize: 18.0,color: Color.fromRGBO(255, 255, 255, 1)),
               ),

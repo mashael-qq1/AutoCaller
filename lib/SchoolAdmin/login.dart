@@ -1,9 +1,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
-import 'package:autocaller/ResetPassword.dart';
+import '/SchoolAdmin/ResetPassword.dart';
 import 'package:flutter/material.dart';
 
 class SchoolAdminLoginPage extends StatefulWidget {
+  const SchoolAdminLoginPage({super.key});
+
   @override
   _SchoolAdminLoginPageState createState() => _SchoolAdminLoginPageState();
 }
@@ -27,7 +28,18 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Center(
+        
+        child: Stack(
+        children: [
+          // Back Button at the Top Left
+          Positioned(
+            top: 40,  // Adjust as needed
+            left: 16,  // Adjust as needed
+            child: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.black, size: 30),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
@@ -116,7 +128,10 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        // Handle forgot password action
+                        Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) =>ResetPasswordPage()),
+      );// Handle forgot password action
                       },
                       child: const Text(
                         'Forgot Password?',
@@ -175,8 +190,9 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
             ),
           ),
         ),
+        ]
       ),
-    );
+    ));
   }
 
   @override

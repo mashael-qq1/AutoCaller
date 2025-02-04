@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 /// The main widget for the Reset Password Page
 class ResetPasswordPage extends StatefulWidget {
+  const ResetPasswordPage({super.key});
+
   @override
   _ResetPasswordPageState createState() => _ResetPasswordPageState();
 }
@@ -28,7 +30,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
         // Show a success message using SnackBar
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Password reset link sent to your email!')),
+          const SnackBar(content: Text('Password reset link sent to your email!')),
         );
       } catch (e) {
         // Handle errors and show an error message
@@ -52,7 +54,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           elevation: 0,
           backgroundColor: Colors.transparent,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -65,21 +67,21 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Edit Password',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   'Want to change your password? Enter the email associated with your account below and we will send you a new link.',
                   style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                 ),
-                SizedBox(height: 20),
-                Text(
+                const SizedBox(height: 20),
+                const Text(
                   'Email Address',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -92,7 +94,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       borderSide: BorderSide.none,
                     ),
                     contentPadding:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -104,22 +106,22 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     return null;
                   },
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Center(
                   child: ElevatedButton(
                     onPressed: _resetPassword,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       padding:
-                          EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                          const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Send Reset Link',
                       style: TextStyle(
-                          color: const Color.fromARGB(255, 247, 245, 245),
+                          color: Color.fromARGB(255, 247, 245, 245),
                           fontSize: 16),
                     ),
                   ),
