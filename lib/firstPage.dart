@@ -26,12 +26,14 @@ class WelcomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Logo
-            const SizedBox(height: 10.0),
+
              Image.asset(
-              'assets/LOGO3.png', // Replace with the path to your logo image
-              height: 100.0, // Adjust the size as needed
-            ),
-            const SizedBox(height: 20.0),
+  'assets/9-removebg-preview.png', // Replace with the path to your logo image
+  height: 200.0, // Increase the height for a larger image
+  width: 200.0,  // You can also set the width for more control
+),
+
+            
 
             // Welcome Text
             const Text(
@@ -76,8 +78,6 @@ class WelcomeScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30.0),
                   
                 ),
-                
-            
               ),
               child: const Text(
                 'Guardian',
