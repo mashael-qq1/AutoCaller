@@ -1,4 +1,7 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:autocaller/PrimaryGuardian/PGHomePage.dart';
+import 'package:autocaller/PrimaryGuardian/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -202,6 +205,25 @@ Navigator.push(
                             : const Text('Sign Up', style: TextStyle(fontSize: 16, color: Colors.white)),
                       ),
                     ),
+                     Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Already have an account? ", style: TextStyle(fontSize: 14, color: Colors.black)),
+                    GestureDetector(
+                      onTap: () {
+                        // Navigate back or to login screen
+                        Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) =>GuardianLoginPage()),
+      );
+                      },
+                      child: const Text(
+                        'Log In',
+                        style: TextStyle(fontSize: 14, color: Colors.blue, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
                   ],
                 ),
               ),
