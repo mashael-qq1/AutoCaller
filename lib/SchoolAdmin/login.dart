@@ -1,6 +1,8 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-import '/SchoolAdmin/ResetPassword.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '/SchoolAdmin/ResetPassword.dart';
+import '/SchoolAdmin/AdminHomePage.dart'; // Import your Admin Home Page
 
 class SchoolAdminLoginPage extends StatefulWidget {
   const SchoolAdminLoginPage({super.key});
@@ -10,9 +12,64 @@ class SchoolAdminLoginPage extends StatefulWidget {
 }
 
 class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
-  // Controllers for email and password
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  bool _isLoading = false;
+
+  void _loginAdmin() async {
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      _showError("Please enter both email and password.");
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Authenticate with Firebase Authentication
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Check if the authenticated user is in the Admin collection
+      DocumentSnapshot adminSnapshot =
+          await _firestore.collection('Admin').doc(userCredential.user!.uid).get();
+
+      if (adminSnapshot.exists) {
+        // Successful login -> Navigate to Admin Home Page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SchoolAdminHomePage()),
+        );
+      } else {
+        _showError("This account is not authorized as an admin.");
+        await _auth.signOut(); // Log out the user if not an admin
+      }
+    } catch (e) {
+      _showError("Login failed: ${e.toString()}");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,179 +77,102 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFFE3F2FD), // Light Blue
-              Color(0xFF90CAF9), // Medium Blue
-            ],
+            colors: [Color(0xFFE3F2FD), Color(0xFF90CAF9)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
-        
         child: Stack(
-        children: [
-          // Back Button at the Top Left
-          Positioned(
-            top: 40,  // Adjust as needed
-            left: 16,  // Adjust as needed
-            child: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.black, size: 30),
-              onPressed: () => Navigator.pop(context),
+          children: [
+            Positioned(
+              top: 40,
+              left: 16,
+              child: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.black, size: 30),
+                onPressed: () => Navigator.pop(context),
+              ),
             ),
-          ),Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Logo
-                Image.asset(
-                  'assets/logo.png', // Replace with your logo path
-                  height: 100,
-                ),
-                const SizedBox(height: 16),
-
-                const Text(
-                  'Welcome Back!',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black, // Custom blue color
-                  ),
-                ),
-                const SizedBox(height: 8), // Add spacing between the texts
-                const Text(
-                  'Use the form below to access your account.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: Color(0xFF57636C), // Custom blue color
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Email TextField
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    labelStyle: TextStyle(
-                      color: Color(0xFF57636C), // Label color
-                      fontSize: 14, // Label font size
-                    ),
-                    hintText: 'Enter your email here',
-                    hintStyle: TextStyle(
-                      color: Colors.grey, // Hint text color
-                      fontSize: 14, // Hint text font size
-                      fontStyle: FontStyle.italic, // Hint text style
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(40),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Password TextField
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    labelStyle: TextStyle(
-                      color: Color(0xFF57636C), // Label color
-                      fontSize: 14, // Label font size
-                    ),
-                    hintText: 'Enter your password here',
-                    hintStyle: TextStyle(
-                      color: Colors.grey, // Hint text color
-                      fontSize: 14, // Hint text font size
-                      fontStyle: FontStyle.italic, // Hint text style
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(40),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween, // Adjust alignment
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) =>ResetPasswordPage()),
-      );// Handle forgot password action
-                      },
-                      child: const Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF57636C),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 130,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Handle sign-in action
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF23a8ff),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(40),
-                          ),
-                        ),
-                        child: const Text(
-                          'Sign In',
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                // Create Account Text
-                Row(
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Image.asset('assets/logo.png', height: 100),
+                    const SizedBox(height: 16),
                     const Text(
-                      "Don't have an account? ",
-                      style: TextStyle(fontSize: 14, color: Colors.black),
+                      'Welcome Back!',
+                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500, color: Colors.black),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        // Handle create account action
-                      },
-                      child: const Text(
-                        'Create Account',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Use the form below to access your account.',
+                      style: TextStyle(fontSize: 14, color: Color(0xFF57636C)),
+                    ),
+                    const SizedBox(height: 24),
+
+                    TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: "Email",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(40),
+                          borderSide: BorderSide.none,
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
+
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: "Password",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(40),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPasswordPage()));
+                          },
+                          child: const Text('Forgot Password?', style: TextStyle(fontSize: 14, color: Color(0xFF57636C))),
+                        ),
+                        SizedBox(
+                          width: 130,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _loginAdmin,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF23a8ff),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+                            ),
+                            child: _isLoading
+                                ? CircularProgressIndicator(color: Colors.white)
+                                : const Text('Sign In', style: TextStyle(fontSize: 16, color: Colors.white)),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
-        ]
       ),
-    ));
+    );
   }
 
   @override
