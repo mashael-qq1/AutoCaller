@@ -100,7 +100,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset('assets/logo.png', height: 100),
+                    Image.asset('assets/9-removebg-preview.png', height: 100),
                     const SizedBox(height: 16),
                     const Text(
                       'Welcome Back!',
