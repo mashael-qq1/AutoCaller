@@ -1,156 +1,167 @@
-import 'package:flutter/material.dart';
+ // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-class SchoolProfilePage extends StatelessWidget {
-  // Mock data for the school profile
-  final Map<String, String> schoolData = {
-    'name': 'ABC School',
-    'phoneNum': '123-456-7890',
-    'email': 'contact@abcschool.com',
-    'address': '123 Main St, Springfield, IL',
-  };
+ import 'package:autocaller/SchoolAdmin/ResetPassword.dart';
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class SchoolProfilePage extends StatefulWidget {
+  @override
+  _SchoolProfilePageState createState() => _SchoolProfilePageState();
+}
+
+class _SchoolProfilePageState extends State<SchoolProfilePage> {
+  Map<String, dynamic>? schoolData;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchSchoolData();
+  }
+
+  Future<void> fetchSchoolData() async {
+    try {
+      DocumentSnapshot schoolDoc = await FirebaseFirestore.instance
+          .collection('School')
+          .doc('DbGEJUxyCLC4XnluGheQ') // Replace with actual document ID
+          .get();
+
+      if (schoolDoc.exists) {
+        setState(() {
+          schoolData = schoolDoc.data() as Map<String, dynamic>;
+        });
+      }
+    } catch (e) {
+      print('Error fetching school data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     appBar: AppBar(
-  title: Text('School Profile'),
-  backgroundColor: Colors.transparent,
-  elevation: 0,
-  //centerTitle: true, // This centers the title
-),
-
-      body: Container(
-        color: Colors.transparent, // Set background color to white
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-
-              // School Logo (replace with your actual logo)
-              Image.asset(
-                'assets/logo.png', // Replace with your logo path
-                height: 100,
-              ),
-              const SizedBox(height: 20),
-
-              // Profile Information in a single container
-              Container(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('School Profile'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: schoolData == null
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.white, // Set background color to white
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // School Name
-                    Text(
-                      "School Name: ",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                    const SizedBox(height: 20),
+                    
+                    // School Logo
+                    Center(
+                      child: schoolData!['logo'] != null
+                          ? Image.network(
+                              schoolData!['logo'],
+                              height: 100,
+                              width: 100,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Icon(Icons.school, size: 100, color: Colors.grey),
+                            )
+                          : Icon(Icons.school, size: 100, color: Colors.grey),
                     ),
-                    Text(
-                      schoolData['name'] ?? 'Not Available',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF57636C),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
-                    // School Phone Number
-                    Text(
-                      "Phone: ",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      schoolData['phoneNum'] ?? 'Not Available',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF57636C),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // School Email
-                    Text(
-                      "Email: ",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      schoolData['email'] ?? 'Not Available',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF57636C),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // School Address
-                    Text(
-                      "Address: ",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      schoolData['address'] ?? 'Not Available',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF57636C),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Logout Button (inside the container)
-                    SizedBox(
-                      width: 200,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Handle logout action here
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF23a8ff),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(40),
+                    // School Information
+                    buildInfoRow("School Name:", schoolData!['name'] ?? 'Not Available',),
+                    buildInfoRow("Phone:", schoolData!['phoneNum'] ?? 'Not Available', color: Color(0xFF23A8FF)),
+                    buildInfoRow("Email:", schoolData!['email'] ?? 'Not Available'),
+                    buildInfoRow("Address:", schoolData!['address'] ?? 'Not Available'),
+                    const SizedBox(height: 20),
+                    
+                    // Divider
+                    Divider(thickness: 1, color: Colors.grey.shade400),
+                    const SizedBox(height: 10),
+                         
+                    // Reset Password Box
+                     Center(
+                      
+                      child: SizedBox(
+                        width: 400,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () {
+                             Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPasswordPage()));// Handle reset password action here
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            elevation: 2,
+                            shadowColor: const Color.fromARGB(255, 200, 199, 199),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
+                          child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "Reset Password",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: Colors.black,
+            ),
+          ),
+          Icon(Icons.arrow_forward_ios, color: Colors.black, size: 20),
+        ],
+      ),
                         ),
-                        child: const Text(
-                          'Logout',
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Logout Button
+                    Center(
+                      child: SizedBox(
+                        width: 200,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Handle logout action here
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF23a8ff),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                          ),
+                          child: const Text(
+                            'Logout',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-            ],
+            ),
+    );
+  }
+
+  /// Helper function to build a labeled info row
+  Widget buildInfoRow(String title, String value, {Color color = Colors.black}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Color(0xFF57636C)),
           ),
-        ),
+          Text(
+            value,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: color),
+          ),
+        ],
       ),
     );
   }

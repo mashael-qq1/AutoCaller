@@ -1,3 +1,4 @@
+import 'package:autocaller/SchoolAdmin/StudentListAdmin.dart';
 import 'package:flutter/material.dart';
 import 'SchoolProfile.dart';
 
@@ -102,7 +103,14 @@ class SchoolAdminHomePage extends StatelessWidget {
                                         'Associated Students',
                                         Icons.people,
                                         Colors.blue.shade600,
-                                        () {},
+                                        () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => StudentsPage(),
+                                            ),
+                                          );
+                                        },
                                       ),
                                       const SizedBox(width: 20),
                                       _createNavCard(
