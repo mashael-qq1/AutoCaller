@@ -1,6 +1,7 @@
 
 // ignore_for_file: prefer_const_constructors
 
+import 'package:autocaller/PrimaryGuardian/login.dart';
 import 'package:autocaller/PrimaryGuardian/signup.dart';
 import 'package:autocaller/SchoolAdmin/login.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +69,7 @@ class WelcomeScreen extends StatelessWidget {
                 // Action for Guardian button
                  Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) =>PrimaryGuardianSignUpPage()),
+        MaterialPageRoute(builder: (context) =>GuardianLoginPage()),
       );
               },
               style: ElevatedButton.styleFrom(

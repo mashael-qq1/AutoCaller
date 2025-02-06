@@ -1,3 +1,4 @@
+import 'package:autocaller/PrimaryGuardian/signup.dart';
 import 'package:autocaller/SchoolAdmin/StudentListAdmin.dart';
 import 'package:flutter/material.dart';
 import 'SchoolProfile.dart';
@@ -112,6 +113,7 @@ class SchoolAdminHomePage extends StatelessWidget {
                                           );
                                         },
                                       ),
+                                      
                                       const SizedBox(width: 20),
                                       _createNavCard(
                                         context,
@@ -120,13 +122,29 @@ class SchoolAdminHomePage extends StatelessWidget {
                                         Colors.blue.shade700,
                                         () {},
                                       ),
+                                      const SizedBox(width: 20),
+                          _createNavCard(
+                                        context,
+                                        'Add Guardian',
+                                        Icons.people,
+                                        Colors.blue.shade600,
+                                        () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>PrimaryGuardianSignUpPage (),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      const SizedBox(width: 20),
                                     ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(height: 40),
+                          
                         ],
                       ),
                     ),

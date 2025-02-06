@@ -118,7 +118,7 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset('assets/logo.png', height: 100),
+                    Image.asset('assets/9-removebg-preview.png', height: 100),
                     const SizedBox(height: 16),
                     const Text(
                       'Add Guardian', // Changed from "Create Account"
