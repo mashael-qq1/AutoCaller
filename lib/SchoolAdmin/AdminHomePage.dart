@@ -2,6 +2,7 @@ import 'package:autocaller/PrimaryGuardian/signup.dart';
 import 'package:autocaller/SchoolAdmin/StudentListAdmin.dart';
 import 'package:flutter/material.dart';
 import 'SchoolProfile.dart';
+import 'package:autocaller/SchoolAdmin/DismissalStatus.dart';
 
 class SchoolAdminHomePage extends StatelessWidget {
   @override
@@ -115,13 +116,18 @@ class SchoolAdminHomePage extends StatelessWidget {
                                       ),
                                       
                                       const SizedBox(width: 20),
-                                      _createNavCard(
-                                        context,
-                                        'Dismissal Status',
-                                        Icons.access_time,
-                                        Colors.blue.shade700,
-                                        () {},
-                                      ),
+                                     _createNavCard(
+  context,
+  'Dismissal Status',
+  Icons.access_time,
+  Colors.blue.shade700,
+  () { 
+    Navigator.push(
+      context,
+     MaterialPageRoute(builder: (context) => DismissalStatus()),
+    );
+  },
+),
                                       const SizedBox(width: 20),
                           _createNavCard(
                                         context,
