@@ -34,7 +34,7 @@ class _DismissalStatusState extends State<DismissalStatus> {
 
       if (adminQuery.docs.isNotEmpty) {
         var schoolReference = adminQuery.docs.first['AschoolID'];
-        
+
         if (schoolReference is DocumentReference) {
           setState(() {
             schoolRef = schoolReference;
@@ -92,7 +92,7 @@ class _DismissalStatusState extends State<DismissalStatus> {
 
             // Extract student details
             String name = studentData['Sname'] ?? "Unknown";
-            String status = studentData.containsKey('dismissalStatus') ? studentData['dismissalStatus'] : "Unknown";
+            String status = studentData['dismissalStatus'] ?? "Unknown";
 
             // Handle Firestore Timestamp
             String formattedTime = _formatTimestamp(studentData['lastDismissalTime']);
@@ -127,13 +127,17 @@ class _DismissalStatusState extends State<DismissalStatus> {
     );
   }
 
-  /// Formats Firestore Timestamp into a readable string
+  /// **Corrected Timestamp Handling**
   String _formatTimestamp(dynamic timestamp) {
-    if (timestamp is Timestamp) {
-      DateTime dateTime = timestamp.toDate();
-      return "${dateTime.day} ${_getMonthName(dateTime.month)} ${dateTime.year}, ${dateTime.hour}:${dateTime.minute}:${dateTime.second}";
+    if (timestamp != null) {
+      if (timestamp is Timestamp) {
+        DateTime dateTime = timestamp.toDate();
+        return "${dateTime.day} ${_getMonthName(dateTime.month)} ${dateTime.year}, ${dateTime.hour}:${dateTime.minute}:${dateTime.second}";
+      } else {
+        debugPrint("❌ Unexpected type for timestamp: ${timestamp.runtimeType}");
+      }
     }
-    return "------"; // Default if timestamp is missing
+    return "------"; // Default if timestamp is null or missing
   }
 
   /// Converts month number to month name
@@ -146,7 +150,7 @@ class _DismissalStatusState extends State<DismissalStatus> {
   }
 }
 
-/// Student Card UI Component
+/// **Student Card UI Component**
 class StudentCard extends StatelessWidget {
   final String name;
   final String status;
