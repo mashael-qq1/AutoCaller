@@ -1,8 +1,7 @@
- // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
- import 'package:autocaller/SchoolAdmin/ResetPassword.dart';
+import 'package:autocaller/SchoolAdmin/ResetPassword.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SchoolProfilePage extends StatefulWidget {
   @override
@@ -11,24 +10,47 @@ class SchoolProfilePage extends StatefulWidget {
 
 class _SchoolProfilePageState extends State<SchoolProfilePage> {
   Map<String, dynamic>? schoolData;
+  String? adminID;
 
   @override
   void initState() {
     super.initState();
-    fetchSchoolData();
+    fetchAdminID();
   }
 
-  Future<void> fetchSchoolData() async {
+  // Fetch the adminID of the current authenticated user
+  Future<void> fetchAdminID() async {
     try {
+      // Get current user from Firebase Authentication
+      User? user = FirebaseAuth.instance.currentUser;
+      
+      if (user != null) {
+        // Use the admin's UID as the document ID in Firestore
+        adminID = user.uid;
+        fetchSchoolData(adminID!);  // Fetch school data based on the adminID
+      } else {
+        print('No user is signed in.');
+      }
+    } catch (e) {
+      print('Error fetching admin ID: $e');
+    }
+  }
+
+  // Fetch the school data based on the adminID
+  Future<void> fetchSchoolData(String adminID) async {
+    try {
+      // Query the 'School' collection using the adminID as the document ID
       DocumentSnapshot schoolDoc = await FirebaseFirestore.instance
           .collection('School')
-          .doc('DbGEJUxyCLC4XnluGheQ') // Replace with actual document ID
+          .doc(adminID)  // Use the adminID as the document ID
           .get();
 
       if (schoolDoc.exists) {
         setState(() {
           schoolData = schoolDoc.data() as Map<String, dynamic>;
         });
+      } else {
+        print('School data not found for adminID: $adminID');
       }
     } catch (e) {
       print('Error fetching school data: $e');
@@ -80,9 +102,9 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
                     Divider(thickness: 1, color: Colors.grey.shade400),
                     const SizedBox(height: 10),
                          
+
                     // Reset Password Box
-                     Center(
-                      
+                    Center(
                       child: SizedBox(
                         width: 400,
                         height: 50,
@@ -99,19 +121,19 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
                             ),
                           ),
                           child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "Reset Password",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: Colors.black,
-            ),
-          ),
-          Icon(Icons.arrow_forward_ios, color: Colors.black, size: 20),
-        ],
-      ),
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Reset Password",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Icon(Icons.arrow_forward_ios, color: Colors.black, size: 20),
+                            ],
+                          ),
                         ),
                       ),
                     ),
