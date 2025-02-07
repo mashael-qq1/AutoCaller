@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dismissalstatusPG.dart'; // Import your dismissal status page
 
 class GuardianHomePage extends StatelessWidget {
   const GuardianHomePage({super.key});
@@ -22,9 +23,13 @@ class GuardianHomePage extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Add navigation to other features
+                // Navigate to DismissalStatusPG
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DismissalStatusPG()),
+                );
               },
-              child: const Text('Explore Features'),
+              child: const Text('View Dismissal Status'),
             ),
           ],
         ),
