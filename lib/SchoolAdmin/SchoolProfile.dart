@@ -10,50 +10,71 @@ class SchoolProfilePage extends StatefulWidget {
 
 class _SchoolProfilePageState extends State<SchoolProfilePage> {
   Map<String, dynamic>? schoolData;
+  DocumentReference? schoolRef; // 🔹 Store reference properly
   String? adminID;
 
   @override
   void initState() {
     super.initState();
-    fetchAdminID();
+    fetchAdminData();
   }
 
-  // Fetch the adminID of the current authenticated user
-  Future<void> fetchAdminID() async {
+  /// Step 1: Fetch Admin's Document to get the School Reference (AschoolID)
+  Future<void> fetchAdminData() async {
     try {
-      // Get current user from Firebase Authentication
       User? user = FirebaseAuth.instance.currentUser;
-      
-      if (user != null) {
-        // Use the admin's UID as the document ID in Firestore
-        adminID = user.uid;
-        fetchSchoolData(adminID!);  // Fetch school data based on the adminID
+      if (user == null) {
+        debugPrint('❌ No user is signed in.');
+        return;
+      }
+
+      adminID = user.uid;
+      debugPrint("✅ Admin ID: $adminID");
+
+      // Query Firestore to get the "AschoolID" field from Admin document
+      DocumentSnapshot adminDoc = await FirebaseFirestore.instance
+          .collection('Admin') // ✅ Ensure this is the correct collection
+          .doc(adminID) // ✅ Fetch the document where adminID is the document ID
+          .get();
+
+      if (adminDoc.exists) {
+        var data = adminDoc.data() as Map<String, dynamic>?;
+
+        if (data != null && data.containsKey('AschoolID')) {
+          schoolRef = data['AschoolID']; // 🔹 This is a Firestore DocumentReference
+          debugPrint("✅ Found AschoolID reference: ${schoolRef?.path}");
+
+          if (schoolRef != null) {
+            fetchSchoolData(schoolRef!);
+          } else {
+            debugPrint("❌ AschoolID reference is null.");
+          }
+        } else {
+          debugPrint("❌ AschoolID field does not exist in Admin document.");
+        }
       } else {
-        print('No user is signed in.');
+        debugPrint("❌ No Admin document found for ID: $adminID");
       }
     } catch (e) {
-      print('Error fetching admin ID: $e');
+      debugPrint("❌ Error fetching admin data: $e");
     }
   }
 
-  // Fetch the school data based on the adminID
-  Future<void> fetchSchoolData(String adminID) async {
+  /// Step 2: Fetch School Data using AschoolID Reference
+  Future<void> fetchSchoolData(DocumentReference schoolRef) async {
     try {
-      // Query the 'School' collection using the adminID as the document ID
-      DocumentSnapshot schoolDoc = await FirebaseFirestore.instance
-          .collection('School')
-          .doc(adminID)  // Use the adminID as the document ID
-          .get();
+      DocumentSnapshot schoolDoc = await schoolRef.get(); // ✅ Fetch document using reference
 
       if (schoolDoc.exists) {
         setState(() {
           schoolData = schoolDoc.data() as Map<String, dynamic>;
         });
+        debugPrint("✅ School data retrieved successfully.");
       } else {
-        print('School data not found for adminID: $adminID');
+        debugPrint("❌ No school data found for reference: ${schoolRef.path}");
       }
     } catch (e) {
-      print('Error fetching school data: $e');
+      debugPrint("❌ Error fetching school data: $e");
     }
   }
 
@@ -75,7 +96,7 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
-                    
+
                     // School Logo
                     Center(
                       child: schoolData!['logo'] != null
@@ -92,16 +113,15 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
                     const SizedBox(height: 20),
 
                     // School Information
-                    buildInfoRow("School Name:", schoolData!['name'] ?? 'Not Available',),
+                    buildInfoRow("School Name:", schoolData!['name'] ?? 'Not Available'),
                     buildInfoRow("Phone:", schoolData!['phoneNum'] ?? 'Not Available', color: Color(0xFF23A8FF)),
                     buildInfoRow("Email:", schoolData!['email'] ?? 'Not Available'),
                     buildInfoRow("Address:", schoolData!['address'] ?? 'Not Available'),
                     const SizedBox(height: 20),
-                    
+
                     // Divider
                     Divider(thickness: 1, color: Colors.grey.shade400),
                     const SizedBox(height: 10),
-                         
 
                     // Reset Password Box
                     Center(
@@ -110,7 +130,7 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
                         height: 50,
                         child: ElevatedButton(
                           onPressed: () {
-                             Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPasswordPage()));// Handle reset password action here
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPasswordPage()));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -146,7 +166,8 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
                         height: 50,
                         child: ElevatedButton(
                           onPressed: () {
-                            // Handle logout action here
+                            FirebaseAuth.instance.signOut();
+                            Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF23a8ff),
