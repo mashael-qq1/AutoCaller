@@ -1,20 +1,18 @@
+import 'package:autocaller/PrimaryGuardian/signup.dart';
 import 'package:flutter/material.dart';
 import 'AdminHomePage.dart';
 import 'DismissalStatus.dart';
-import 'SchoolProfile.dart';
 import 'StudentListAdmin.dart';
+import 'SchoolProfile.dart';
+import 'package:autocaller/PrimaryGuardian/signup.dart';
 
-class NavBarAdmin extends StatefulWidget {
+class NavBarAdmin extends StatelessWidget {
   final int currentIndex;
+
   const NavBarAdmin({Key? key, required this.currentIndex}) : super(key: key);
 
-  @override
-  _NavBarAdminState createState() => _NavBarAdminState();
-}
-
-class _NavBarAdminState extends State<NavBarAdmin> {
-  void _onItemTapped(int index) {
-    if (index == widget.currentIndex) return; // Avoid reloading the same page
+  void _onItemTapped(BuildContext context, int index) {
+    if (index == currentIndex) return; // Avoid unnecessary navigation
 
     switch (index) {
       case 0:
@@ -22,14 +20,20 @@ class _NavBarAdminState extends State<NavBarAdmin> {
             MaterialPageRoute(builder: (context) => DismissalStatus()));
         break;
       case 1:
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PrimaryGuardianSignUpPage()));
+        break;
+      case 2:
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => SchoolAdminHomePage()));
         break;
-      case 2:
+      case 3:
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => StudentsPage()));
         break;
-      case 3:
+      case 4:
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => SchoolProfilePage()));
         break;
@@ -38,31 +42,41 @@ class _NavBarAdminState extends State<NavBarAdmin> {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      currentIndex: widget.currentIndex,
-      onTap: _onItemTapped,
-      selectedItemColor: Colors.black,
-      unselectedItemColor: Colors.grey,
-      backgroundColor: Colors.white,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.access_time),
-          label: 'Dismissal',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.people),
-          label: 'Students',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ],
+    return BottomAppBar(
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(Icons.access_time, "Dismissal", 0, context),
+          _buildNavItem(Icons.person_add, "Add Guardian", 1, context),
+          _buildNavItem(Icons.home, "Home", 2, context),
+          _buildNavItem(Icons.group, "Students", 3, context),
+          _buildNavItem(Icons.account_circle, "Profile", 4, context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(
+      IconData icon, String label, int index, BuildContext context) {
+    return GestureDetector(
+      onTap: () => _onItemTapped(context, index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: currentIndex == index ? Colors.blue : Colors.grey,
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              color: currentIndex == index ? Colors.blue : Colors.grey,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
