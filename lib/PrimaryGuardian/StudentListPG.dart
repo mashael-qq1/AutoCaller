@@ -1,29 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'NavBarAdmin.dart'; // Import the NavBarAdmin
 
-class StudentsPage extends StatelessWidget {
+class StudentListPG extends StatelessWidget {
+  final String loggedInGuardianId;
+
+  StudentListPG({required this.loggedInGuardianId});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Students'),
+        title: Text('Students (Primary Guardian)'),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      bottomNavigationBar:
-          NavBarAdmin(currentIndex: 2), // Set index 2 for Students
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('Student').snapshots(),
+          stream: FirebaseFirestore.instance
+              .collection('Student')
+              .where('primaryGuardianID', isEqualTo: loggedInGuardianId)
+              .snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             }
 
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Center(child: Text('No students found.'));
+              return Center(child: Text('No students found for this guardian.'));
             }
 
             final students = snapshot.data!.docs;
