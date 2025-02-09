@@ -19,11 +19,13 @@ class SchoolAdminHomePage extends StatelessWidget {
         child: Column(
           children: [
             AppBar(
-              title: const Text('School Admin Dashboard'),
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              centerTitle: true,
-            ),
+  title: const Text('School Admin Dashboard'),
+  backgroundColor: Colors.transparent,
+  elevation: 0,
+  centerTitle: true,
+  automaticallyImplyLeading: false, // Removes the back button
+),
+
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
