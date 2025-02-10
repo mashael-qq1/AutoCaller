@@ -18,10 +18,15 @@ class WelcomeScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, Colors.lightBlueAccent],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+    colors: [
+      Color(0xFFFFFFFF), // Pure white at the top
+      Color.fromARGB(255, 255, 255, 255), // Light blue transition
+      Color.fromARGB(255, 96, 178, 245), // Deeper blue at the bottom
+    ],
+    stops: [0.0, 0.3, 1.0], // Adjust stops to give white more space
+    begin: Alignment.topRight,
+    end: Alignment.bottomLeft,
+  ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -41,6 +46,7 @@ class WelcomeScreen extends StatelessWidget {
                 fontSize: 24.0,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF004AAD),
+                
               ),
               textAlign: TextAlign.center,
             ),
@@ -60,7 +66,7 @@ class WelcomeScreen extends StatelessWidget {
               'Sign in as',
               style: TextStyle(
                 fontSize: 40.0,
-                color: Color(0xFF004AAD),
+                color: Color.fromARGB(255, 0, 0, 0),
                 fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.center,
