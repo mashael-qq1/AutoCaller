@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:autocaller/SchoolAdmin/NavBarAdmin.dart';
 
 class PrimaryGuardianSignUpPage extends StatefulWidget {
   const PrimaryGuardianSignUpPage({super.key});
@@ -325,6 +326,7 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
           ),
         ],
       ),
+      bottomNavigationBar: NavBarAdmin(currentIndex: 1), // Add Navigation Bar
     );
   }
 }
