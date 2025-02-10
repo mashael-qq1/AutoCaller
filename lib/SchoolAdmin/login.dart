@@ -56,7 +56,8 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
         await _auth.signOut(); // Log out the user if not an admin
       }
     } catch (e) {
-      _showError("Login failed: ${e.toString()}");
+      _showError("Login failed, the supplied credentials is incorrect. ");
+      
     } finally {
       setState(() {
         _isLoading = false;
