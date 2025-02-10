@@ -2,18 +2,17 @@ import 'package:autocaller/SchoolAdmin/ResetPassword.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:autocaller/firstPage.dart'; // Import your WelcomeScreen
+import 'package:autocaller/firstPage.dart';
+import 'NavBarPG.dart';
+import 'EditProfilePG.dart';
 
 class PrimaryGuardianProfilePage extends StatefulWidget {
-  const PrimaryGuardianProfilePage({super.key});
-
   @override
   _PrimaryGuardianProfilePageState createState() =>
       _PrimaryGuardianProfilePageState();
 }
 
-class _PrimaryGuardianProfilePageState
-    extends State<PrimaryGuardianProfilePage> {
+class _PrimaryGuardianProfilePageState extends State<PrimaryGuardianProfilePage> {
   Map<String, dynamic>? guardianData;
   String? guardianID;
 
@@ -72,8 +71,7 @@ class _PrimaryGuardianProfilePageState
                 await FirebaseAuth.instance.signOut();
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const WelcomeScreen()),
+                  MaterialPageRoute(builder: (context) => WelcomeScreen()),
                   (Route<dynamic> route) => false,
                 );
               },
@@ -101,7 +99,7 @@ class _PrimaryGuardianProfilePageState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-                  const Center(
+                  Center(
                     child: Icon(
                       Icons.account_circle,
                       size: 100,
@@ -111,15 +109,13 @@ class _PrimaryGuardianProfilePageState
                   const SizedBox(height: 20),
                   buildInfoRow("Guardian Name:",
                       guardianData!['fullName'] ?? 'Not Available'),
-                  buildInfoRow(
-                      "Email:", guardianData!['email'] ?? 'Not Available'),
+                  buildInfoRow("Email:",
+                      guardianData!['email'] ?? 'Not Available'),
                   buildInfoRow("Phone Number:",
                       guardianData!['phone'] ?? 'Not Available'),
-
                   const SizedBox(height: 20),
                   Divider(thickness: 1, color: Colors.grey.shade400),
                   const SizedBox(height: 10),
-
                   Center(
                     child: SizedBox(
                       width: 400,
@@ -129,22 +125,22 @@ class _PrimaryGuardianProfilePageState
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    const ResetPasswordPage()),
+                                builder: (context) => ResetPasswordPage()),
                           );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           elevation: 2,
-                          shadowColor: const Color.fromARGB(255, 200, 199, 199),
+                          shadowColor:
+                              const Color.fromARGB(255, 200, 199, 199),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            const Text(
                               "Reset Password",
                               style: TextStyle(
                                 fontSize: 16,
@@ -160,14 +156,21 @@ class _PrimaryGuardianProfilePageState
                     ),
                   ),
                   const SizedBox(height: 10),
+                  buildProfileButton("Edit Profile", () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditProfilePage(
+                            userId: guardianID!, guardianData: guardianData!),
+                      ),
+                    );
 
-                  buildProfileButton("Edit Profile", () {
-                    // TODO: Implement edit profile functionality
+                    if (result == true) {
+                      _fetchGuardianData(); // Refresh the profile data
+                    }
                   }),
                   const SizedBox(height: 30),
-                  //Divider(thickness: 1, color: Colors.grey.shade400),
                   const SizedBox(height: 10),
-
                   Center(
                     child: SizedBox(
                       width: 200,
@@ -195,11 +198,12 @@ class _PrimaryGuardianProfilePageState
                 ],
               ),
             ),
+      bottomNavigationBar:
+          guardianID != null ? NavBarPG(loggedInGuardianId: guardianID!) : null,
     );
   }
 
-  Widget buildInfoRow(String title, String value,
-      {Color color = Colors.black}) {
+  Widget buildInfoRow(String title, String value, {Color color = Colors.black}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Column(
@@ -207,7 +211,7 @@ class _PrimaryGuardianProfilePageState
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
                 color: Color(0xFF57636C)),
@@ -242,14 +246,13 @@ class _PrimaryGuardianProfilePageState
             children: [
               Text(
                 text,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   color: Colors.black,
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios,
-                  color: Colors.black, size: 20),
+              Icon(Icons.arrow_forward_ios, color: Colors.black, size: 20),
             ],
           ),
         ),
