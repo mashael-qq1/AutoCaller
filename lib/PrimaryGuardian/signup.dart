@@ -23,6 +23,8 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   /// Validation Functions
   bool _isValidName(String name) {
@@ -141,14 +143,21 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
     );
   }
 
-  /// Reusable TextField widget
-  Widget _buildTextField(TextEditingController controller, String label,
-      {bool isPassword = false,
-      TextInputType keyboardType = TextInputType.text}) {
+  /// Reusable TextField widget with eye icon for password fields
+  Widget _buildTextField(
+    TextEditingController controller,
+    String label, {
+    bool isPassword = false,
+    bool isConfirmPassword = false,
+    TextInputType keyboardType = TextInputType.text, // Add this parameter
+  }) {
     return TextField(
       controller: controller,
-      obscureText: isPassword,
-      keyboardType: keyboardType,
+      obscureText: isPassword
+          ? (isConfirmPassword
+              ? !_isConfirmPasswordVisible
+              : !_isPasswordVisible)
+          : false,
       decoration: InputDecoration(
         labelText: label,
         filled: true,
@@ -157,6 +166,28 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
           borderRadius: BorderRadius.circular(40),
           borderSide: BorderSide.none,
         ),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  isConfirmPassword
+                      ? (_isConfirmPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off)
+                      : (_isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                ),
+                onPressed: () {
+                  setState(() {
+                    if (isConfirmPassword) {
+                      _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                    } else {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    }
+                  });
+                },
+              )
+            : null,
       ),
     );
   }
@@ -216,7 +247,7 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
                     SizedBox(height: 16),
                     _buildTextField(
                         _confirmPasswordController, "Confirm Password",
-                        isPassword: true),
+                        isPassword: true, isConfirmPassword: true),
                     SizedBox(height: 24),
                     SizedBox(
                       width: 150,
