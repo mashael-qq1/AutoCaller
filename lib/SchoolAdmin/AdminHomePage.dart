@@ -59,7 +59,7 @@ class SchoolAdminHomePage extends StatelessWidget {
                             child: Column(
                               children: [
                                 const Text(
-                                  'Welcome to SchoolFlow, the place where you can manage everything with ease!',
+                                  'Welcome to AutoCaller, the place where you can manage everything with ease!',
                                   style: TextStyle(
                                     fontSize: 26,
                                     fontWeight: FontWeight.bold,
