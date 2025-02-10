@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'NavBarAdmin.dart'; // Import NavBar
 
 class DismissalStatus extends StatefulWidget {
   const DismissalStatus({super.key});
@@ -41,7 +42,8 @@ class _DismissalStatusState extends State<DismissalStatus> {
           });
           debugPrint("✅ Retrieved schoolID: ${schoolRef!.path}");
         } else {
-          debugPrint("❌ Unexpected schoolID type: ${schoolReference.runtimeType}");
+          debugPrint(
+              "❌ Unexpected schoolID type: ${schoolReference.runtimeType}");
         }
       } else {
         debugPrint("❌ No admin found with this email.");
@@ -54,13 +56,23 @@ class _DismissalStatusState extends State<DismissalStatus> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Match School Profile Page
       appBar: AppBar(
         title: const Text("Dismissal Status"),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.transparent, // Match School Profile
+        elevation: 0,
       ),
-      body: schoolRef == null
-          ? const Center(child: CircularProgressIndicator()) // Show loading spinner
-          : _buildDismissalStatusList(),
+      body: Column(
+        children: [
+          Expanded(
+            child: schoolRef == null
+                ? const Center(
+                    child: CircularProgressIndicator()) // Show loading spinner
+                : _buildDismissalStatusList(),
+          ),
+          const NavBarAdmin(currentIndex: 0), // Add NavBar at the bottom
+        ],
+      ),
     );
   }
 
@@ -71,7 +83,8 @@ class _DismissalStatusState extends State<DismissalStatus> {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('Student')
-          .where('schoolID', isEqualTo: schoolRef) // Use DocumentReference comparison
+          .where('schoolID',
+              isEqualTo: schoolRef) // Use DocumentReference comparison
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -95,9 +108,11 @@ class _DismissalStatusState extends State<DismissalStatus> {
             String status = studentData['dismissalStatus'] ?? "Unknown";
 
             // Handle Firestore Timestamp
-            String formattedTime = _formatTimestamp(studentData['lastDismissalTime']);
+            String formattedTime =
+                _formatTimestamp(studentData['lastDismissalTime']);
 
-            debugPrint("📌 Student: $name, Status: $status, Dismissal Time: $formattedTime");
+            debugPrint(
+                "📌 Student: $name, Status: $status, Dismissal Time: $formattedTime");
 
             return StudentCard(
               name: name,
@@ -120,7 +135,8 @@ class _DismissalStatusState extends State<DismissalStatus> {
           SizedBox(height: 10),
           Text(
             "No students found",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
           ),
         ],
       ),
@@ -143,8 +159,18 @@ class _DismissalStatusState extends State<DismissalStatus> {
   /// Converts month number to month name
   String _getMonthName(int month) {
     const List<String> months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
     ];
     return months[month - 1];
   }
@@ -156,7 +182,11 @@ class StudentCard extends StatelessWidget {
   final String status;
   final String dismissalTime;
 
-  const StudentCard({super.key, required this.name, required this.status, required this.dismissalTime});
+  const StudentCard(
+      {super.key,
+      required this.name,
+      required this.status,
+      required this.dismissalTime});
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +205,8 @@ class StudentCard extends StatelessWidget {
           children: [
             Text(
               dismissalTime,
-              style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.blue, fontWeight: FontWeight.bold),
             ),
           ],
         ),

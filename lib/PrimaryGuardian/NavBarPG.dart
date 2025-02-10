@@ -9,22 +9,22 @@ import '../PrimaryGuardian/StudentListPG.dart';
 class NavBarPG extends StatelessWidget {
   final String loggedInGuardianId;
 
-  NavBarPG({required this.loggedInGuardianId});
+  const NavBarPG({super.key, required this.loggedInGuardianId});
 
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
       color: Colors.white,
-      shape: CircularNotchedRectangle(),
+      shape: const CircularNotchedRectangle(),
       notchMargin: 6.0,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(
-              context, Icons.access_time, 'Dismissal', DismissalStatusPG()),
+          _buildNavItem(context, Icons.access_time, 'Dismissal',
+              const DismissalStatusPG()),
           _buildNavItem(context, Icons.person_add, 'Add Secondary Guardian',
               null), // Unfunctional for now
-          _buildNavItem(context, Icons.home, 'Home', GuardianHomePage()),
+          _buildNavItem(context, Icons.home, 'Home', const GuardianHomePage()),
           _buildNavItem(context, Icons.groups, 'Students',
               StudentListPG(loggedInGuardianId: loggedInGuardianId)),
           _buildNavItem(
@@ -47,7 +47,7 @@ class NavBarPG extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: Colors.grey.shade700),
-          Text(label, style: TextStyle(color: Colors.black54)),
+          Text(label, style: const TextStyle(color: Colors.black54)),
         ],
       ),
     );

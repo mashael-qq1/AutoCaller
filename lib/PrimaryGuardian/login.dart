@@ -18,7 +18,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   bool _isLoading = false;
-
+  bool _isPasswordVisible = false;
   void _loginGuardian() async {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
@@ -49,7 +49,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
         // Navigate to the home page if the user is a guardian
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => GuardianHomePage()),
+          MaterialPageRoute(builder: (context) => const GuardianHomePage()),
         );
       } else {
         _showError("This account is not authorized as a guardian.");
@@ -67,7 +67,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(color: Colors.white)),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
       ),
     );
@@ -90,7 +90,8 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
               top: 40,
               left: 16,
               child: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.black, size: 30),
+                icon:
+                    const Icon(Icons.arrow_back, color: Colors.black, size: 30),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -104,7 +105,10 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
                     const SizedBox(height: 16),
                     const Text(
                       'Welcome Back!',
-                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500, color: Colors.black),
+                      style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black),
                     ),
                     const SizedBox(height: 8),
                     const Text(
@@ -132,7 +136,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
                     // Password Input Field
                     TextField(
                       controller: _passwordController,
-                      obscureText: true,
+                      obscureText: !_isPasswordVisible,
                       decoration: InputDecoration(
                         labelText: "Password",
                         filled: true,
@@ -140,6 +144,19 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(40),
                           borderSide: BorderSide.none,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
                         ),
                       ),
                     ),
@@ -151,9 +168,15 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPasswordPage()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ResetPasswordPage()));
                           },
-                          child: const Text('Forgot Password?', style: TextStyle(fontSize: 14, color: Color(0xFF57636C))),
+                          child: const Text('Forgot Password?',
+                              style: TextStyle(
+                                  fontSize: 14, color: Color(0xFF57636C))),
                         ),
                         SizedBox(
                           width: 130,
@@ -162,11 +185,15 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
                             onPressed: _isLoading ? null : _loginGuardian,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF23a8ff),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(40)),
                             ),
                             child: _isLoading
-                                ? CircularProgressIndicator(color: Colors.white)
-                                : const Text('Sign In', style: TextStyle(fontSize: 16, color: Colors.white)),
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white)
+                                : const Text('Sign In',
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.white)),
                           ),
                         ),
                       ],

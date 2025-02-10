@@ -10,7 +10,7 @@ import 'package:autocaller/PrimaryGuardian/signup.dart';
 class NavBarAdmin extends StatelessWidget {
   final int currentIndex;
 
-  const NavBarAdmin({Key? key, required this.currentIndex}) : super(key: key);
+  const NavBarAdmin({super.key, required this.currentIndex});
 
   void _onItemTapped(BuildContext context, int index) {
     if (index == currentIndex) return; // Avoid unnecessary navigation
@@ -18,13 +18,13 @@ class NavBarAdmin extends StatelessWidget {
     switch (index) {
       case 0:
         Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => DismissalStatus()));
+            MaterialPageRoute(builder: (context) => const DismissalStatus()));
         break;
       case 1:
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => PrimaryGuardianSignUpPage()));
+                builder: (context) => const PrimaryGuardianSignUpPage()));
         break;
       case 2:
         Navigator.pushReplacement(context,
