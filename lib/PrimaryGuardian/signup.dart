@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:autocaller/SchoolAdmin/NavBarAdmin.dart';
+import 'package:autocaller/SchoolAdmin/AdminHomePage.dart';
 
 class PrimaryGuardianSignUpPage extends StatefulWidget {
   const PrimaryGuardianSignUpPage({super.key});
@@ -260,6 +261,22 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
+            ),
+          ),
+
+          // Back Button Positioned on the Blue Background
+          Positioned(
+            top: 40, // Adjust for better positioning
+            left: 16,
+            child: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.black, size: 28),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SchoolAdminHomePage()),
+                );
+              },
             ),
           ),
 
