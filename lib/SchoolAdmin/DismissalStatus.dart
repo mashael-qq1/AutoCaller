@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'NavBarAdmin.dart'; // Import NavBar
 
 class DismissalStatus extends StatefulWidget {
   const DismissalStatus({super.key});
@@ -54,13 +55,22 @@ class _DismissalStatusState extends State<DismissalStatus> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Match School Profile Page
       appBar: AppBar(
         title: const Text("Dismissal Status"),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.transparent, // Match School Profile
+        elevation: 0,
       ),
-      body: schoolRef == null
-          ? const Center(child: CircularProgressIndicator()) // Show loading spinner
-          : _buildDismissalStatusList(),
+      body: Column(
+        children: [
+          Expanded(
+            child: schoolRef == null
+                ? const Center(child: CircularProgressIndicator()) // Show loading spinner
+                : _buildDismissalStatusList(),
+          ),
+          NavBarAdmin(currentIndex: 0), // Add NavBar at the bottom
+        ],
+      ),
     );
   }
 
