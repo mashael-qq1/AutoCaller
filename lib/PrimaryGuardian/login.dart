@@ -56,7 +56,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
         await _auth.signOut();
       }
     } catch (e) {
-      _showError("Login failed: ${e.toString()}");
+      _showError("Login failed, the supplied credentials is incorrect.");
     } finally {
       setState(() {
         _isLoading = false;
