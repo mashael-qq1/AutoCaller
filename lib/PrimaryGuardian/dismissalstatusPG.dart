@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'NavBarPG.dart'; // Import the Primary Guardian NavBar
 
 class DismissalStatusPG extends StatefulWidget {
   const DismissalStatusPG({super.key});
@@ -11,6 +12,7 @@ class DismissalStatusPG extends StatefulWidget {
 
 class _DismissalStatusPGState extends State<DismissalStatusPG> {
   List<DocumentReference>? childrenRefs;
+  String? guardianID;
 
   @override
   void initState() {
@@ -20,24 +22,24 @@ class _DismissalStatusPGState extends State<DismissalStatusPG> {
 
   /// Fetches the Guardian's `children` references using the logged-in email
   Future<void> _fetchGuardianChildren() async {
-    String? guardianEmail = FirebaseAuth.instance.currentUser?.email;
-
-    if (guardianEmail == null) {
-      debugPrint("❌ No guardian email found");
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      debugPrint("❌ No guardian logged in");
       return;
     }
 
-    debugPrint("📌 Searching for guardian with email: ${guardianEmail.trim().toLowerCase()}");
+    guardianID = user.uid;
+    debugPrint("📌 Guardian ID: $guardianID");
 
     try {
       var guardianQuery = await FirebaseFirestore.instance
           .collection('Primary Guardian')
-          .where('email', isEqualTo: guardianEmail.trim().toLowerCase()) // ✅ Case insensitive email match
+          .where('userId', isEqualTo: guardianID) // Ensure correct field
           .get();
 
       if (guardianQuery.docs.isNotEmpty) {
         var guardianDoc = guardianQuery.docs.first;
-        List<dynamic>? children = guardianDoc['children']; // ✅ Gets `children` array
+        List<dynamic>? children = guardianDoc['children']; // ✅ Get `children` array
 
         if (children != null && children.isNotEmpty) {
           setState(() {
@@ -49,7 +51,7 @@ class _DismissalStatusPGState extends State<DismissalStatusPG> {
           debugPrint("❌ No children found in guardian document.");
         }
       } else {
-        debugPrint("❌ No guardian found with this email.");
+        debugPrint("❌ No guardian found with this ID.");
       }
     } catch (e) {
       debugPrint("❌ Error fetching children references: $e");
@@ -59,13 +61,24 @@ class _DismissalStatusPGState extends State<DismissalStatusPG> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // ✅ Match School Profile Page
       appBar: AppBar(
         title: const Text("My Children's Dismissal Status"),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.transparent, // ✅ Removed blue
+        elevation: 0, // ✅ Remove shadow
       ),
-      body: childrenRefs == null
-          ? const Center(child: CircularProgressIndicator()) // Show loading spinner
-          : _buildDismissalStatusList(),
+      body: Column(
+        children: [
+          Expanded(
+            child: childrenRefs == null
+                ? const Center(child: CircularProgressIndicator()) // Show loading spinner
+                : _buildDismissalStatusList(),
+          ),
+        ],
+      ),
+      
+      // ✅ Add NavBar at the bottom
+      bottomNavigationBar: guardianID != null ? NavBarPG(loggedInGuardianId: guardianID!) : null,
     );
   }
 
@@ -171,9 +184,7 @@ class _DismissalStatusPGState extends State<DismissalStatusPG> {
     ];
     return months[month - 1];
   }
-}
-
-/// Student Card UI Component
+}/// Student Card UI Component
 class StudentCard extends StatelessWidget {
   final String name;
   final String status;
@@ -184,15 +195,29 @@ class StudentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white, // ✅ Set background to white
+      elevation: 0, // ✅ Remove shadow if needed
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: Colors.grey.shade300, width: 1), // ✅ Optional: Add subtle border
+      ),
       child: ListTile(
         leading: const CircleAvatar(
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: Colors.blueAccent, // ✅ Keep blue for contrast
           child: Icon(Icons.person, color: Colors.white),
         ),
-        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text("Status: $status"),
+        title: Text(
+          name,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black, // ✅ Ensure text color is black
+          ),
+        ),
+        subtitle: Text(
+          "Status: $status",
+          style: const TextStyle(color: Colors.black), // ✅ Ensure subtitle is black
+        ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

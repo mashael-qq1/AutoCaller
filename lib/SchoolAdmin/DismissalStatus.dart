@@ -175,38 +175,51 @@ class _DismissalStatusState extends State<DismissalStatus> {
     return months[month - 1];
   }
 }
-
 /// **Student Card UI Component**
 class StudentCard extends StatelessWidget {
   final String name;
   final String status;
   final String dismissalTime;
 
-  const StudentCard(
-      {super.key,
-      required this.name,
-      required this.status,
-      required this.dismissalTime});
+  const StudentCard({
+    super.key,
+    required this.name,
+    required this.status,
+    required this.dismissalTime,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white, // ✅ Ensure the card background is white
+      elevation: 0, // ✅ Remove shadow if needed
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: Colors.grey.shade300, width: 1), // ✅ Subtle border
+      ),
       child: ListTile(
         leading: const CircleAvatar(
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: Colors.blueAccent, // ✅ Keep blue for contrast
           child: Icon(Icons.person, color: Colors.white),
         ),
-        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text("Status: $status"),
+        title: Text(
+          name,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black, // ✅ Ensure text color is black
+          ),
+        ),
+        subtitle: Text(
+          "Status: $status",
+          style: const TextStyle(color: Colors.black), // ✅ Ensure subtitle is black
+        ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               dismissalTime,
-              style: const TextStyle(
-                  color: Colors.blue, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
             ),
           ],
         ),
