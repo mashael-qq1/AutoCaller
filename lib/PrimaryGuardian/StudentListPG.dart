@@ -27,7 +27,8 @@ class StudentListPG extends StatelessWidget {
             }
 
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Center(child: Text('No students found for this guardian.'));
+              return Center(
+                  child: Text('No students found for this guardian.'));
             }
 
             final students = snapshot.data!.docs;

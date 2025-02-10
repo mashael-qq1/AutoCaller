@@ -7,7 +7,7 @@ class StudentsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Students'),
+        title: Text('Students '),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
