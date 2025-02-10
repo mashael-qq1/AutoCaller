@@ -123,30 +123,6 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20.0),
-
-            // Sign-up link
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  "Don't have an account? ",
-                  style: TextStyle(fontSize: 16.0, color: Colors.black54),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    // Action for Create Account
-                  },
-                  child: const Text(
-                    'Create Account',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),
