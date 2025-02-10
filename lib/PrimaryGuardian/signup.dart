@@ -295,7 +295,7 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
                           style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.w500,
-                              color: const Color(0xFF004AAD))),
+                              color: const Color.fromARGB(255, 0, 0, 0))),
                       SizedBox(height: 8),
                       Text(
                         'Enter the guardian’s details below.',
