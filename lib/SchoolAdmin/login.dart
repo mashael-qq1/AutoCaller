@@ -18,7 +18,7 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   bool _isLoading = false;
-
+bool _isPasswordVisible = false;
   void _loginAdmin() async {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
@@ -126,20 +126,30 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                     const SizedBox(height: 16),
 
                     TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(40),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
+  controller: _passwordController,
+  obscureText: !_isPasswordVisible,
+  decoration: InputDecoration(
+    labelText: "Password",
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(40),
+      borderSide: BorderSide.none,
+    ),
+    suffixIcon: IconButton(
+      icon: Icon(
+        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+        color: Colors.grey,
+      ),
+      onPressed: () {
+        setState(() {
+          _isPasswordVisible = !_isPasswordVisible;
+        });
+      },
+    ),
+  ),
+),
+const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
