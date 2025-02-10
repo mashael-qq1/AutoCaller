@@ -4,6 +4,7 @@ import 'AdminHomePage.dart';
 import 'DismissalStatus.dart';
 import 'StudentListAdmin.dart';
 import 'SchoolProfile.dart';
+// ignore: duplicate_import
 import 'package:autocaller/PrimaryGuardian/signup.dart';
 
 class NavBarAdmin extends StatelessWidget {

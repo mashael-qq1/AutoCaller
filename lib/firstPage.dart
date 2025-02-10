@@ -1,7 +1,7 @@
-
 // ignore_for_file: prefer_const_constructors
 
 import 'package:autocaller/PrimaryGuardian/login.dart';
+// ignore: unused_import
 import 'package:autocaller/PrimaryGuardian/signup.dart';
 import 'package:autocaller/SchoolAdmin/login.dart';
 import 'package:flutter/material.dart';
@@ -28,13 +28,11 @@ class WelcomeScreen extends StatelessWidget {
           children: [
             // Logo
 
-             Image.asset(
-  'assets/9-removebg-preview.png', // Replace with the path to your logo image
-  height: 200.0, // Increase the height for a larger image
-  width: 200.0,  // You can also set the width for more control
-),
-
-            
+            Image.asset(
+              'assets/9-removebg-preview.png', // Replace with the path to your logo image
+              height: 200.0, // Increase the height for a larger image
+              width: 200.0, // You can also set the width for more control
+            ),
 
             // Welcome Text
             const Text(
@@ -50,13 +48,21 @@ class WelcomeScreen extends StatelessWidget {
             const Text(
               'Your partner in creating a seamless and secure\n'
               'dismissal experience for students',
-              style: TextStyle(fontSize: 16.0, color: Color.fromARGB(95, 22, 101, 154),fontWeight: FontWeight.bold,),
+              style: TextStyle(
+                fontSize: 16.0,
+                color: Color.fromARGB(95, 22, 101, 154),
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30.0),
-             const Text(
+            const Text(
               'Sign in as',
-              style: TextStyle(fontSize: 40.0, color: Colors.black,fontWeight:FontWeight.w500,),
+              style: TextStyle(
+                fontSize: 40.0,
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30.0),
@@ -64,52 +70,57 @@ class WelcomeScreen extends StatelessWidget {
             SizedBox(
               width: 300.0, // Explicit width
               height: 55.0, // Explicit height
-            child: ElevatedButton(
-              onPressed: () {
-                // Action for Guardian button
-                 Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) =>GuardianLoginPage()),
-      );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue, // Background color
-                padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 15.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                  
+              child: ElevatedButton(
+                onPressed: () {
+                  // Action for Guardian button
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => GuardianLoginPage()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Background color
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 60.0, vertical: 15.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                child: const Text(
+                  'Guardian',
+                  style: TextStyle(
+                      fontSize: 18.0, color: Color.fromRGBO(255, 255, 255, 1)),
                 ),
               ),
-              child: const Text(
-                'Guardian',
-                style: TextStyle(fontSize: 18.0,color: Color.fromRGBO(255, 255, 255, 1)),
-              ),
-            ),
             ),
             const SizedBox(height: 15.0),
-             SizedBox(
+            SizedBox(
               width: 300.0, // Explicit width
               height: 55.0, // Explicit height
-            child: ElevatedButton(
-              onPressed: () {
-                // Action for School Admin button
-               Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) =>SchoolAdminLoginPage()),
-      );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue, // Background color
-                padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 15.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  // Action for School Admin button
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => SchoolAdminLoginPage()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Background color
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 60.0, vertical: 15.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                child: const Text(
+                  'School Admin',
+                  style: TextStyle(
+                      fontSize: 18.0, color: Color.fromRGBO(255, 255, 255, 1)),
                 ),
               ),
-              child: const Text(
-                'School Admin',
-                style: TextStyle(fontSize: 18.0, color: Color.fromRGBO(255, 255, 255, 1)),
-              ),
-            ),
             ),
             const SizedBox(height: 20.0),
 
@@ -142,4 +153,3 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 }
-

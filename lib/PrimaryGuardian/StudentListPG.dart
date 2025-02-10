@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'NavBarPG.dart'; // Import the navigation bar
 
 class StudentListPG extends StatelessWidget {
   final String loggedInGuardianId;
@@ -68,6 +69,8 @@ class StudentListPG extends StatelessWidget {
           },
         ),
       ),
+      bottomNavigationBar: NavBarPG(
+          loggedInGuardianId: loggedInGuardianId), //Pass the parameter here
     );
   }
 }
