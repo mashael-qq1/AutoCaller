@@ -257,7 +257,7 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
             height: double.infinity, // Ensures it covers the whole screen
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFFE3F2FD), Color(0xFF90CAF9)],
+                colors: [Color.fromARGB(255, 253, 253, 253), Color.fromARGB(255, 189, 222, 251)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -289,8 +289,8 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset('assets/9-removebg-preview.png', height: 100),
-                      SizedBox(height: 16),
+                      
+                      SizedBox(height: 96),
                       Text('Add Guardian',
                           style: TextStyle(
                               fontSize: 32,

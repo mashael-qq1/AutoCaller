@@ -62,7 +62,7 @@ class SchoolAdminHomePage extends StatelessWidget {
                                   'Welcome to AutoCaller, the place where you can manage everything with ease!',
                                   style: TextStyle(
                                     fontSize: 26,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.normal,
                                     color: Colors.black,
                                   ),
                                   textAlign: TextAlign.center,
@@ -76,7 +76,7 @@ class SchoolAdminHomePage extends StatelessWidget {
                                     'Manage your school profile, students, and dismissal status effortlessly with SchoolFlow.',
                                     style: TextStyle(
                                       fontSize: 18,
-                                      fontWeight: FontWeight.w600,
+                                      fontWeight: FontWeight.w500,
                                       color: Colors.black54,
                                     ),
                                     textAlign: TextAlign.center,
