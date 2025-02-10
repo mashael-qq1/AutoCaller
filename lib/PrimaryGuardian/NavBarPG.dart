@@ -20,15 +20,15 @@ class NavBarPG extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(context, Icons.access_time, 'Dismissal',
+          _buildNavItem(context, Icons.access_time, '',
               const DismissalStatusPG()),
-          _buildNavItem(context, Icons.person_add, 'Add Secondary Guardian',
+          _buildNavItem(context, Icons.person_add, '',
               null), // Unfunctional for now
-          _buildNavItem(context, Icons.home, 'Home', const GuardianHomePage()),
-          _buildNavItem(context, Icons.groups, 'Students',
+          _buildNavItem(context, Icons.home, '', const GuardianHomePage()),
+          _buildNavItem(context, Icons.groups, '',
               StudentListPG(loggedInGuardianId: loggedInGuardianId)),
           _buildNavItem(
-              context, Icons.person, 'Profile', PrimaryGuardianProfilePage()),
+              context, Icons.person, '', PrimaryGuardianProfilePage()),
         ],
       ),
     );
