@@ -137,7 +137,7 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
                   });
                 },
               )
-            : null,
+            : null, // Ensure non-password fields have no suffix icon
       ),
     );
   }
