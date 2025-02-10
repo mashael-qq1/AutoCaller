@@ -222,65 +222,83 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFE3F2FD), Color(0xFF90CAF9)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset('assets/9-removebg-preview.png', height: 100),
-                SizedBox(height: 16),
-                Text('Add Guardian',
-                    style:
-                        TextStyle(fontSize: 32, fontWeight: FontWeight.w500)),
-                SizedBox(height: 8),
-                Text(
-                  'Enter the guardian’s details below.',
-                  style: TextStyle(fontSize: 14, color: Color(0xFF57636C)),
-                ),
-                SizedBox(height: 24),
-                _buildTextField(_fullNameController, "Full Name"),
-                SizedBox(height: 16),
-                _buildTextField(_emailController, "Email",
-                    keyboardType: TextInputType.emailAddress),
-                SizedBox(height: 16),
-                _buildTextField(_phoneController, "Phone Number",
-                    keyboardType: TextInputType.phone),
-                SizedBox(height: 16),
-                _buildPasswordField(),
-                SizedBox(height: 16),
-                _buildTextField(_confirmPasswordController, "Confirm Password",
-                    isPassword: true, isConfirmPassword: true),
-                SizedBox(height: 24),
-                SizedBox(
-                  width: 150,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _signUpGuardian,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF23a8ff),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(40)),
-                    ),
-                    child: _isLoading
-                        ? CircularProgressIndicator(color: Colors.white)
-                        : const Text('Add Guardian',
-                            style:
-                                TextStyle(fontSize: 16, color: Colors.white)),
-                  ),
-                ),
-              ],
+      body: Stack(
+        children: [
+          // Background gradient covering the entire screen
+          Container(
+            width: double.infinity,
+            height: double.infinity, // Ensures it covers the whole screen
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFE3F2FD), Color(0xFF90CAF9)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
           ),
-        ),
+
+          // Scrollable content on top of the gradient
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/9-removebg-preview.png', height: 100),
+                      SizedBox(height: 16),
+                      Text('Add Guardian',
+                          style: TextStyle(
+                              fontSize: 32, fontWeight: FontWeight.w500)),
+                      SizedBox(height: 8),
+                      Text(
+                        'Enter the guardian’s details below.',
+                        style:
+                            TextStyle(fontSize: 14, color: Color(0xFF57636C)),
+                      ),
+                      SizedBox(height: 24),
+                      _buildTextField(_fullNameController, "Full Name"),
+                      SizedBox(height: 16),
+                      _buildTextField(_emailController, "Email",
+                          keyboardType: TextInputType.emailAddress),
+                      SizedBox(height: 16),
+                      _buildTextField(_phoneController, "Phone Number",
+                          keyboardType: TextInputType.phone),
+                      SizedBox(height: 16),
+                      _buildPasswordField(),
+                      SizedBox(height: 16),
+                      _buildTextField(
+                          _confirmPasswordController, "Confirm Password",
+                          isPassword: true, isConfirmPassword: true),
+                      SizedBox(height: 24),
+                      SizedBox(
+                        width: 150,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _signUpGuardian,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF23a8ff),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(40)),
+                          ),
+                          child: _isLoading
+                              ? CircularProgressIndicator(color: Colors.white)
+                              : const Text('Add Guardian',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.white)),
+                        ),
+                      ),
+                      SizedBox(
+                          height:
+                              30), // Prevents button from touching screen edge
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
