@@ -293,7 +293,9 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
                       SizedBox(height: 16),
                       Text('Add Guardian',
                           style: TextStyle(
-                              fontSize: 32, fontWeight: FontWeight.w500)),
+                              fontSize: 32,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF004AAD))),
                       SizedBox(height: 8),
                       Text(
                         'Enter the guardian’s details below.',
