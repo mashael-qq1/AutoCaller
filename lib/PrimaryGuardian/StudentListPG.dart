@@ -5,13 +5,13 @@ import 'NavBarPG.dart'; // Import the navigation bar
 class StudentListPG extends StatelessWidget {
   final String loggedInGuardianId;
 
-  StudentListPG({required this.loggedInGuardianId});
+  const StudentListPG({super.key, required this.loggedInGuardianId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Students (Primary Guardian)'),
+        title: const Text('Students (Primary Guardian)'),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -24,11 +24,11 @@ class StudentListPG extends StatelessWidget {
               .snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Center(
+              return const Center(
                   child: Text('No students found for this guardian.'));
             }
 
@@ -57,7 +57,7 @@ class StudentListPG extends StatelessWidget {
                     ),
                     title: Text(
                       name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),

@@ -18,7 +18,7 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   bool _isLoading = false;
-bool _isPasswordVisible = false;
+  bool _isPasswordVisible = false;
   void _loginAdmin() async {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
@@ -40,8 +40,10 @@ bool _isPasswordVisible = false;
       );
 
       // Check if the authenticated user is in the Admin collection
-      DocumentSnapshot adminSnapshot =
-          await _firestore.collection('Admin').doc(userCredential.user!.uid).get();
+      DocumentSnapshot adminSnapshot = await _firestore
+          .collection('Admin')
+          .doc(userCredential.user!.uid)
+          .get();
 
       if (adminSnapshot.exists) {
         // Successful login -> Navigate to Admin Home Page
@@ -65,7 +67,7 @@ bool _isPasswordVisible = false;
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(color: Colors.white)),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
       ),
     );
@@ -88,7 +90,8 @@ bool _isPasswordVisible = false;
               top: 40,
               left: 16,
               child: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.black, size: 30),
+                icon:
+                    const Icon(Icons.arrow_back, color: Colors.black, size: 30),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -102,7 +105,10 @@ bool _isPasswordVisible = false;
                     const SizedBox(height: 16),
                     const Text(
                       'Welcome Back!',
-                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500, color: Colors.black),
+                      style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black),
                     ),
                     const SizedBox(height: 8),
                     const Text(
@@ -110,7 +116,6 @@ bool _isPasswordVisible = false;
                       style: TextStyle(fontSize: 14, color: Color(0xFF57636C)),
                     ),
                     const SizedBox(height: 24),
-
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
@@ -124,40 +129,47 @@ bool _isPasswordVisible = false;
                       ),
                     ),
                     const SizedBox(height: 16),
-
                     TextField(
-  controller: _passwordController,
-  obscureText: !_isPasswordVisible,
-  decoration: InputDecoration(
-    labelText: "Password",
-    filled: true,
-    fillColor: Colors.white,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(40),
-      borderSide: BorderSide.none,
-    ),
-    suffixIcon: IconButton(
-      icon: Icon(
-        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-        color: Colors.grey,
-      ),
-      onPressed: () {
-        setState(() {
-          _isPasswordVisible = !_isPasswordVisible;
-        });
-      },
-    ),
-  ),
-),
-const SizedBox(height: 16),
+                      controller: _passwordController,
+                      obscureText: !_isPasswordVisible,
+                      decoration: InputDecoration(
+                        labelText: "Password",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(40),
+                          borderSide: BorderSide.none,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPasswordPage()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ResetPasswordPage()));
                           },
-                          child: const Text('Forgot Password?', style: TextStyle(fontSize: 14, color: Color(0xFF57636C))),
+                          child: const Text('Forgot Password?',
+                              style: TextStyle(
+                                  fontSize: 14, color: Color(0xFF57636C))),
                         ),
                         SizedBox(
                           width: 130,
@@ -166,11 +178,15 @@ const SizedBox(height: 16),
                             onPressed: _isLoading ? null : _loginAdmin,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF23a8ff),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(40)),
                             ),
                             child: _isLoading
-                                ? CircularProgressIndicator(color: Colors.white)
-                                : const Text('Sign In', style: TextStyle(fontSize: 16, color: Colors.white)),
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white)
+                                : const Text('Sign In',
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.white)),
                           ),
                         ),
                       ],
@@ -192,4 +208,3 @@ const SizedBox(height: 16),
     super.dispose();
   }
 }
-

@@ -3,27 +3,29 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'NavBarAdmin.dart'; // Import the NavBarAdmin
 
 class StudentsPage extends StatelessWidget {
+  const StudentsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Students '),
+        title: const Text('Students '),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
       bottomNavigationBar:
-          NavBarAdmin(currentIndex: 2), // Set index 2 for Students
+          const NavBarAdmin(currentIndex: 2), // Set index 2 for Students
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: StreamBuilder(
           stream: FirebaseFirestore.instance.collection('Student').snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Center(child: Text('No students found.'));
+              return const Center(child: Text('No students found.'));
             }
 
             final students = snapshot.data!.docs;
@@ -51,7 +53,7 @@ class StudentsPage extends StatelessWidget {
                     ),
                     title: Text(
                       name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),

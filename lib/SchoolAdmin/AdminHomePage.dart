@@ -5,6 +5,8 @@ import 'SchoolProfile.dart';
 import 'package:autocaller/SchoolAdmin/DismissalStatus.dart';
 
 class SchoolAdminHomePage extends StatelessWidget {
+  const SchoolAdminHomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,20 +21,19 @@ class SchoolAdminHomePage extends StatelessWidget {
         child: Column(
           children: [
             AppBar(
-  title: const Text('School Admin Dashboard'),
-  backgroundColor: Colors.transparent,
-  elevation: 0,
-  centerTitle: true,
-  automaticallyImplyLeading: false, // Removes the back button
-),
-
+              title: const Text('School Admin Dashboard'),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              centerTitle: true,
+              automaticallyImplyLeading: false, // Removes the back button
+            ),
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Center(
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(
+                      constraints: const BoxConstraints(
                         maxWidth: 1200,
                       ),
                       child: Column(
@@ -69,7 +70,8 @@ class SchoolAdminHomePage extends StatelessWidget {
                                 const SizedBox(height: 30),
 
                                 const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 20.0),
                                   child: Text(
                                     'Manage your school profile, students, and dismissal status effortlessly with SchoolFlow.',
                                     style: TextStyle(
@@ -96,7 +98,8 @@ class SchoolAdminHomePage extends StatelessWidget {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => SchoolProfilePage(),
+                                              builder: (context) =>
+                                                  SchoolProfilePage(),
                                             ),
                                           );
                                         },
@@ -111,27 +114,29 @@ class SchoolAdminHomePage extends StatelessWidget {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => StudentsPage(),
+                                              builder: (context) =>
+                                                  StudentsPage(),
                                             ),
                                           );
                                         },
                                       ),
-                                      
                                       const SizedBox(width: 20),
-                                     _createNavCard(
-  context,
-  'Dismissal Status',
-  Icons.access_time,
-  Colors.blue.shade700,
-  () { 
-    Navigator.push(
-      context,
-     MaterialPageRoute(builder: (context) => DismissalStatus()),
-    );
-  },
-),
+                                      _createNavCard(
+                                        context,
+                                        'Dismissal Status',
+                                        Icons.access_time,
+                                        Colors.blue.shade700,
+                                        () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const DismissalStatus()),
+                                          );
+                                        },
+                                      ),
                                       const SizedBox(width: 20),
-                          _createNavCard(
+                                      _createNavCard(
                                         context,
                                         'Add Guardian',
                                         Icons.people,
@@ -140,7 +145,8 @@ class SchoolAdminHomePage extends StatelessWidget {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>PrimaryGuardianSignUpPage (),
+                                              builder: (context) =>
+                                                  const PrimaryGuardianSignUpPage(),
                                             ),
                                           );
                                         },
@@ -152,7 +158,6 @@ class SchoolAdminHomePage extends StatelessWidget {
                               ],
                             ),
                           ),
-                          
                         ],
                       ),
                     ),
@@ -167,7 +172,8 @@ class SchoolAdminHomePage extends StatelessWidget {
   }
 
   // Helper method to create a navigation card
-  Widget _createNavCard(BuildContext context, String title, IconData icon, Color color, Function onTap) {
+  Widget _createNavCard(BuildContext context, String title, IconData icon,
+      Color color, Function onTap) {
     return GestureDetector(
       onTap: () => onTap(),
       child: AnimatedContainer(
