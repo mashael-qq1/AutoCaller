@@ -60,7 +60,7 @@ class WelcomeScreen extends StatelessWidget {
               'Sign in as',
               style: TextStyle(
                 fontSize: 40.0,
-                color: Colors.black,
+                color: Color(0xFF004AAD),
                 fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.center,

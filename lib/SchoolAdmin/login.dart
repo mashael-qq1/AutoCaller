@@ -57,7 +57,6 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
       }
     } catch (e) {
       _showError("Login failed, the supplied credentials is incorrect. ");
-      
     } finally {
       setState(() {
         _isLoading = false;
@@ -109,7 +108,7 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                       style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black),
+                          color: Color(0xFF004AAD)),
                     ),
                     const SizedBox(height: 8),
                     const Text(
