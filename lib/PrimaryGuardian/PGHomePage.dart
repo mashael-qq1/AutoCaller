@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dismissalstatusPG.dart'; // Import your dismissal status page
 import 'PGprofile.dart';
+import 'package:autocaller/PrimaryGuardian/NavBarPG.dart';
 
 class GuardianHomePage extends StatelessWidget {
   const GuardianHomePage({super.key});
@@ -9,8 +10,13 @@ class GuardianHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Guardian Home'),
+        title: const Text(
+          'Guardian Home',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true, // Centers the app bar title
         backgroundColor: Colors.blue,
+        elevation: 0,
       ),
       body: Center(
         child: Column(
@@ -27,7 +33,8 @@ class GuardianHomePage extends StatelessWidget {
                 // Navigate to DismissalStatusPG
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const DismissalStatusPG()),
+                  MaterialPageRoute(
+                      builder: (context) => const DismissalStatusPG()),
                 );
               },
               child: const Text('View Dismissal Status'),
@@ -38,7 +45,8 @@ class GuardianHomePage extends StatelessWidget {
                 // Navigate to GuardianProfile
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => PrimaryGuardianProfilePage()),
+                  MaterialPageRoute(
+                      builder: (context) => PrimaryGuardianProfilePage()),
                 );
               },
               child: const Text('View Profile'),
@@ -46,6 +54,8 @@ class GuardianHomePage extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar:
+          const NavBarPG(loggedInGuardianId: "guardian_id"), // Attach NavBarPG
     );
   }
 }
