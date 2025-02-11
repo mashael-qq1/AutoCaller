@@ -1,5 +1,5 @@
-import 'package:autocaller/SchoolAdmin/ResetPassword.dart';
 import 'package:flutter/material.dart';
+import 'package:autocaller/SchoolAdmin/ResetPassword.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:autocaller/firstPage.dart';
@@ -12,7 +12,8 @@ class PrimaryGuardianProfilePage extends StatefulWidget {
       _PrimaryGuardianProfilePageState();
 }
 
-class _PrimaryGuardianProfilePageState extends State<PrimaryGuardianProfilePage> {
+class _PrimaryGuardianProfilePageState
+    extends State<PrimaryGuardianProfilePage> {
   Map<String, dynamic>? guardianData;
   String? guardianID;
 
@@ -87,10 +88,18 @@ class _PrimaryGuardianProfilePageState extends State<PrimaryGuardianProfilePage>
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Guardian Profile'),
-        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false, // Removes the back button
+        title: const Text(
+          'Guardian Profile',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            fontSize: 20, // Adjust font size if needed
+          ),
+        ),
+        centerTitle: true, // Centers the title
+        backgroundColor: Colors.white, // White background for the AppBar
         elevation: 0,
-        automaticallyImplyLeading: false,
       ),
       body: guardianData == null
           ? const Center(child: CircularProgressIndicator())
@@ -110,8 +119,8 @@ class _PrimaryGuardianProfilePageState extends State<PrimaryGuardianProfilePage>
                   const SizedBox(height: 20),
                   buildInfoRow("Guardian Name:",
                       guardianData!['fullName'] ?? 'Not Available'),
-                  buildInfoRow("Email:",
-                      guardianData!['email'] ?? 'Not Available'),
+                  buildInfoRow(
+                      "Email:", guardianData!['email'] ?? 'Not Available'),
                   buildInfoRow("Phone Number:",
                       guardianData!['phone'] ?? 'Not Available'),
                   const SizedBox(height: 20),
@@ -132,8 +141,7 @@ class _PrimaryGuardianProfilePageState extends State<PrimaryGuardianProfilePage>
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           elevation: 2,
-                          shadowColor:
-                              const Color.fromARGB(255, 200, 199, 199),
+                          shadowColor: const Color.fromARGB(255, 200, 199, 199),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -204,7 +212,8 @@ class _PrimaryGuardianProfilePageState extends State<PrimaryGuardianProfilePage>
     );
   }
 
-  Widget buildInfoRow(String title, String value, {Color color = Colors.black}) {
+  Widget buildInfoRow(String title, String value,
+      {Color color = Colors.black}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Column(

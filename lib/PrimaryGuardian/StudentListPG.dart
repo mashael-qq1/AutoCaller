@@ -55,8 +55,18 @@ class _StudentListPGState extends State<StudentListPG> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Students."),
-        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false, // Removes the back button
+        title: const Text(
+          "Students",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            fontSize: 20, // Adjust font size if needed
+          ),
+        ),
+        centerTitle: true, // Centers the title
+        backgroundColor: Colors.white, // White background for the AppBar
+        elevation: 0,
       ),
       body: childrenRefs == null
           ? const Center(child: CircularProgressIndicator())
@@ -122,11 +132,14 @@ class _StudentListPGState extends State<StudentListPG> {
         children: [
           Icon(Icons.error_outline, color: Colors.red, size: 40),
           SizedBox(height: 10),
-          Text("No children found",
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red)),
+          Text(
+            "No children found",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.red,
+            ),
+          ),
         ],
       ),
     );
