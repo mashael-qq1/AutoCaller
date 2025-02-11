@@ -158,6 +158,8 @@ class _DismissalStatusState extends State<DismissalStatus> {
   }
 }
 
+
+/// **Student Card UI Component**
 class StudentCard extends StatelessWidget {
   final String name;
   final String status;
@@ -173,36 +175,67 @@ class StudentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white,
-      elevation: 0,
+      color: Colors.white, // ✅ Keep background clean
+      elevation: 0, // ✅ Remove shadow
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300, width: 1),
+        side: BorderSide(color: Colors.grey.shade300, width: 1), // ✅ Subtle border
       ),
-      child: ListTile(
-        leading: const CircleAvatar(
-          backgroundColor: Colors.blueAccent,
-          child: Icon(Icons.person, color: Colors.white),
-        ),
-        title: Text(
-          name,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        subtitle: Text(
-          "Status: $status",
-          style: const TextStyle(color: Colors.black),
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      child: Padding(
+        padding: const EdgeInsets.all(12), // ✅ Adjust padding
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween, // ✅ Distribute space evenly
           children: [
-            Text(
-              dismissalTime,
-              style: const TextStyle(
-                  color: Colors.blue, fontWeight: FontWeight.bold),
+            // Left side (Profile Picture)
+            CircleAvatar(
+              backgroundColor: Colors.blueAccent, // ✅ Keep blue for contrast
+              child: Icon(Icons.person, color: Colors.white),
+            ),
+            const SizedBox(width: 10), // ✅ Space between image and text
+            
+            // Center (Name & Status)
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 5), // ✅ Add small spacing
+                  Text(
+                    "Status: $status",
+                    style: const TextStyle(color: Colors.black54, fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+
+            // Right side (Last Dismissal Time)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const Text(
+                  "Last Dismissal Time:",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey, // ✅ Distinct color
+                  ),
+                ),
+                Text(
+                  dismissalTime,
+                  style: const TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
