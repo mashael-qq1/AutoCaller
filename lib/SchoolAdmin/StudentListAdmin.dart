@@ -8,13 +8,14 @@ class StudentsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Students '),
-        backgroundColor: Colors.transparent,
+        title: const Text('Students.'),
+        backgroundColor: Colors.white,
         elevation: 0,
       ),
       bottomNavigationBar:
-          const NavBarAdmin(currentIndex: 2), // Set index 2 for Students
+          const NavBarAdmin(currentIndex: 3), // Set index 3 for Students
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: StreamBuilder(
