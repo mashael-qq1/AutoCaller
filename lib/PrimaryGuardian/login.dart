@@ -104,6 +104,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
             // Center the image below the arrow icon
             
             Center(
+              child:SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
@@ -216,6 +217,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
                 ),
               ),
             ),
+            )
           ],
         ),
       ),
