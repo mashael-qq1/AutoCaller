@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'NavBarPG.dart';
+import 'NavBarPG.dart'; // Import the Primary Guardian NavBar
 
 class StudentListPG extends StatefulWidget {
   final String loggedInGuardianId;
@@ -61,7 +61,7 @@ class _StudentListPGState extends State<StudentListPG> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black,
-            fontSize: 20, // Adjust font size if needed
+            fontSize: 18, // Consistent font size
           ),
         ),
         centerTitle: true, // Centers the title
@@ -133,7 +133,7 @@ class _StudentListPGState extends State<StudentListPG> {
           Icon(Icons.error_outline, color: Colors.red, size: 40),
           SizedBox(height: 10),
           Text(
-            "No children found",
+            "No students found",
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -146,6 +146,7 @@ class _StudentListPGState extends State<StudentListPG> {
   }
 }
 
+/// **Updated Student Card UI**
 class StudentCard extends StatelessWidget {
   final String name;
   final String gradeLevel;
@@ -156,15 +157,50 @@ class StudentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white,
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: ListTile(
-        leading: const CircleAvatar(
-          backgroundColor: Colors.blueAccent,
-          child: Icon(Icons.person, color: Colors.white),
+      elevation: 3, // ✅ Add shadow for consistency
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12), // ✅ Match the design
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 🔹 Profile Picture
+            CircleAvatar(
+              radius: 25, // ✅ Keep consistent size
+              backgroundColor: Colors.blue.shade100,
+              child: Icon(
+                Icons.person,
+                color: Colors.blue.shade700,
+              ),
+            ),
+            const SizedBox(width: 12), // ✅ Space between image and text
+
+            // 🔹 Name & Grade
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Grade: $gradeLevel",
+                    style: const TextStyle(color: Colors.black54, fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text("Grade: $gradeLevel"),
       ),
     );
   }
