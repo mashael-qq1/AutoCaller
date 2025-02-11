@@ -56,7 +56,7 @@ class _StudentListPGState extends State<StudentListPG> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Students."),
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
       ),
       body: childrenRefs == null
           ? const Center(child: CircularProgressIndicator())
