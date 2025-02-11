@@ -145,9 +145,11 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
                         const SizedBox(height: 20),
                         buildInfoRow("School Name:",
                             schoolData!['name'] ?? 'Not Available'),
-                        buildInfoRow("Phone:",
-                            schoolData!['phoneNum'] ?? 'Not Available',
-                            color: Color(0xFF23A8FF)),
+                        buildInfoRow(
+                          "Phone:",
+                          schoolData!['phoneNum'] ?? 'Not Available',
+                          //color: Color(0xFF23A8FF)
+                        ),
                         buildInfoRow(
                             "Email:", schoolData!['email'] ?? 'Not Available'),
                         buildInfoRow("Address:",
