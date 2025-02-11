@@ -113,7 +113,7 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset('assets/9-removebg-preview.png', height: 150),
-                    const SizedBox(height: 100),
+                    const SizedBox(height: 10),
                     const Text(
                       'Welcome Back!',
                       style: TextStyle(
