@@ -46,11 +46,10 @@ class NavBarAdmin extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(Icons.access_time, 0, context),
-          _buildNavItem(Icons.person_add, 1, context),
-          _buildNavItem(Icons.home, 2, context),
-          _buildNavItem(Icons.group, 3, context),
-          _buildNavItem(Icons.account_circle, 4, context),
+          _buildNavItem(Icons.access_time, 0, context), // Dismissal Status
+          _buildNavItem(Icons.person_add, 1, context), // Add Guardian
+          _buildNavItem(Icons.group, 3, context), // Students
+          _buildNavItem(Icons.account_circle, 4, context), // Profile
         ],
       ),
     );
