@@ -73,7 +73,7 @@ class SchoolAdminHomePage extends StatelessWidget {
                                   padding:
                                       EdgeInsets.symmetric(horizontal: 20.0),
                                   child: Text(
-                                    'Manage your school profile, students, and dismissal status effortlessly with SchoolFlow.',
+                                    'Manage your school profile, students, and dismissal status effortlessly with AutoCaller.',
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500,

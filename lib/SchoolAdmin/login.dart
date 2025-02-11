@@ -79,35 +79,30 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-    colors: [
-      Color(0xFFFFFFFF), // Pure white at the top
-      Color.fromARGB(255, 255, 255, 255), // Light blue transition
-      Color.fromARGB(255, 96, 178, 245), // Deeper blue at the bottom
-    ],
-    stops: [0.0, 0.3, 1.0], // Adjust stops to give white more space
-    begin: Alignment.topRight,
-    end: Alignment.bottomLeft,
-  ),
-        ),
-        child: Stack(
-      children: [
-        // Arrow icon in the top-left corner
-        Positioned(
-          top: 40,
-          left: 16,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black, size: 30),
-            onPressed: () => Navigator.pop(context),
+            colors: [
+              Color(0xFFFFFFFF), // Pure white at the top
+              Color.fromARGB(255, 255, 255, 255), // Light blue transition
+              Color.fromARGB(255, 96, 178, 245), // Deeper blue at the bottom
+            ],
+            stops: [0.0, 0.3, 1.0], // Adjust stops to give white more space
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
           ),
         ),
-        
-        // Center the image below the arrow icon
-       Positioned(
-          top: 120,  // Adjust this value to move the image up/down
-          left: MediaQuery.of(context).size.width / 2.4 - 50,  // Center the image horizontally
-          child: Image.asset('assets/9-removebg-preview.png', height: 150),
-        ),
-      
+        child: Stack(
+          children: [
+            // Arrow icon in the top-left corner
+            Positioned(
+              top: 40,
+              left: 16,
+              child: IconButton(
+                icon:
+                    const Icon(Icons.arrow_back, color: Colors.black, size: 30),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+
+            // Center the image below the arrow icon
 
             Center(
               child: Padding(
@@ -115,7 +110,8 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 100),
+                    SizedBox(height: 60),
+                    Image.asset('assets/9-removebg-preview.png', height: 150),
                     const Text(
                       'Welcome Back!',
                       style: TextStyle(

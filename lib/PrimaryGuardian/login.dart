@@ -79,40 +79,38 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-    colors: [
-      Color(0xFFFFFFFF), // Pure white at the top
-      Color.fromARGB(255, 255, 255, 255), // Light blue transition
-      Color.fromARGB(255, 96, 178, 245), // Deeper blue at the bottom
-    ],
-    stops: [0.0, 0.3, 1.0], // Adjust stops to give white more space
-    begin: Alignment.topCenter,
-    end: Alignment.bottomLeft,
-  ),
+            colors: [
+              Color(0xFFFFFFFF), // Pure white at the top
+              Color.fromARGB(255, 255, 255, 255), // Light blue transition
+              Color.fromARGB(255, 96, 178, 245), // Deeper blue at the bottom
+            ],
+            stops: [0.0, 0.3, 1.0], // Adjust stops to give white more space
+            begin: Alignment.topCenter,
+            end: Alignment.bottomLeft,
+          ),
         ),
         child: Stack(
           children: [
             Positioned(
-          top: 40,
-          left: 16,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black, size: 30),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ),
-        
-        // Center the image below the arrow icon
-       Positioned(
-          top: 120,  // Adjust this value to move the image up/down
-          left: MediaQuery.of(context).size.width / 2.4 - 50,  // Center the image horizontally
-          child: Image.asset('assets/9-removebg-preview.png', height: 150),
-        ),
+              top: 40,
+              left: 16,
+              child: IconButton(
+                icon:
+                    const Icon(Icons.arrow_back, color: Colors.black, size: 30),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+
+            // Center the image below the arrow icon
+
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    
+                    Image.asset('assets/9-removebg-preview.png', height: 150),
+
                     const SizedBox(height: 100),
                     const Text(
                       'Welcome Back!',
@@ -134,7 +132,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         labelText: "Email",
-                         labelStyle: TextStyle(color: Color(0xFF57636C)),
+                        labelStyle: TextStyle(color: Color(0xFF57636C)),
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
