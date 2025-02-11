@@ -21,7 +21,7 @@ class WelcomeScreen extends StatelessWidget {
     colors: [
       Color(0xFFFFFFFF), // Pure white at the top
       Color.fromARGB(255, 255, 255, 255), // Light blue transition
-      Color.fromARGB(255, 175, 216, 250), // Deeper blue at the bottom
+      Color.fromARGB(255, 96, 178, 245), // Deeper blue at the bottom
     ],
     stops: [0.0, 0.3, 1.0], // Adjust stops to give white more space
     begin: Alignment.topRight,
