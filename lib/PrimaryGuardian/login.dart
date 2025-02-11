@@ -102,12 +102,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
             ),
 
             // Center the image below the arrow icon
-            Positioned(
-              top: 120, // Adjust this value to move the image up/down
-              left: MediaQuery.of(context).size.width / 2.4 -
-                  50, // Center the image horizontally
-              child: Image.asset('assets/9-removebg-preview.png', height: 150),
-            ),
+            
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
