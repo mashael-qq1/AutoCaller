@@ -16,7 +16,7 @@ class SchoolProfilePage extends StatefulWidget {
 
 class _SchoolProfilePageState extends State<SchoolProfilePage> {
   Map<String, dynamic>? schoolData;
-  DocumentReference? schoolRef; // 🔹 Store reference properly
+  DocumentReference? schoolRef;
   String? adminID;
 
   @override
@@ -25,72 +25,51 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
     fetchAdminData();
   }
 
-  /// Step 1: Fetch Admin's Document to get the School Reference (AschoolID)
   Future<void> fetchAdminData() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        debugPrint('❌ No user is signed in.');
         return;
       }
 
       adminID = user.uid;
-      debugPrint("✅ Admin ID: $adminID");
-
-      // Query Firestore to get the "AschoolID" field from Admin document
       DocumentSnapshot adminDoc = await FirebaseFirestore.instance
-          .collection('Admin') // ✅ Ensure this is the correct collection
-          .doc(adminID) // ✅ Fetch the document where adminID is the document ID
+          .collection('Admin')
+          .doc(adminID)
           .get();
 
       if (adminDoc.exists) {
         var data = adminDoc.data() as Map<String, dynamic>?;
 
         if (data != null && data.containsKey('AschoolID')) {
-          schoolRef =
-              data['AschoolID']; // 🔹 This is a Firestore DocumentReference
-          debugPrint("✅ Found AschoolID reference: ${schoolRef?.path}");
-
+          schoolRef = data['AschoolID'];
           if (schoolRef != null) {
             fetchSchoolData(schoolRef!);
-          } else {
-            debugPrint("❌ AschoolID reference is null.");
           }
-        } else {
-          debugPrint("❌ AschoolID field does not exist in Admin document.");
         }
-      } else {
-        debugPrint("❌ No Admin document found for ID: $adminID");
       }
     } catch (e) {
-      debugPrint("❌ Error fetching admin data: $e");
+      debugPrint("Error fetching admin data: $e");
     }
   }
 
-  /// Step 2: Fetch School Data using AschoolID Reference
   Future<void> fetchSchoolData(DocumentReference schoolRef) async {
     try {
-      DocumentSnapshot schoolDoc =
-          await schoolRef.get(); // ✅ Fetch document using reference
-
+      DocumentSnapshot schoolDoc = await schoolRef.get();
       if (schoolDoc.exists) {
         setState(() {
           schoolData = schoolDoc.data() as Map<String, dynamic>;
         });
-        debugPrint("✅ School data retrieved successfully.");
-      } else {
-        debugPrint("❌ No school data found for reference: ${schoolRef.path}");
       }
     } catch (e) {
-      debugPrint("❌ Error fetching school data: $e");
+      debugPrint("Error fetching school data: $e");
     }
   }
 
-// logout alert
   Future<void> _confirmLogout(BuildContext context) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // User must tap button!
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirm Logout'),
@@ -99,13 +78,13 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
             TextButton(
               child: const Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
             ),
             TextButton(
               child: const Text('Logout'),
               onPressed: () async {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
                 await FirebaseAuth.instance.signOut();
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -125,8 +104,17 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('School Profile'),
-        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false, // Removes back button
+        title: const Text(
+          'School Profile',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: true, // Centers title
+        backgroundColor: Colors.white,
         elevation: 0,
       ),
       body: Column(
@@ -140,7 +128,6 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 20),
-                        // School Logo
                         Center(
                           child: schoolData!['logo'] != null
                               ? Image.network(
@@ -241,7 +228,6 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
     );
   }
 
-  /// Helper function to build a labeled info row
   Widget buildInfoRow(String title, String value,
       {Color color = Colors.black}) {
     return Padding(

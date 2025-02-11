@@ -10,9 +10,18 @@ class StudentsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Students.'),
-        backgroundColor: Colors.white,
-        elevation: 0,
+        automaticallyImplyLeading: false, // Removes back button
+        title: const Text(
+          'Students',
+          style: TextStyle(
+            fontWeight: FontWeight.bold, // Ensures consistency
+            fontSize: 18,
+            color: Colors.black, // Matches other pages
+          ),
+        ),
+        centerTitle: true, // Centers the title
+        backgroundColor: Colors.white, // White background
+        elevation: 0, // Removes shadow
       ),
       bottomNavigationBar:
           const NavBarAdmin(currentIndex: 3), // Set index 3 for Students
@@ -39,6 +48,7 @@ class StudentsPage extends StatelessWidget {
                 final gradeLevel = student['gradeLevel'] ?? 'N/A';
 
                 return Card(
+                  color: Colors.white,
                   elevation: 3,
                   margin: const EdgeInsets.symmetric(vertical: 6),
                   shape: RoundedRectangleBorder(
