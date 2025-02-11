@@ -145,7 +145,7 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
 
   // Validation functions
   bool _isValidName(String name) {
-    return RegExp(r'^[a-zA-Z\s]{3,}$').hasMatch(name);
+    return RegExp(r'^(?!.*\s{3,})[a-zA-Z\s]{3,}$').hasMatch(name);
   }
 
   bool _isValidEmail(String email) {

@@ -141,18 +141,18 @@ class _DismissalStatusState extends State<DismissalStatus> {
 
   String _getMonthName(int month) {
     const List<String> months = [
-      "January",
-      "February",
-      "March",
-      "April",
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
       "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
     ];
     return months[month - 1];
   }
@@ -222,7 +222,7 @@ class StudentCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 const Text(
-                  "Last Dismissal Time:",
+                  "Dismissal Time:",
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

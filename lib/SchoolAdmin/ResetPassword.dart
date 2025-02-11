@@ -20,7 +20,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   // Firebase Authentication instance to interact with Firebase services
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// Function to handle password reset
   void _resetPassword() async {
     // Validate the form fields
     if (_formKey.currentState!.validate()) {
@@ -28,14 +27,27 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         // Send a password reset email to the provided email
         await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
 
-        // Show a success message using SnackBar
+        // Show a success message using a blue SnackBar
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset link sent to your email!')),
+          SnackBar(
+            content: Text(
+              'Password reset link sent to your email!',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            backgroundColor: Colors.blue, // ✅ Blue background
+            behavior: SnackBarBehavior
+                .floating, // Floating style for better visibility
+            elevation: 5,
+          ),
         );
       } catch (e) {
         // Handle errors and show an error message
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -93,8 +105,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -112,8 +124,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     onPressed: _resetPassword,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
