@@ -104,12 +104,7 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
             ),
 
             // Center the image below the arrow icon
-            Positioned(
-              top: 120, // Adjust this value to move the image up/down
-              left: MediaQuery.of(context).size.width / 2.4 -
-                  50, // Center the image horizontally
-              child: Image.asset('assets/9-removebg-preview.png', height: 150),
-            ),
+            
 
             Center(
               child: Padding(
@@ -117,6 +112,7 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Image.asset('assets/9-removebg-preview.png', height: 150),
                     const SizedBox(height: 100),
                     const Text(
                       'Welcome Back!',

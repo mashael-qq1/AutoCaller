@@ -90,6 +90,7 @@ class _PrimaryGuardianProfilePageState extends State<PrimaryGuardianProfilePage>
         title: const Text('Guardian Profile'),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        automaticallyImplyLeading: false,
       ),
       body: guardianData == null
           ? const Center(child: CircularProgressIndicator())
