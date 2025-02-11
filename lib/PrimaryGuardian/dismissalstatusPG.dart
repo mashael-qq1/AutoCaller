@@ -195,7 +195,7 @@ class StudentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white, // Ensure white background
-      elevation: 0, // Remove shadow
+      elevation: 3, // Remove shadow
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
