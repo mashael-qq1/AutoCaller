@@ -158,8 +158,6 @@ class _DismissalStatusState extends State<DismissalStatus> {
   }
 }
 
-
-/// **Student Card UI Component**
 class StudentCard extends StatelessWidget {
   final String name;
   final String status;
@@ -175,26 +173,29 @@ class StudentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white, // ✅ Keep background clean
-      elevation: 0, // ✅ Remove shadow
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      color: Colors.white, // ✅ Keep background white
+      elevation: 3, // ✅ Add subtle shadow like Students Page
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300, width: 1), // ✅ Subtle border
+        borderRadius: BorderRadius.circular(12), // ✅ Match Students Page
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12), // ✅ Adjust padding
+        padding: const EdgeInsets.all(12),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween, // ✅ Distribute space evenly
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Left side (Profile Picture)
+            // 🔹 Left: Profile Image
             CircleAvatar(
-              backgroundColor: Colors.blueAccent, // ✅ Keep blue for contrast
-              child: Icon(Icons.person, color: Colors.white),
+              radius: 25, // ✅ Adjusted for consistency
+              backgroundColor: Colors.blue.shade100,
+              child: Icon(
+                Icons.person,
+                color: Colors.blue.shade700,
+              ),
             ),
-            const SizedBox(width: 10), // ✅ Space between image and text
-            
-            // Center (Name & Status)
+            const SizedBox(width: 12), // ✅ Space between image and text
+
+            // 🔹 Center: Name & Status
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,7 +208,7 @@ class StudentCard extends StatelessWidget {
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 5), // ✅ Add small spacing
+                  const SizedBox(height: 4),
                   Text(
                     "Status: $status",
                     style: const TextStyle(color: Colors.black54, fontSize: 14),
@@ -216,7 +217,7 @@ class StudentCard extends StatelessWidget {
               ),
             ),
 
-            // Right side (Last Dismissal Time)
+            // 🔹 Right: Last Dismissal Time
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
