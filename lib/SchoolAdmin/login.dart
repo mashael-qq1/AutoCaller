@@ -1,3 +1,4 @@
+import 'package:autocaller/SchoolAdmin/SchoolProfile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,7 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
         // Successful login -> Navigate to Admin Home Page
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => SchoolAdminHomePage()),
+          MaterialPageRoute(builder: (context) => SchoolProfilePage()),
         );
       } else {
         _showError("This account is not authorized as an admin.");
