@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dismissalstatusPG.dart'; // Import your dismissal status page
+import 'PGprofile.dart';
 import 'package:autocaller/PrimaryGuardian/NavBarPG.dart';
 
 class GuardianHomePage extends StatelessWidget {
@@ -10,17 +12,46 @@ class GuardianHomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Guardian Home',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.normal),
         ),
         centerTitle: true, // Centers the app bar title
-        backgroundColor: Colors.white, // Makes the app bar white
+        backgroundColor: Colors.blue,
         elevation: 0,
       ),
-      body: const Center(
-        child: Text(
-          'Welcome to the Guardian Home Page!',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Welcome to the Guardian Home Page!',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to DismissalStatusPG
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const DismissalStatusPG()),
+                );
+              },
+              child: const Text('View Dismissal Status'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to GuardianProfile
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PrimaryGuardianProfilePage()),
+                );
+              },
+              child: const Text('View Profile'),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar:
