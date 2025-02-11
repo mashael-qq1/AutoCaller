@@ -257,7 +257,10 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
             height: double.infinity, // Ensures it covers the whole screen
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color.fromARGB(255, 253, 253, 253), Color.fromARGB(255, 189, 222, 251)],
+                colors: [
+                  Color.fromARGB(255, 253, 253, 253),
+                  Color.fromARGB(255, 189, 222, 251)
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -265,20 +268,20 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
           ),
 
           // Back Button Positioned on the Blue Background
-          Positioned(
-            top: 40, // Adjust for better positioning
-            left: 16,
-            child: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.black, size: 28),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SchoolAdminHomePage()),
-                );
-              },
-            ),
-          ),
+          //    Positioned(
+          //      top: 40, // Adjust for better positioning
+          //      left: 16,
+          //      child: IconButton(
+          //        icon: Icon(Icons.arrow_back, color: Colors.black, size: 28),
+          //        onPressed: () {
+          //        Navigator.pushReplacement(
+          //          context,
+          //          MaterialPageRoute(
+          //              builder: (context) => const SchoolAdminHomePage()),
+          //        );
+          //      },
+          //    ),
+          //  ),
 
           // Scrollable content on top of the gradient
           SafeArea(
@@ -289,7 +292,6 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      
                       SizedBox(height: 96),
                       Text('Add Guardian',
                           style: TextStyle(
