@@ -71,8 +71,8 @@ class _StudentListPGState extends State<StudentListPG> {
       body: childrenRefs == null
           ? const Center(child: CircularProgressIndicator())
           : _buildStudentList(),
-      bottomNavigationBar:
-          NavBarPG(loggedInGuardianId: widget.loggedInGuardianId),
+      bottomNavigationBar: NavBarPG(
+          loggedInGuardianId: widget.loggedInGuardianId, currentIndex: 3),
     );
   }
 

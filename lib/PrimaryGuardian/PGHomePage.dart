@@ -28,14 +28,15 @@ class GuardianHomePage extends StatelessWidget {
           'Welcome to the Guardian Home Page!',
           style: TextStyle(
             fontSize: 16, // Adjusted to match other pages
-            fontWeight: FontWeight.normal, // Matches profile page styling
-            color: Colors.black, // Consistent text color
+            fontWeight: FontWeight.bold, // Matches profile page styling
+            color: Color.fromARGB(255, 25, 118, 210), // Consistent text color
           ),
           textAlign: TextAlign.center,
         ),
       ),
-      bottomNavigationBar:
-          const NavBarPG(loggedInGuardianId: "guardian_id"), // Attach NavBarPG
+      bottomNavigationBar: const NavBarPG(
+          loggedInGuardianId: "guardian_id",
+          currentIndex: 2), // Attach NavBarPG
     );
   }
 }

@@ -73,8 +73,9 @@ class _DismissalStatusPGState extends State<DismissalStatusPG> {
           ),
         ],
       ),
-      bottomNavigationBar:
-          guardianID != null ? NavBarPG(loggedInGuardianId: guardianID!) : null,
+      bottomNavigationBar: guardianID != null
+          ? NavBarPG(loggedInGuardianId: guardianID!, currentIndex: 0)
+          : null, //
     );
   }
 

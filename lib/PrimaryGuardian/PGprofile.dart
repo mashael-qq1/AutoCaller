@@ -207,8 +207,9 @@ class _PrimaryGuardianProfilePageState
                 ],
               ),
             ),
-      bottomNavigationBar:
-          guardianID != null ? NavBarPG(loggedInGuardianId: guardianID!) : null,
+      bottomNavigationBar: guardianID != null
+          ? NavBarPG(loggedInGuardianId: guardianID!, currentIndex: 4)
+          : null,
     );
   }
 
