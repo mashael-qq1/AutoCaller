@@ -111,7 +111,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
                     'assets/9-removebg-preview.png',height: 150,
                     ),
                     
-                    const SizedBox(height: 100),
+                    const SizedBox(height: 10),
                     const Text(
                       'Welcome Back!',
                       style: TextStyle(
