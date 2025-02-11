@@ -58,7 +58,9 @@ class _DismissalStatusState extends State<DismissalStatus> {
     return Scaffold(
       backgroundColor: Colors.white, // Match School Profile Page
       appBar: AppBar(
+        automaticallyImplyLeading: false, // This removes the back button
         title: const Text("Dismissal Status"),
+        centerTitle: true, // Centers the text in the AppBar
         backgroundColor: Colors.transparent, // Match School Profile
         elevation: 0,
       ),
@@ -175,6 +177,7 @@ class _DismissalStatusState extends State<DismissalStatus> {
     return months[month - 1];
   }
 }
+
 /// **Student Card UI Component**
 class StudentCard extends StatelessWidget {
   final String name;
@@ -196,7 +199,8 @@ class StudentCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300, width: 1), // ✅ Subtle border
+        side: BorderSide(
+            color: Colors.grey.shade300, width: 1), // ✅ Subtle border
       ),
       child: ListTile(
         leading: const CircleAvatar(
@@ -212,14 +216,16 @@ class StudentCard extends StatelessWidget {
         ),
         subtitle: Text(
           "Status: $status",
-          style: const TextStyle(color: Colors.black), // ✅ Ensure subtitle is black
+          style: const TextStyle(
+              color: Colors.black), // ✅ Ensure subtitle is black
         ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               dismissalTime,
-              style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.blue, fontWeight: FontWeight.bold),
             ),
           ],
         ),
