@@ -1,4 +1,5 @@
 import 'package:autocaller/PrimaryGuardian/signup.dart';
+import 'package:autocaller/firstPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -94,14 +95,22 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
         child: Stack(
           children: [
             Positioned(
-              top: 40,
-              left: 16,
-              child: IconButton(
-                icon:
-                    const Icon(Icons.arrow_back, color: Colors.black, size: 30),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ),
+  top: 40,
+  left: 16,
+  child: IconButton(
+    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 30),
+    onPressed: () {
+      // Navigate to the first page (e.g., HomePage or any specific page)
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const WelcomeScreen(), // Replace with your first page widget
+        ),
+      );
+    },
+  ),
+),
+
 
             // Center the image below the arrow icon
             
