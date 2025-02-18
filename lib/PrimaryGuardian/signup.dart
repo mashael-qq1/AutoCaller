@@ -91,6 +91,7 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
   bool _hasNumber = false;
   bool _hasSpecialChar = false;
   bool _hasMinLength = false;
+  final FocusNode _passwordFocusNode = FocusNode();
 
   void _updatePasswordValidation(String password) {
     setState(() {
@@ -106,60 +107,66 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
     return Row(
       children: [
         Icon(Icons.check_circle,
-            color: isMet ? Colors.blue : Colors.grey, size: 16),
+            color: isMet ? Colors.blue : Color(0xFF57636C), size: 16),
         SizedBox(width: 6),
-        Text(text, style: TextStyle(color: isMet ? Colors.blue : Colors.grey)),
+        Text(text, style: TextStyle(color: isMet ? Colors.blue :  Color(0xFF57636C))),
       ],
     );
   }
 
   Widget _buildPasswordField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          controller: _passwordController,
-          obscureText: !_isPasswordVisible,
-          onChanged: _updatePasswordValidation,
-          decoration: InputDecoration(
-            labelText: "Password",
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(40),
-              borderSide: BorderSide.none,
-            ),
-             focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(40),
-        borderSide: BorderSide.none,
-      ),
-      labelStyle: TextStyle(
-        color: Color(0xFF57636C), // Keep label gray
-      ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                  _isPasswordVisible ? Icons.visibility : Icons.visibility_off),
-              onPressed: () {
-                setState(() {
-                  _isPasswordVisible = !_isPasswordVisible;
-                });
-              },
-            ),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      TextField(
+        controller: _passwordController,
+        focusNode: _passwordFocusNode, // Attach the FocusNode
+        obscureText: !_isPasswordVisible,
+        onChanged: _updatePasswordValidation,
+        onTap: () {
+          setState(() {
+            // Update the visibility of password requirements when tapped
+            _isPasswordVisible = true;
+          });
+        },
+        decoration: InputDecoration(
+          labelText: "Password",
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(40),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(40),
+            borderSide: BorderSide.none,
+          ),
+          labelStyle: TextStyle(
+            color: Color(0xFF57636C), // Keep label gray
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(
+                _isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+            onPressed: () {
+              setState(() {
+                _isPasswordVisible = !_isPasswordVisible;
+              });
+            },
           ),
         ),
+      ),
+      // Show password requirements only when the field is focused
+      if (_passwordFocusNode.hasFocus) ...[
         SizedBox(height: 8),
         _buildPasswordRequirement("At least 8 characters", _hasMinLength),
-        _buildPasswordRequirement(
-            "At least one uppercase letter", _hasUpperCase),
-        _buildPasswordRequirement(
-            "At least one lowercase letter", _hasLowerCase),
+        _buildPasswordRequirement("At least one uppercase letter", _hasUpperCase),
+        _buildPasswordRequirement("At least one lowercase letter", _hasLowerCase),
         _buildPasswordRequirement("At least one number", _hasNumber),
-        _buildPasswordRequirement(
-            "At least one special character", _hasSpecialChar),
+        _buildPasswordRequirement("At least one special character", _hasSpecialChar),
       ],
-    );
-  }
-
+    ],
+  );
+}
   // Validation functions
   bool _isValidName(String name) {
     return RegExp(r'^(?!.*\s{3,})[a-zA-Z\s]{3,}$').hasMatch(name);
@@ -284,9 +291,7 @@ Widget build(BuildContext context) {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0), // Keeps the width consistent
             child: Column(
-              
               children: [
-              
                 // Logo Image right below the back button
                 Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -297,7 +302,7 @@ Widget build(BuildContext context) {
                     fit: BoxFit.contain, // Adjust the image size without distortion
                   ),
                 ),
-                SizedBox(height: 10), // To add space between the logo and form
+                SizedBox(height: 0), // To add space between the logo and form
                // Align the "Get Started" text to the left
                 Align(
                   child: Text(
@@ -384,7 +389,7 @@ RichText(
     ],
   ),
 ),
-SizedBox(height: 30),
+SizedBox(height: 100),
 
 
               ],
