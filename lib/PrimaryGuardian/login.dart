@@ -1,5 +1,7 @@
+import 'package:autocaller/PrimaryGuardian/signup.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '/SchoolAdmin/ResetPassword.dart';
 import '/PrimaryGuardian/PGHomePage.dart';
@@ -213,6 +215,37 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 32),
+RichText(
+  text: TextSpan(
+    text: "Don't have an account? ",
+    style: const TextStyle(
+      fontSize: 14,
+     color: const Color.fromARGB(255, 0, 0, 0),
+    ),
+    children: [
+      TextSpan(
+        text: "Create one",
+        style: const TextStyle(
+          fontSize: 14,
+           color: const Color.fromARGB(255, 0, 0, 0),
+         fontWeight:FontWeight.w700 ,
+        ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PrimaryGuardianSignUpPage(),
+              ),
+            );
+          },
+      ),
+    ],
+  ),
+),
+
+ // Give space before the bottom
                   ],
                 ),
               ),

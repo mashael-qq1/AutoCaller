@@ -1,7 +1,9 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, sort_child_properties_last
 
+import 'package:autocaller/PrimaryGuardian/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:autocaller/SchoolAdmin/NavBarAdmin.dart';
 import 'package:autocaller/SchoolAdmin/AdminHomePage.dart';
@@ -49,7 +51,15 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(40),
           borderSide: BorderSide.none,
+          
         ),
+          focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(40),
+        borderSide: BorderSide.none,
+      ),
+      labelStyle: TextStyle(
+        color: Color(0xFF57636C), // Keep label gray
+      ),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
@@ -119,6 +129,13 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
               borderRadius: BorderRadius.circular(40),
               borderSide: BorderSide.none,
             ),
+             focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(40),
+        borderSide: BorderSide.none,
+      ),
+      labelStyle: TextStyle(
+        color: Color(0xFF57636C), // Keep label gray
+      ),
             suffixIcon: IconButton(
               icon: Icon(
                   _isPasswordVisible ? Icons.visibility : Icons.visibility_off),
@@ -247,107 +264,136 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Background gradient covering the entire screen
-          Container(
-            width: double.infinity,
-            height: double.infinity, // Ensures it covers the whole screen
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 253, 253, 253),
-                  Color.fromARGB(255, 189, 222, 251)
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: SafeArea(
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFFFFFFF), // Pure white at the top
+              Color.fromARGB(255, 255, 255, 255), // Light blue transition
+              Color.fromARGB(255, 96, 178, 245), // Deeper blue at the bottom
+            ],
+            stops: [0.0, 0.2, 1.0], // Adjust stops to give white more space
+            begin: Alignment.topCenter,
+            end: Alignment.bottomLeft,
           ),
-
-          // Back Button Positioned on the Blue Background
-          //    Positioned(
-          //      top: 40, // Adjust for better positioning
-          //      left: 16,
-          //      child: IconButton(
-          //        icon: Icon(Icons.arrow_back, color: Colors.black, size: 28),
-          //        onPressed: () {
-          //        Navigator.pushReplacement(
-          //          context,
-          //          MaterialPageRoute(
-          //              builder: (context) => const SchoolAdminHomePage()),
-          //        );
-          //      },
-          //    ),
-          //  ),
-
-          // Scrollable content on top of the gradient
-          SafeArea(
-            child: SingleChildScrollView(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 96),
-                      Text('Add Guardian',
-                          style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.w500,
-                              color: const Color.fromARGB(255, 0, 0, 0))),
-                      SizedBox(height: 8),
-                      Text(
-                        'Enter the guardian’s details below.',
-                        style:
-                            TextStyle(fontSize: 14, color: Color(0xFF57636C)),
-                      ),
-                      SizedBox(height: 24),
-                      _buildTextField(_fullNameController, "Full Name"),
-                      SizedBox(height: 16),
-                      _buildTextField(_emailController, "Email",
-                          keyboardType: TextInputType.emailAddress),
-                      SizedBox(height: 16),
-                      _buildTextField(_phoneController, "Phone Number",
-                          keyboardType: TextInputType.phone),
-                      SizedBox(height: 16),
-                      _buildPasswordField(),
-                      SizedBox(height: 16),
-                      _buildTextField(
-                          _confirmPasswordController, "Confirm Password",
-                          isPassword: true, isConfirmPassword: true),
-                      SizedBox(height: 24),
-                      SizedBox(
-                        width: 150,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _signUpGuardian,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF23a8ff),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(40)),
-                          ),
-                          child: _isLoading
-                              ? CircularProgressIndicator(color: Colors.white)
-                              : const Text('Add Guardian',
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.white)),
-                        ),
-                      ),
-                      SizedBox(
-                          height:
-                              30), // Prevents button from touching screen edge
-                    ],
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0), // Keeps the width consistent
+            child: Column(
+              
+              children: [
+              
+                // Logo Image right below the back button
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Image.asset(
+                    'assets/9-removebg-preview.png', // Replace with the actual path to your logo image
+                    height: 150, // Set the height of the logo
+                    width: 110,  // Set the width of the logo
+                    fit: BoxFit.contain, // Adjust the image size without distortion
                   ),
                 ),
+                SizedBox(height: 10), // To add space between the logo and form
+               // Align the "Get Started" text to the left
+                Align(
+                  child: Text(
+                    'Get Started',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 8),
+                
+                // Align the description text to the left
+                Align(
+                  child: Text(
+                    'Use the form below to get started.',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF57636C)),
+                  ),
+                ), 
+                SizedBox(height: 24),
+                _buildTextField(_fullNameController, "Full Name"),
+                SizedBox(height: 16),
+                _buildTextField(_emailController, "Email",
+                    keyboardType: TextInputType.emailAddress),
+                SizedBox(height: 16),
+                _buildTextField(_phoneController, "Phone Number",
+                    keyboardType: TextInputType.phone),
+                SizedBox(height: 16),
+                _buildPasswordField(),
+                SizedBox(height: 16),
+                _buildTextField(
+                    _confirmPasswordController, "Confirm Password",
+                    isPassword: true, isConfirmPassword: true),
+                SizedBox(height: 24),
+                SizedBox(
+                  width: 150,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _signUpGuardian,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF23a8ff),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(40)),
+                    ),
+                    child: _isLoading
+                        ? CircularProgressIndicator(color: Colors.white)
+                        : const Text('Sign up ',
+                            style:
+                                TextStyle(fontSize: 14, color: Colors.white)),
+                  ),
+                ),
+              SizedBox(height: 30),
+RichText(
+  text: TextSpan(
+    style: TextStyle(
+      fontSize: 14,
+      color: Color(0xFF57636C),
+    ),
+    children: [
+      TextSpan(
+        text: 'Already have an account? ',
+         style: TextStyle(
+          color: const Color.fromARGB(255, 0, 0, 0),
+        
+        ),
+      ),
+      TextSpan(
+        text: 'login',
+        style: TextStyle(
+          color: const Color.fromARGB(255, 0, 0, 0),
+         fontWeight:FontWeight.w700 ,
+        ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const GuardianLoginPage(),
               ),
+            );
+          },
+      ),
+    ],
+  ),
+),
+SizedBox(height: 30),
+
+
+              ],
             ),
           ),
-        ],
+        ),
       ),
-      bottomNavigationBar: NavBarAdmin(currentIndex: 1), // Add Navigation Bar
-    );
-  }
+    ),
+   
+  );
+}
 }
