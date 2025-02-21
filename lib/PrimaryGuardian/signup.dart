@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, sort_child_properties_last
 
+import 'package:autocaller/PrimaryGuardian/PGHomePage.dart';
 import 'package:autocaller/PrimaryGuardian/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -232,8 +233,12 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
         'userId': userCredential.user!.uid,
       });
 
-      _showSuccessMessage("Guardian Added Successfully!");
+      _showSuccessMessage("Signed up Successfully!");
       _clearFormFields();
+       Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => GuardianHomePage()), // Replace with your homepage widget
+    );
     } catch (e) {
       _showError("Failed to add guardian: ${e.toString()}");
     } finally {
