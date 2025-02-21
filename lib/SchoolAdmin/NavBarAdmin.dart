@@ -1,4 +1,5 @@
 import 'package:autocaller/PrimaryGuardian/signup.dart';
+import 'package:autocaller/SchoolAdmin/AddStudent.dart';
 import 'package:flutter/material.dart';
 import 'AdminHomePage.dart';
 import 'DismissalStatus.dart';
@@ -22,7 +23,7 @@ class NavBarAdmin extends StatelessWidget {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => const PrimaryGuardianSignUpPage()));
+                builder: (context) => AddStudentPage()));
         break;
       case 2:
         Navigator.pushReplacement(context,
