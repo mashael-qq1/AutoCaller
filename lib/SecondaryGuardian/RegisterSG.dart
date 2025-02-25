@@ -66,15 +66,16 @@ class _RegisterSecondaryGuardianPageState
 
       // Store secondary guardian in Firestore
       await _firestore
-          .collection('SecondaryGuardian')
+          .collection('Secondary Guardian')
           .doc(secondaryGuardianID)
           .set({
-        "name": _nameController.text.trim(),
+        "FullName": _nameController.text.trim(),
         "PhoneNum": _phoneController.text.trim(),
         "email": _emailController.text.trim(),
         "isAuthorized": true,
+        "uid": secondaryGuardianID,
         "primaryGuardianID": widget.primaryGuardianID,
-        "studentsID": widget.studentIDs,
+        "children": widget.studentIDs,
       });
 
       // Link the Secondary Guardian under the Primary Guardian
