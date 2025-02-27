@@ -1,5 +1,6 @@
 import 'package:autocaller/SecondaryGuardian/SGhome.dart';
 import 'package:autocaller/firstPage.dart';
+import 'package:autocaller/SchoolAdmin/ResetPassword.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -36,20 +37,16 @@ class _SecondaryGuardianLoginPageState
     });
 
     try {
-      // 🔹 Sign in user with Firebase Authentication
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       String uid = userCredential.user!.uid;
-
-      // 🔹 Check if user exists in Firestore under "Secondary Guardian"
       DocumentSnapshot guardianSnapshot =
           await _firestore.collection('Secondary Guardian').doc(uid).get();
 
       if (guardianSnapshot.exists) {
-        // 🔹 Navigate to Secondary Guardian Home Page if valid
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const SGhome()),
@@ -98,11 +95,13 @@ class _SecondaryGuardianLoginPageState
               top: 40,
               left: 16,
               child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black, size: 30),
+                icon:
+                    const Icon(Icons.arrow_back, color: Colors.black, size: 30),
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const WelcomeScreen()),
                   );
                 },
               ),
@@ -118,12 +117,16 @@ class _SecondaryGuardianLoginPageState
                       const SizedBox(height: 10),
                       const Text(
                         'Welcome Secondary Guardian!',
-                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.w500, color: Colors.black),
+                        style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black),
                       ),
                       const SizedBox(height: 8),
                       const Text(
                         'Use the form below to access your account.',
-                        style: TextStyle(fontSize: 14, color: Color(0xFF57636C)),
+                        style:
+                            TextStyle(fontSize: 14, color: Color(0xFF57636C)),
                       ),
                       const SizedBox(height: 24),
 
@@ -159,7 +162,9 @@ class _SecondaryGuardianLoginPageState
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                               color: Colors.grey,
                             ),
                             onPressed: () {
@@ -172,25 +177,45 @@ class _SecondaryGuardianLoginPageState
                       ),
                       const SizedBox(height: 16),
 
-                      // Sign In Button
-                      SizedBox(
-                        width: 150,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _loginSecondaryGuardian,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(40),
+                      // Forgot Password and Sign In Button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ResetPasswordPage()),
+                              );
+                            },
+                            child: const Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                  fontSize: 14, color: Color(0xFF57636C)),
                             ),
                           ),
-                          child: _isLoading
-                              ? const CircularProgressIndicator(color: Colors.white)
-                              : const Text(
-                                  'Sign In',
-                                  style: TextStyle(fontSize: 16, color: Colors.white),
-                                ),
-                        ),
+                          SizedBox(
+                            width: 130,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed:
+                                  _isLoading ? null : _loginSecondaryGuardian,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF23a8ff),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(40)),
+                              ),
+                              child: _isLoading
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white)
+                                  : const Text('Sign In',
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.white)),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 32),
                     ],

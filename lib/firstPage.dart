@@ -1,5 +1,5 @@
 // ignore_for_file: prefer_const_constructors
-import 'package:autocaller/SecondaryGuardian/login.dart';  // ✅ Import Secondary Guardian Login
+import 'package:autocaller/SecondaryGuardian/login.dart'; // ✅ Import Secondary Guardian Login
 import 'package:autocaller/PrimaryGuardian/login.dart';
 import 'package:autocaller/SchoolAdmin/login.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +20,7 @@ class WelcomeScreen extends StatelessWidget {
               Color.fromARGB(255, 255, 255, 255), // Light blue transition
               Color.fromARGB(255, 96, 178, 245), // Deeper blue at the bottom
             ],
-            stops: [0.0, 0.3, 1.0], 
+            stops: [0.0, 0.3, 1.0],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
           ),
@@ -30,7 +30,7 @@ class WelcomeScreen extends StatelessWidget {
           children: [
             // 🔹 App Logo
             Image.asset(
-              'assets/9-removebg-preview.png', 
+              'assets/9-removebg-preview.png',
               height: 200.0,
               width: 200.0,
             ),
@@ -72,17 +72,20 @@ class WelcomeScreen extends StatelessWidget {
             const SizedBox(height: 30.0),
 
             // 🔹 Guardian Button
-            _buildLoginButton(context, 'Guardian', Colors.blue, GuardianLoginPage()),
+            _buildLoginButton(
+                context, 'Primary Guardian', Colors.blue, GuardianLoginPage()),
 
             const SizedBox(height: 15.0),
 
             // 🔹 School Admin Button
-            _buildLoginButton(context, 'School Admin', Colors.blue, SchoolAdminLoginPage()),
+            _buildLoginButton(
+                context, 'School Admin', Colors.blue, SchoolAdminLoginPage()),
 
             const SizedBox(height: 15.0),
 
             // 🔹 Secondary Guardian Button (✅ FIXED ✅)
-            _buildLoginButton(context, 'Secondary Guardian', Colors.blue, SecondaryGuardianLoginPage()),
+            _buildLoginButton(context, 'Secondary Guardian', Colors.blue,
+                SecondaryGuardianLoginPage()),
 
             const SizedBox(height: 20.0),
           ],
@@ -92,17 +95,20 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   // 🔹 Function to Create a Styled Button
-  Widget _buildLoginButton(BuildContext context, String title, Color color, Widget page) {
+  Widget _buildLoginButton(
+      BuildContext context, String title, Color color, Widget page) {
     return SizedBox(
       width: 300.0,
       height: 55.0,
       child: ElevatedButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => page));
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
         ),
         child: Text(
           title,
