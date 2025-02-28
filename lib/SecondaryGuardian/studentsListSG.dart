@@ -14,14 +14,16 @@ class StudentListSG extends StatefulWidget {
 
 class _StudentListSGState extends State<StudentListSG> {
   List<DocumentReference>? childrenRefs;
+  bool? isAuthorized;
 
   @override
   void initState() {
     super.initState();
-    _fetchGuardianChildren();
+    _fetchGuardianData();
   }
 
-  Future<void> _fetchGuardianChildren() async {
+  /// **Fetches Guardian Data (Children References & Authorization Status)**
+  Future<void> _fetchGuardianData() async {
     String? guardianEmail = FirebaseAuth.instance.currentUser?.email;
 
     if (guardianEmail == null) {
@@ -31,22 +33,25 @@ class _StudentListSGState extends State<StudentListSG> {
 
     try {
       var guardianQuery = await FirebaseFirestore.instance
-          .collection('Secondary Guardian') // ✅ Fetch from Secondary Guardian Collection
+          .collection(
+              'Secondary Guardian') // ✅ Fetch from Secondary Guardian Collection
           .where('email', isEqualTo: guardianEmail.trim().toLowerCase())
           .get();
 
       if (guardianQuery.docs.isNotEmpty) {
         var guardianDoc = guardianQuery.docs.first;
-        List<dynamic>? children = guardianDoc['children'];
+        bool guardianIsAuthorized = guardianDoc['isAuthorized'] ?? false;
 
-        if (children != null && children.isNotEmpty) {
-          setState(() {
-            childrenRefs = children.cast<DocumentReference>();
-          });
-        }
+        setState(() {
+          isAuthorized = guardianIsAuthorized;
+          if (guardianIsAuthorized) {
+            childrenRefs = (guardianDoc['children'] as List<dynamic>?)
+                ?.cast<DocumentReference>();
+          }
+        });
       }
     } catch (e) {
-      debugPrint("❌ Error fetching children references: $e");
+      debugPrint("❌ Error fetching guardian data: $e");
     }
   }
 
@@ -68,14 +73,27 @@ class _StudentListSGState extends State<StudentListSG> {
         backgroundColor: Colors.white, // White background for the AppBar
         elevation: 0,
       ),
-      body: childrenRefs == null
-          ? const Center(child: CircularProgressIndicator())
-          : _buildStudentList(),
+      body: _buildBody(),
       bottomNavigationBar: NavBarSG(
           loggedInGuardianId: widget.loggedInGuardianId, currentIndex: 1),
     );
   }
 
+  Widget _buildBody() {
+    if (isAuthorized == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (!isAuthorized!) {
+      return _accessRevokedMessage();
+    }
+
+    return childrenRefs == null
+        ? const Center(child: CircularProgressIndicator())
+        : _buildStudentList();
+  }
+
+  /// **Displays List of Students**
   Widget _buildStudentList() {
     if (childrenRefs == null || childrenRefs!.isEmpty) {
       return _noChildrenFound();
@@ -109,6 +127,7 @@ class _StudentListSGState extends State<StudentListSG> {
     );
   }
 
+  /// **Fetch Student Documents**
   Future<List<DocumentSnapshot>> _fetchStudentDocuments(
       List<DocumentReference> studentRefs) async {
     List<DocumentSnapshot> studentDocs = [];
@@ -125,6 +144,7 @@ class _StudentListSGState extends State<StudentListSG> {
     return studentDocs;
   }
 
+  /// **Message When No Students Are Found**
   Widget _noChildrenFound() {
     return const Center(
       child: Column(
@@ -138,6 +158,29 @@ class _StudentListSGState extends State<StudentListSG> {
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.red,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// **Message When Guardian Is Disabled**
+  Widget _accessRevokedMessage() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.block, color: Colors.red, size: 50),
+          SizedBox(height: 10),
+          Text(
+            "You have been disabled by the Primary Guardian,\n"
+            "you no longer have access to their students.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
           ),
         ],

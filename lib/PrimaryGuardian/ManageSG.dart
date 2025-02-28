@@ -64,6 +64,7 @@ class _ManageSGState extends State<ManageSG> {
       stream: FirebaseFirestore.instance
           .collection('Secondary Guardian')
           .where('primaryGuardianID', isEqualTo: widget.loggedInGuardianId)
+          .where('isAuthorized', isEqualTo: true)
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -97,9 +98,13 @@ class _ManageSGState extends State<ManageSG> {
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
-        leading: const CircleAvatar(
-          backgroundColor: Colors.blueAccent,
-          child: Icon(Icons.person, color: Colors.white),
+        leading: CircleAvatar(
+          radius: 25, // ✅ Keep consistent size
+          backgroundColor: Colors.blue.shade100,
+          child: Icon(
+            Icons.person,
+            color: Colors.blue.shade700,
+          ),
         ),
         title: Text(
           name,
@@ -112,10 +117,39 @@ class _ManageSGState extends State<ManageSG> {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          onPressed: () => _removeGuardian(guardianRef),
+          onPressed: () => _confirmRemoveGuardian(guardianRef),
           child: const Text("Remove", style: TextStyle(color: Colors.white)),
         ),
       ),
+    );
+  }
+
+  void _confirmRemoveGuardian(DocumentReference guardianRef) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirm Removal"),
+          content: const Text(
+              "Are you sure you want to remove this secondary guardian?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context)
+                    .pop(); // Close the dialog before proceeding
+                await _removeGuardian(guardianRef);
+              },
+              child: const Text("Remove", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
     );
   }
 
