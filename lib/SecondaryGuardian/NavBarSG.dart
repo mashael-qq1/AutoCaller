@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:autocaller/SecondaryGuardian/SGhome.dart'; 
-import 'package:autocaller/SecondaryGuardian/dissmisalstatusSG.dart'; 
-import 'package:autocaller/SecondaryGuardian/profileSG.dart'; 
+import 'package:autocaller/SecondaryGuardian/SGhome.dart';
+import 'package:autocaller/SecondaryGuardian/dissmisalstatusSG.dart';
+import 'package:autocaller/SecondaryGuardian/profileSG.dart';
 import 'package:autocaller/SecondaryGuardian/studentsListSG.dart';
 
 class NavBarSG extends StatelessWidget {
   final String loggedInGuardianId;
   final int currentIndex;
 
-  const NavBarSG({super.key, required this.loggedInGuardianId, required this.currentIndex});
+  const NavBarSG(
+      {super.key,
+      required this.loggedInGuardianId,
+      required this.currentIndex});
 
   void _onItemTapped(BuildContext context, int index) {
     print("Tapped on index: $index");
@@ -20,7 +23,7 @@ class NavBarSG extends StatelessWidget {
         print("Navigating to DismissalStatusSG");
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) =>  DismissalStatusSG()),
+          MaterialPageRoute(builder: (context) => DismissalStatusSG()),
         );
         break;
       case 1:
@@ -28,14 +31,23 @@ class NavBarSG extends StatelessWidget {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => StudentListSG(loggedInGuardianId: loggedInGuardianId)),
+              builder: (context) =>
+                  StudentListSG(loggedInGuardianId: loggedInGuardianId)),
         );
         break;
       case 2:
+        print("Navigating to SGhome");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SGhome()),
+        );
+        break;
+      case 3:
         print("Navigating to SGProfile");
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => SecondaryGuardianProfilePage()),
+          MaterialPageRoute(
+              builder: (context) => SecondaryGuardianProfilePage()),
         );
         break;
     }
@@ -50,7 +62,8 @@ class NavBarSG extends StatelessWidget {
         children: [
           _buildNavItem(Icons.access_time, 0, context), // Dismissal Status
           _buildNavItem(Icons.groups, 1, context), // View Students
-          _buildNavItem(Icons.person, 2, context), // View Profile
+          _buildNavItem(Icons.home, 2, context), // Home (Centered)
+          _buildNavItem(Icons.person, 3, context), // View Profile
         ],
       ),
     );

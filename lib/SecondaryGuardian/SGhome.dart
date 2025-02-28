@@ -17,7 +17,7 @@ class SGhome extends StatelessWidget {
       ),
       bottomNavigationBar: const NavBarSG(
         loggedInGuardianId: "secondary_guardian_id",
-        currentIndex: 0,
+        currentIndex: 2, // Home icon is now highlighted
       ),
     );
   }
