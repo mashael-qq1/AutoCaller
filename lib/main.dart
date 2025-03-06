@@ -4,6 +4,7 @@ import 'package:autocaller/firstPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,10 +21,22 @@ Future<void> main() async {
   } else {
     await Firebase.initializeApp();
   }
-
+// Request Location Permissions before running the app
+  await requestPermissions();
   runApp(const MyApp());
 }
+// Function to request location permissions
+Future<void> requestPermissions() async {
+  LocationPermission permission = await Geolocator.requestPermission();
 
+  if (permission == LocationPermission.denied) {
+    print("❌ Location permission denied");
+  } else if (permission == LocationPermission.deniedForever) {
+    print("❌ Location permissions are permanently denied. Enable them from app settings.");
+  } else {
+    print("✅ Location permission granted");
+  }
+}
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

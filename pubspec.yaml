@@ -17,6 +17,10 @@ dependencies:
   cloud_firestore: ^5.6.2
   share_plus: ^10.1.4
   firebase_dynamic_links: ^6.1.3
+  geolocator: ^10.1.0  # For fetching GPS location
+  geofence_service_in_app: ^3.6.3  # For Geofencing
+  google_maps_flutter: ^2.10.1
+  firebase_database: ^11.3.4
 
 dev_dependencies:
   flutter_test:
