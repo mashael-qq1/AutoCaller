@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'SGhome.dart'; // Navigate to Secondary Guardian Home Page after registration
 
 class RegisterSecondaryGuardianPage extends StatefulWidget {
   final String primaryGuardianID;
@@ -56,6 +57,7 @@ class _RegisterSecondaryGuardianPageState
     });
 
     try {
+      // Create Secondary Guardian Auth
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -64,6 +66,7 @@ class _RegisterSecondaryGuardianPageState
 
       String secondaryGuardianID = userCredential.user!.uid;
 
+      // Store Secondary Guardian in Firestore
       await _firestore.collection('Secondary Guardian').doc(secondaryGuardianID).set({
         "FullName": _nameController.text.trim(),
         "PhoneNum": _phoneController.text.trim(),
@@ -74,7 +77,8 @@ class _RegisterSecondaryGuardianPageState
         "children": widget.studentIDs,
       });
 
-      await _firestore.collection('PrimaryGuardian').doc(widget.primaryGuardianID).update({
+      // Update Primary Guardian with Secondary Guardian ID
+      await _firestore.collection('Primary Guardian').doc(widget.primaryGuardianID).update({
         "secondaryGuardiansID": FieldValue.arrayUnion([secondaryGuardianID])
       });
 
@@ -84,7 +88,10 @@ class _RegisterSecondaryGuardianPageState
         const SnackBar(content: Text("Registration successful!")),
       );
 
-      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SGhome()),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: ${e.toString()}")),
@@ -110,7 +117,7 @@ class _RegisterSecondaryGuardianPageState
       Uri.parse('https://fcm.googleapis.com/fcm/send'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'key=BLCIoXmBAMnLvvq9bTvqNxqJUWc4aY8mXrYyce8p--KTJ5LK-aS65KAz70vHtC_0oYlqrm7IjVqldpbbd12k72E', // <-- Put your Server Key here
+        'Authorization': 'key=BLCIoXmBAMnLvvq9bTvqNxqJUWc4aY8mXrYyce8p--KTJ5LK-aS65KAz70vHtC_0oYlqrm7IjVqldpbbd12k72E', // Replace with your real FCM Server Key
       },
       body: jsonEncode({
         "to": fcmToken,
