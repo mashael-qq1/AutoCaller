@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class RegisterSecondaryGuardianPage extends StatefulWidget {
   final String primaryGuardianID;
@@ -30,7 +32,6 @@ class _RegisterSecondaryGuardianPageState
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _isLoading = false;
 
-  /// **Registers the Secondary Guardian**
   Future<void> _registerSecondaryGuardian() async {
     if (_nameController.text.isEmpty ||
         _phoneController.text.isEmpty ||
@@ -55,7 +56,6 @@ class _RegisterSecondaryGuardianPageState
     });
 
     try {
-      // Create user in Firebase Authentication
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -64,11 +64,7 @@ class _RegisterSecondaryGuardianPageState
 
       String secondaryGuardianID = userCredential.user!.uid;
 
-      // Store secondary guardian in Firestore
-      await _firestore
-          .collection('Secondary Guardian')
-          .doc(secondaryGuardianID)
-          .set({
+      await _firestore.collection('Secondary Guardian').doc(secondaryGuardianID).set({
         "FullName": _nameController.text.trim(),
         "PhoneNum": _phoneController.text.trim(),
         "email": _emailController.text.trim(),
@@ -78,13 +74,11 @@ class _RegisterSecondaryGuardianPageState
         "children": widget.studentIDs,
       });
 
-      // Link the Secondary Guardian under the Primary Guardian
-      await _firestore
-          .collection('PrimaryGuardian')
-          .doc(widget.primaryGuardianID)
-          .update({
+      await _firestore.collection('PrimaryGuardian').doc(widget.primaryGuardianID).update({
         "secondaryGuardiansID": FieldValue.arrayUnion([secondaryGuardianID])
       });
+
+      await _sendNotificationToPrimaryGuardian();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Registration successful!")),
@@ -102,17 +96,41 @@ class _RegisterSecondaryGuardianPageState
     }
   }
 
+  Future<void> _sendNotificationToPrimaryGuardian() async {
+    DocumentSnapshot primaryDoc = await _firestore
+        .collection('Primary Guardian')
+        .doc(widget.primaryGuardianID)
+        .get();
+
+    String? fcmToken = primaryDoc['fcmToken'];
+
+    if (fcmToken == null) return;
+
+    await http.post(
+      Uri.parse('https://fcm.googleapis.com/fcm/send'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'key=BLCIoXmBAMnLvvq9bTvqNxqJUWc4aY8mXrYyce8p--KTJ5LK-aS65KAz70vHtC_0oYlqrm7IjVqldpbbd12k72E', // <-- Put your Server Key here
+      },
+      body: jsonEncode({
+        "to": fcmToken,
+        "notification": {
+          "title": "Invitation Accepted",
+          "body":
+              "${_nameController.text.trim()} accepted your invitation as a Secondary Guardian.",
+        },
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text(
-          "Secondary Guardian Registration",
-          style: TextStyle(
-              fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18),
-        ),
+        title: const Text("Secondary Guardian Registration",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -124,8 +142,7 @@ class _RegisterSecondaryGuardianPageState
           children: [
             _buildInputField("Full Name", "Enter your name", _nameController),
             const SizedBox(height: 12),
-            _buildInputField(
-                "Phone Number", "Enter phone number", _phoneController,
+            _buildInputField("Phone Number", "Enter phone number", _phoneController,
                 keyboardType: TextInputType.phone),
             const SizedBox(height: 12),
             _buildInputField("Email", "Enter email", _emailController,
@@ -135,8 +152,7 @@ class _RegisterSecondaryGuardianPageState
                 obscureText: true),
             const SizedBox(height: 12),
             _buildInputField("Confirm Password", "Re-enter password",
-                _confirmPasswordController,
-                obscureText: true),
+                _confirmPasswordController, obscureText: true),
             const SizedBox(height: 20),
             _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -147,7 +163,6 @@ class _RegisterSecondaryGuardianPageState
     );
   }
 
-  /// **Input Field Builder**
   Widget _buildInputField(
       String label, String hint, TextEditingController controller,
       {TextInputType? keyboardType, bool obscureText = false}) {
@@ -156,9 +171,7 @@ class _RegisterSecondaryGuardianPageState
       children: [
         Text(label,
             style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black)),
+                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -170,8 +183,9 @@ class _RegisterSecondaryGuardianPageState
             filled: true,
             fillColor: Colors.grey.shade100,
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
           ),
@@ -180,7 +194,6 @@ class _RegisterSecondaryGuardianPageState
     );
   }
 
-  /// **Register Button**
   Widget _buildRegisterButton() {
     return SizedBox(
       width: double.infinity,
@@ -192,10 +205,7 @@ class _RegisterSecondaryGuardianPageState
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: const Text("Register",
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white)),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
       ),
     );
   }

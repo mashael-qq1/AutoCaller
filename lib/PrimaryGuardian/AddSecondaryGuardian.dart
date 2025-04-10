@@ -27,44 +27,46 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
     _fetchChildren();
   }
 
-  Future<void> _fetchChildren() async {
-    try {
-      DocumentSnapshot guardianDoc = await FirebaseFirestore.instance
-          .collection('Primary Guardian')
-          .doc(widget.loggedInGuardianId)
-          .get();
+Future<void> _fetchChildren() async {
+  try {
+    DocumentSnapshot guardianDoc = await FirebaseFirestore.instance
+        .collection('Primary Guardian')
+        .doc(widget.loggedInGuardianId)
+        .get();
 
-      if (!guardianDoc.exists) return;
-      var data = guardianDoc.data() as Map<String, dynamic>?;
-      if (data == null || data['children'] == null) return;
+    if (!guardianDoc.exists) return;
 
-      List<dynamic> childRefs = data['children'];
-      List<Map<String, dynamic>> tempChildren = [];
+    var data = guardianDoc.data() as Map<String, dynamic>?;
 
-      for (var ref in childRefs) {
-        DocumentReference childRef = ref is String
-            ? FirebaseFirestore.instance.doc(ref)
-            : ref as DocumentReference;
+    if (data == null || data['children'] == null) return;
 
-        DocumentSnapshot childDoc = await childRef.get();
-        if (childDoc.exists) {
-          tempChildren.add({
-            'id': childDoc.id,
-            'name': childDoc['Sname'] ?? "Unknown",
-            'grade': childDoc['gradeLevel'] ?? "N/A",
-          });
-        }
-      }
+    List<dynamic> childRefs = data['children'];
+    List<Map<String, dynamic>> tempChildren = [];
 
-      if (mounted) {
-        setState(() {
-          children = tempChildren;
+    for (var ref in childRefs) {
+      // Always get it like this because it's saved with full path
+      DocumentReference childRef = FirebaseFirestore.instance.doc(ref.path);
+
+      DocumentSnapshot childDoc = await childRef.get();
+
+      if (childDoc.exists) {
+        tempChildren.add({
+          'id': childDoc.id,
+          'name': childDoc['Sname'] ?? "Unknown",
+          'grade': childDoc['gradeLevel'] ?? "N/A",
         });
       }
-    } catch (e) {
-      debugPrint("❌ Error fetching students: $e");
     }
+
+    if (mounted) {
+      setState(() {
+        children = tempChildren;
+      });
+    }
+  } catch (e) {
+    debugPrint("❌ Error fetching students: $e");
   }
+}
 
   void _toggleChildSelection(String childId) {
     setState(() {
