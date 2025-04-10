@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'SGhome.dart'; // Make sure this import is correct
 
 class RegisterSecondaryGuardianPage extends StatefulWidget {
   final String primaryGuardianID;
@@ -30,7 +31,6 @@ class _RegisterSecondaryGuardianPageState
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _isLoading = false;
 
-  /// **Registers the Secondary Guardian**
   Future<void> _registerSecondaryGuardian() async {
     if (_nameController.text.isEmpty ||
         _phoneController.text.isEmpty ||
@@ -55,7 +55,6 @@ class _RegisterSecondaryGuardianPageState
     });
 
     try {
-      // Create user in Firebase Authentication
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -64,7 +63,6 @@ class _RegisterSecondaryGuardianPageState
 
       String secondaryGuardianID = userCredential.user!.uid;
 
-      // Store secondary guardian in Firestore
       await _firestore
           .collection('Secondary Guardian')
           .doc(secondaryGuardianID)
@@ -78,7 +76,6 @@ class _RegisterSecondaryGuardianPageState
         "children": widget.studentIDs,
       });
 
-      // Link the Secondary Guardian under the Primary Guardian
       await _firestore
           .collection('PrimaryGuardian')
           .doc(widget.primaryGuardianID)
@@ -90,7 +87,10 @@ class _RegisterSecondaryGuardianPageState
         const SnackBar(content: Text("Registration successful!")),
       );
 
-      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SGhome()),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: ${e.toString()}")),
@@ -147,7 +147,6 @@ class _RegisterSecondaryGuardianPageState
     );
   }
 
-  /// **Input Field Builder**
   Widget _buildInputField(
       String label, String hint, TextEditingController controller,
       {TextInputType? keyboardType, bool obscureText = false}) {
@@ -180,7 +179,6 @@ class _RegisterSecondaryGuardianPageState
     );
   }
 
-  /// **Register Button**
   Widget _buildRegisterButton() {
     return SizedBox(
       width: double.infinity,
