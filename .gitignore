@@ -41,3 +41,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+<<<<<<< HEAD
+=======
+assets/service-account.json
+assets/service-account.json
+assets/service-account.json
+>>>>>>> a862083c429fe302339e754937aaedbe94427d4b

@@ -25,7 +25,11 @@ android {
         applicationId = "com.example.autocaller"
         // Override the minSdkVersion to 23.
         minSdk = 23
+<<<<<<< HEAD
         targetSdk = flutter.targetSdkVersion
+=======
+        targetSdk = 33
+>>>>>>> a862083c429fe302339e754937aaedbe94427d4b
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
