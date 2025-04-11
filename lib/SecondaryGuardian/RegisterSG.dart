@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'SGhome.dart'; // Navigate to Secondary Guardian Home Page after registration
+import 'package:autocaller/notification_service.dart'; // correct import
+
+import 'SGhome.dart';
 
 class RegisterSecondaryGuardianPage extends StatefulWidget {
   final String primaryGuardianID;
@@ -57,7 +57,6 @@ class _RegisterSecondaryGuardianPageState
     });
 
     try {
-      // Create Secondary Guardian Auth
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -66,8 +65,10 @@ class _RegisterSecondaryGuardianPageState
 
       String secondaryGuardianID = userCredential.user!.uid;
 
-      // Store Secondary Guardian in Firestore
-      await _firestore.collection('Secondary Guardian').doc(secondaryGuardianID).set({
+      await _firestore
+          .collection('Secondary Guardian')
+          .doc(secondaryGuardianID)
+          .set({
         "FullName": _nameController.text.trim(),
         "PhoneNum": _phoneController.text.trim(),
         "email": _emailController.text.trim(),
@@ -77,12 +78,31 @@ class _RegisterSecondaryGuardianPageState
         "children": widget.studentIDs,
       });
 
-      // Update Primary Guardian with Secondary Guardian ID
-      await _firestore.collection('Primary Guardian').doc(widget.primaryGuardianID).update({
+      await _firestore
+          .collection('Primary Guardian')
+          .doc(widget.primaryGuardianID)
+          .update({
         "secondaryGuardiansID": FieldValue.arrayUnion([secondaryGuardianID])
       });
 
-      await _sendNotificationToPrimaryGuardian();
+      // Get FCM Token of Primary Guardian
+      DocumentSnapshot primaryDoc = await _firestore
+          .collection('Primary Guardian')
+          .doc(widget.primaryGuardianID)
+          .get();
+
+      String? fcmToken = primaryDoc['fcmToken'];
+
+      print("📲 Primary Guardian FCM Token: $fcmToken");
+
+      if (fcmToken != null) {
+        await NotificationService.sendNotification(
+          token: fcmToken,
+          title: "Invitation Accepted",
+          body:
+              "${_nameController.text.trim()} accepted your invitation as a Secondary Guardian.",
+        );
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Registration successful!")),
@@ -103,41 +123,17 @@ class _RegisterSecondaryGuardianPageState
     }
   }
 
-  Future<void> _sendNotificationToPrimaryGuardian() async {
-    DocumentSnapshot primaryDoc = await _firestore
-        .collection('Primary Guardian')
-        .doc(widget.primaryGuardianID)
-        .get();
-
-    String? fcmToken = primaryDoc['fcmToken'];
-
-    if (fcmToken == null) return;
-
-    await http.post(
-      Uri.parse('https://fcm.googleapis.com/fcm/send'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'key=BLCIoXmBAMnLvvq9bTvqNxqJUWc4aY8mXrYyce8p--KTJ5LK-aS65KAz70vHtC_0oYlqrm7IjVqldpbbd12k72E', // Replace with your real FCM Server Key
-      },
-      body: jsonEncode({
-        "to": fcmToken,
-        "notification": {
-          "title": "Invitation Accepted",
-          "body":
-              "${_nameController.text.trim()} accepted your invitation as a Secondary Guardian.",
-        },
-      }),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text("Secondary Guardian Registration",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+        title: const Text(
+          "Secondary Guardian Registration",
+          style:
+              TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -149,14 +145,14 @@ class _RegisterSecondaryGuardianPageState
           children: [
             _buildInputField("Full Name", "Enter your name", _nameController),
             const SizedBox(height: 12),
-            _buildInputField("Phone Number", "Enter phone number", _phoneController,
-                keyboardType: TextInputType.phone),
+            _buildInputField("Phone Number", "Enter phone number",
+                _phoneController, keyboardType: TextInputType.phone),
             const SizedBox(height: 12),
             _buildInputField("Email", "Enter email", _emailController,
                 keyboardType: TextInputType.emailAddress),
             const SizedBox(height: 12),
-            _buildInputField("Password", "Enter password", _passwordController,
-                obscureText: true),
+            _buildInputField("Password", "Enter password",
+                _passwordController, obscureText: true),
             const SizedBox(height: 12),
             _buildInputField("Confirm Password", "Re-enter password",
                 _confirmPasswordController, obscureText: true),
@@ -170,8 +166,8 @@ class _RegisterSecondaryGuardianPageState
     );
   }
 
-  Widget _buildInputField(
-      String label, String hint, TextEditingController controller,
+  Widget _buildInputField(String label, String hint,
+      TextEditingController controller,
       {TextInputType? keyboardType, bool obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,10 +205,12 @@ class _RegisterSecondaryGuardianPageState
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue.shade700,
           padding: const EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: const Text("Register",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
       ),
     );
   }
