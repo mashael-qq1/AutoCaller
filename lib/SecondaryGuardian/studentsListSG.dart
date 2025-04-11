@@ -33,12 +33,8 @@ class _StudentListSGState extends State<StudentListSG> {
 
     try {
       var guardianQuery = await FirebaseFirestore.instance
-<<<<<<< HEAD
           .collection(
               'Secondary Guardian') // ✅ Fetch from Secondary Guardian Collection
-=======
-          .collection('Secondary Guardian')
->>>>>>> a862083c429fe302339e754937aaedbe94427d4b
           .where('email', isEqualTo: guardianEmail.trim().toLowerCase())
           .get();
 
@@ -49,19 +45,8 @@ class _StudentListSGState extends State<StudentListSG> {
         setState(() {
           isAuthorized = guardianIsAuthorized;
           if (guardianIsAuthorized) {
-<<<<<<< HEAD
             childrenRefs = (guardianDoc['children'] as List<dynamic>?)
                 ?.cast<DocumentReference>();
-=======
-            List<dynamic>? childrenList = guardianDoc['children'];
-            if (childrenList != null) {
-              childrenRefs = childrenList
-                  .map((childId) => FirebaseFirestore.instance
-                      .collection('Student')
-                      .doc(childId))
-                  .toList();
-            }
->>>>>>> a862083c429fe302339e754937aaedbe94427d4b
           }
         });
       }
@@ -75,40 +60,22 @@ class _StudentListSGState extends State<StudentListSG> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-<<<<<<< HEAD
         automaticallyImplyLeading: false, // Removes the back button
-=======
-        automaticallyImplyLeading: false,
->>>>>>> a862083c429fe302339e754937aaedbe94427d4b
         title: const Text(
           "Students",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black,
-<<<<<<< HEAD
             fontSize: 18, // Consistent font size
           ),
         ),
         centerTitle: true, // Centers the title
         backgroundColor: Colors.white, // White background for the AppBar
-=======
-            fontSize: 18,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
->>>>>>> a862083c429fe302339e754937aaedbe94427d4b
         elevation: 0,
       ),
       body: _buildBody(),
       bottomNavigationBar: NavBarSG(
-<<<<<<< HEAD
           loggedInGuardianId: widget.loggedInGuardianId, currentIndex: 1),
-=======
-        loggedInGuardianId: widget.loggedInGuardianId,
-        currentIndex: 1,
-      ),
->>>>>>> a862083c429fe302339e754937aaedbe94427d4b
     );
   }
 
@@ -233,44 +200,28 @@ class StudentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white,
-<<<<<<< HEAD
       elevation: 3, // ✅ Add shadow for consistency
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12), // ✅ Match the design
-=======
-      elevation: 3,
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
->>>>>>> a862083c429fe302339e754937aaedbe94427d4b
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-<<<<<<< HEAD
             // 🔹 Profile Picture
             CircleAvatar(
               radius: 25, // ✅ Keep consistent size
-=======
-            CircleAvatar(
-              radius: 25,
->>>>>>> a862083c429fe302339e754937aaedbe94427d4b
               backgroundColor: Colors.blue.shade100,
               child: Icon(
                 Icons.person,
                 color: Colors.blue.shade700,
               ),
             ),
-<<<<<<< HEAD
             const SizedBox(width: 12), // ✅ Space between image and text
 
             // 🔹 Name & Grade
-=======
-            const SizedBox(width: 12),
->>>>>>> a862083c429fe302339e754937aaedbe94427d4b
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,14 +237,7 @@ class StudentCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     "Grade: $gradeLevel",
-<<<<<<< HEAD
                     style: const TextStyle(color: Colors.black54, fontSize: 14),
-=======
-                    style: const TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14,
-                    ),
->>>>>>> a862083c429fe302339e754937aaedbe94427d4b
                   ),
                 ],
               ),
