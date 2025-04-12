@@ -10,9 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -23,7 +21,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
-
   await _initLocalNotification();
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -40,37 +37,28 @@ Future<void> requestPermissions() async {
   if (permission == LocationPermission.denied) {
     print("❌ Location permission denied");
   } else if (permission == LocationPermission.deniedForever) {
-    print("❌ Location permission denied forever");
+    print("❌ Location permission permanently denied");
   } else {
     print("✅ Location permission granted");
   }
 
-  NotificationSettings settings =
-      await FirebaseMessaging.instance.requestPermission(
+  NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
     alert: true,
-    announcement: false,
     badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
     sound: true,
   );
 
   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    print('✅ User granted permission');
-  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
-    print('✅ User granted provisional permission');
+    print('✅ User granted notification permission');
   } else {
-    print('❌ User declined or has not accepted permission');
+    print('❌ User denied notification permission');
   }
 }
 
 Future<void> _initLocalNotification() async {
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  const InitializationSettings initializationSettings =
-      InitializationSettings(android: initializationSettingsAndroid);
+  const InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
 
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
@@ -108,7 +96,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _handleDynamicLinks();
-    requestPermissions(); // This is enough now
+    requestPermissions();
   }
 
   void _handleDynamicLinks() async {

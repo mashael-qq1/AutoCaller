@@ -33,7 +33,8 @@ class _StudentListSGState extends State<StudentListSG> {
 
     try {
       var guardianQuery = await FirebaseFirestore.instance
-          .collection('Secondary Guardian')
+          .collection(
+              'Secondary Guardian') // ✅ Fetch from Secondary Guardian Collection
           .where('email', isEqualTo: guardianEmail.trim().toLowerCase())
           .get();
 
@@ -44,14 +45,8 @@ class _StudentListSGState extends State<StudentListSG> {
         setState(() {
           isAuthorized = guardianIsAuthorized;
           if (guardianIsAuthorized) {
-            List<dynamic>? childrenList = guardianDoc['children'];
-            if (childrenList != null) {
-              childrenRefs = childrenList
-                  .map((childId) => FirebaseFirestore.instance
-                      .collection('Student')
-                      .doc(childId))
-                  .toList();
-            }
+            childrenRefs = (guardianDoc['children'] as List<dynamic>?)
+                ?.cast<DocumentReference>();
           }
         });
       }
@@ -65,24 +60,22 @@ class _StudentListSGState extends State<StudentListSG> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false, // Removes the back button
         title: const Text(
           "Students",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black,
-            fontSize: 18,
+            fontSize: 18, // Consistent font size
           ),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
+        centerTitle: true, // Centers the title
+        backgroundColor: Colors.white, // White background for the AppBar
         elevation: 0,
       ),
       body: _buildBody(),
       bottomNavigationBar: NavBarSG(
-        loggedInGuardianId: widget.loggedInGuardianId,
-        currentIndex: 1,
-      ),
+          loggedInGuardianId: widget.loggedInGuardianId, currentIndex: 1),
     );
   }
 
@@ -207,25 +200,28 @@ class StudentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white,
-      elevation: 3,
+      elevation: 3, // ✅ Add shadow for consistency
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12), // ✅ Match the design
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // 🔹 Profile Picture
             CircleAvatar(
-              radius: 25,
+              radius: 25, // ✅ Keep consistent size
               backgroundColor: Colors.blue.shade100,
               child: Icon(
                 Icons.person,
                 color: Colors.blue.shade700,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 12), // ✅ Space between image and text
+
+            // 🔹 Name & Grade
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,10 +237,7 @@ class StudentCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     "Grade: $gradeLevel",
-                    style: const TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14,
-                    ),
+                    style: const TextStyle(color: Colors.black54, fontSize: 14),
                   ),
                 ],
               ),

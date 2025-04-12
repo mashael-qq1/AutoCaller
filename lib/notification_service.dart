@@ -6,12 +6,13 @@ import 'package:googleapis_auth/auth_io.dart';
 class NotificationService {
   static const String projectId = 'autocaller-196cc';
 
-  // Call Cloud Run Function
+  /// Call Cloud Run Function to notify Primary Guardian
   static Future<void> callSecondaryGuardianArrival({
     required String primaryGuardianID,
     required String secondaryGuardianName,
   }) async {
-    final url = Uri.parse('https://us-central1-autocaller-196cc.cloudfunctions.net/onSecondaryGuardianArrival');
+    final url = Uri.parse(
+        'https://us-central1-autocaller-196cc.cloudfunctions.net/onSecondaryGuardianArrival');
 
     try {
       final response = await http.post(
@@ -30,10 +31,11 @@ class NotificationService {
     }
   }
 
-  // Generate Auth Client
+  /// Generate Auth Client for sending FCM Notification
   static Future<AutoRefreshingAuthClient> _getAuthClient() async {
     final serviceAccountJson =
         await rootBundle.loadString('assets/service-account.json');
+
     final accountCredentials =
         ServiceAccountCredentials.fromJson(serviceAccountJson);
 
@@ -43,7 +45,7 @@ class NotificationService {
     );
   }
 
-  // Send FCM Notification
+  /// Send FCM Notification directly (using service account)
   static Future<void> sendNotification({
     required String token,
     required String title,
@@ -53,7 +55,8 @@ class NotificationService {
       final client = await _getAuthClient();
 
       final response = await client.post(
-        Uri.parse('https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
+        Uri.parse(
+            'https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           "message": {

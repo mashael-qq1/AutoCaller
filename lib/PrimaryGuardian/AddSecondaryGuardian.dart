@@ -16,107 +16,127 @@ class AddSecondaryGuardian extends StatefulWidget {
 
 class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
   final TextEditingController _guardianNameController = TextEditingController();
-  final TextEditingController _guardianPhoneController =
-      TextEditingController();
-  List<Map<String, dynamic>> children = [];
-  List<String> selectedChildren = [];
+  final TextEditingController _guardianPhoneController = TextEditingController();
+  List<Map<String, dynamic>> children = []; // Stores fetched students
+  List<String> selectedChildren = []; // Stores selected child IDs
 
   @override
   void initState() {
     super.initState();
-    _fetchChildren();
+    _fetchChildren(); // Fetch students on page load
   }
 
-Future<void> _fetchChildren() async {
-  try {
-    DocumentSnapshot guardianDoc = await FirebaseFirestore.instance
-        .collection('Primary Guardian')
-        .doc(widget.loggedInGuardianId)
-        .get();
+  /// **🔹 Fetches students linked to the Primary Guardian**
+  Future<void> _fetchChildren() async {
+    debugPrint("🔄 Fetching students for Guardian ID: ${widget.loggedInGuardianId}");
 
-    if (!guardianDoc.exists) return;
+    try {
+      DocumentSnapshot guardianDoc = await FirebaseFirestore.instance
+          .collection('Primary Guardian')
+          .doc(widget.loggedInGuardianId)
+          .get();
 
-    var data = guardianDoc.data() as Map<String, dynamic>?;
+      if (!guardianDoc.exists) {
+        debugPrint("❌ No guardian document found.");
+        return;
+      }
 
-    if (data == null || data['children'] == null) return;
+      var data = guardianDoc.data() as Map<String, dynamic>?;
 
-    List<dynamic> childRefs = data['children'];
-    List<Map<String, dynamic>> tempChildren = [];
+      if (data == null || !data.containsKey('children') || data['children'] == null) {
+        debugPrint("❌ No 'children' field found in Firestore.");
+        return;
+      }
 
-    for (var ref in childRefs) {
-      // Always get it like this because it's saved with full path
-      DocumentReference childRef = FirebaseFirestore.instance.doc(ref.path);
+      List<dynamic> childRefs = data['children'];
 
-      DocumentSnapshot childDoc = await childRef.get();
+      if (childRefs.isEmpty) {
+        debugPrint("❌ Guardian has no students associated.");
+        return;
+      }
 
-      if (childDoc.exists) {
-        tempChildren.add({
-          'id': childDoc.id,
-          'name': childDoc['Sname'] ?? "Unknown",
-          'grade': childDoc['gradeLevel'] ?? "N/A",
+      debugPrint("✅ Found ${childRefs.length} students. Fetching details...");
+
+      List<Map<String, dynamic>> tempChildren = [];
+
+      for (var ref in childRefs) {
+        try {
+          DocumentReference childRef;
+          if (ref is String) {
+            debugPrint("🟡 Warning: Expected DocumentReference, got String: $ref");
+            childRef = FirebaseFirestore.instance.doc(ref);
+          } else {
+            childRef = ref as DocumentReference;
+          }
+
+          DocumentSnapshot childDoc = await childRef.get();
+
+          if (childDoc.exists) {
+            tempChildren.add({
+              'id': childDoc.id,
+              'name': childDoc['Sname'] ?? "Unknown",
+              'grade': childDoc['gradeLevel'] ?? "N/A", // Fetching only Name & Grade
+            });
+            debugPrint("✅ Loaded student: ${childDoc['Sname']}");
+          } else {
+            debugPrint("❌ Skipped missing student document: ${childRef.id}");
+          }
+        } catch (e) {
+          debugPrint("❌ Error fetching student document: $e");
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          children = tempChildren;
         });
       }
-    }
 
-    if (mounted) {
-      setState(() {
-        children = tempChildren;
-      });
+      debugPrint("✅ Successfully loaded ${children.length} students.");
+    } catch (e) {
+      debugPrint("❌ Error fetching students: $e");
     }
-  } catch (e) {
-    debugPrint("❌ Error fetching students: $e");
   }
-}
 
+  /// **🔹 Toggles student selection**
   void _toggleChildSelection(String childId) {
     setState(() {
-      selectedChildren.contains(childId)
-          ? selectedChildren.remove(childId)
-          : selectedChildren.add(childId);
+      if (selectedChildren.contains(childId)) {
+        selectedChildren.remove(childId);
+      } else {
+        selectedChildren.add(childId);
+      }
     });
   }
 
+  /// **🔹 Generates a Dynamic Link and shares it**
   Future<void> _generateAndShareLink() async {
     if (_guardianNameController.text.isEmpty ||
         _guardianPhoneController.text.isEmpty ||
         selectedChildren.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                "Please enter all details and select at least one student.")),
+        const SnackBar(content: Text("Please enter all details and select at least one student.")),
       );
       return;
     }
 
     String link = await DynamicLinkService.createDynamicLink(
       widget.loggedInGuardianId,
-      selectedChildren.join(","),
+      selectedChildren.join(","), // Join multiple selected students
     );
 
-    String message =
-        "You have been invited To Autocaller as a Secondary Guardian to pick up the children. Please download the app and register using this link: $link";
-
-    await Share.share(message);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Referral link shared successfully!")),
-    );
-
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/ManageSG');
-    });
+    Share.share('You’ve been invited as a guardian. Click here: $link');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.white, // Match Dismissal Status Page
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text(
           "Add Secondary Guardian",
-          style: TextStyle(
-              fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -127,41 +147,40 @@ Future<void> _fetchChildren() async {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInputField("Secondary Guardian Name", "Enter Guardian Name",
-                _guardianNameController),
+            // 🔹 Guardian Name Input
+            _buildInputField("Secondary Guardian Name", "Enter Guardian Name", _guardianNameController),
             const SizedBox(height: 12),
-            _buildInputField("Guardian Phone Number", "Enter Phone Number",
-                _guardianPhoneController,
+
+            // 🔹 Guardian Phone Input
+            _buildInputField("Guardian Phone Number", "Enter Phone Number", _guardianPhoneController,
                 keyboardType: TextInputType.phone),
             const SizedBox(height: 20),
+
+            // 🔹 Student Selection Checklist
             const Text("Select Student(s) to Grant Access",
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black)),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
             const SizedBox(height: 8),
             Expanded(child: _buildStudentList()),
+
             const SizedBox(height: 10),
+
+            // 🔹 Share Button
             _buildShareButton(),
           ],
         ),
       ),
-      bottomNavigationBar: NavBarPG(
-          loggedInGuardianId: widget.loggedInGuardianId, currentIndex: 1),
+
+      // 🔹 Bottom Navigation Bar
+      bottomNavigationBar: NavBarPG(loggedInGuardianId: widget.loggedInGuardianId, currentIndex: 1),
     );
   }
 
-  Widget _buildInputField(
-      String label, String hint, TextEditingController controller,
-      {TextInputType? keyboardType}) {
+  /// **🔹 Input Field Builder**
+  Widget _buildInputField(String label, String hint, TextEditingController controller, {TextInputType? keyboardType}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black)),
+        Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -172,26 +191,26 @@ Future<void> _fetchChildren() async {
             filled: true,
             fillColor: Colors.grey.shade100,
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
           ),
         ),
       ],
     );
   }
 
+  /// **🔹 Builds the Student Selection List**
   Widget _buildStudentList() {
     if (children.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
+
     return ListView.builder(
       itemCount: children.length,
       itemBuilder: (context, index) {
         var student = children[index];
         return CheckboxListTile(
-          title: Text("${student['name']} (Grade: ${student['grade']})"),
+          title: Text("${student['name']} (Grade: ${student['grade']})"), // Name & Grade
           value: selectedChildren.contains(student['id']),
           onChanged: (bool? value) {
             _toggleChildSelection(student['id']);
@@ -202,6 +221,7 @@ Future<void> _fetchChildren() async {
     );
   }
 
+  /// **🔹 Builds the Share Button**
   Widget _buildShareButton() {
     return SizedBox(
       width: double.infinity,
@@ -213,10 +233,7 @@ Future<void> _fetchChildren() async {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: const Text("Generate & Share Link",
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white)),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
       ),
     );
   }

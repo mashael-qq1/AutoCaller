@@ -1,8 +1,9 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:autocaller/notification_service.dart'; // correct import
-
+import 'package:autocaller/notification_service.dart';
 import 'SGhome.dart';
 
 class RegisterSecondaryGuardianPage extends StatefulWidget {
@@ -16,21 +17,21 @@ class RegisterSecondaryGuardianPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _RegisterSecondaryGuardianPageState createState() =>
+  State<RegisterSecondaryGuardianPage> createState() =>
       _RegisterSecondaryGuardianPageState();
 }
 
 class _RegisterSecondaryGuardianPageState
     extends State<RegisterSecondaryGuardianPage> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+
   bool _isLoading = false;
 
   Future<void> _registerSecondaryGuardian() async {
@@ -39,16 +40,12 @@ class _RegisterSecondaryGuardianPageState
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _confirmPasswordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in all fields.")),
-      );
+      _showSnackBar("Please fill in all fields.");
       return;
     }
 
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match.")),
-      );
+      _showSnackBar("Passwords do not match.");
       return;
     }
 
@@ -85,45 +82,30 @@ class _RegisterSecondaryGuardianPageState
         "secondaryGuardiansID": FieldValue.arrayUnion([secondaryGuardianID])
       });
 
-      // Get FCM Token of Primary Guardian
-      DocumentSnapshot primaryDoc = await _firestore
-          .collection('Primary Guardian')
-          .doc(widget.primaryGuardianID)
-          .get();
-
-      String? fcmToken = primaryDoc['fcmToken'];
-
-      print("📲 Primary Guardian FCM Token: $fcmToken");
-
-      if (fcmToken != null) {
-        await NotificationService.sendNotification(
-          token: fcmToken,
-          title: "Invitation Accepted",
-          body:
-              "${_nameController.text.trim()} accepted your invitation as a Secondary Guardian.",
-        );
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Registration successful!")),
+      await NotificationService.callSecondaryGuardianArrival(
+        primaryGuardianID: widget.primaryGuardianID,
+        secondaryGuardianName: _nameController.text.trim(),
       );
-await NotificationService.callSecondaryGuardianArrival(
-  primaryGuardianID: widget.primaryGuardianID,
-  secondaryGuardianName: _nameController.text.trim(),
-);
+
+      _showSnackBar("Registration successful!");
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SGhome()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}")),
-      );
+      _showSnackBar("Error: ${e.toString()}");
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -132,36 +114,34 @@ await NotificationService.callSecondaryGuardianArrival(
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text(
-          "Secondary Guardian Registration",
-          style:
-              TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-        ),
+        title: Text("Secondary Guardian Registration",
+            style: TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.black)),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildInputField("Full Name", "Enter your name", _nameController),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _buildInputField("Phone Number", "Enter phone number",
                 _phoneController, keyboardType: TextInputType.phone),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _buildInputField("Email", "Enter email", _emailController,
                 keyboardType: TextInputType.emailAddress),
-            const SizedBox(height: 12),
-            _buildInputField("Password", "Enter password",
-                _passwordController, obscureText: true),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
+            _buildInputField("Password", "Enter password", _passwordController,
+                obscureText: true),
+            SizedBox(height: 12),
             _buildInputField("Confirm Password", "Re-enter password",
                 _confirmPasswordController, obscureText: true),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator())
                 : _buildRegisterButton(),
           ],
         ),
@@ -176,24 +156,22 @@ await NotificationService.callSecondaryGuardianArrival(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: const TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
-        const SizedBox(height: 8),
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black)),
+        SizedBox(height: 8),
         TextField(
           controller: controller,
           keyboardType: keyboardType,
           obscureText: obscureText,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey.shade500),
             filled: true,
             fillColor: Colors.grey.shade100,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none),
           ),
         ),
       ],
@@ -207,11 +185,10 @@ await NotificationService.callSecondaryGuardianArrival(
         onPressed: _registerSecondaryGuardian,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue.shade700,
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          padding: EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
-        child: const Text("Register",
+        child: Text("Register",
             style: TextStyle(
                 fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
       ),
