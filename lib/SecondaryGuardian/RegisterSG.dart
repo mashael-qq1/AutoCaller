@@ -107,7 +107,10 @@ class _RegisterSecondaryGuardianPageState
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Registration successful!")),
       );
-
+await NotificationService.callSecondaryGuardianArrival(
+  primaryGuardianID: widget.primaryGuardianID,
+  secondaryGuardianName: _nameController.text.trim(),
+);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SGhome()),

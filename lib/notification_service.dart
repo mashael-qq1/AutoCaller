@@ -6,6 +6,31 @@ import 'package:googleapis_auth/auth_io.dart';
 class NotificationService {
   static const String projectId = 'autocaller-196cc';
 
+  // Call Cloud Run Function
+  static Future<void> callSecondaryGuardianArrival({
+    required String primaryGuardianID,
+    required String secondaryGuardianName,
+  }) async {
+    final url = Uri.parse('https://us-central1-autocaller-196cc.cloudfunctions.net/onSecondaryGuardianArrival');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'primaryGuardianID': primaryGuardianID,
+          'secondaryGuardianName': secondaryGuardianName,
+        }),
+      );
+
+      print('🌐 Cloud Function Response Code: ${response.statusCode}');
+      print('🌐 Cloud Function Response Body: ${response.body}');
+    } catch (e) {
+      print('❌ Error calling Cloud Run Function: $e');
+    }
+  }
+
+  // Generate Auth Client
   static Future<AutoRefreshingAuthClient> _getAuthClient() async {
     final serviceAccountJson =
         await rootBundle.loadString('assets/service-account.json');
@@ -18,6 +43,7 @@ class NotificationService {
     );
   }
 
+  // Send FCM Notification
   static Future<void> sendNotification({
     required String token,
     required String title,

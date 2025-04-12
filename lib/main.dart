@@ -5,7 +5,6 @@ import 'package:autocaller/SecondaryGuardian/RegisterSG.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -24,8 +23,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
-
-  await requestPermissions();
 
   await _initLocalNotification();
 
@@ -48,11 +45,24 @@ Future<void> requestPermissions() async {
     print("✅ Location permission granted");
   }
 
-  await FirebaseMessaging.instance.requestPermission(
+  NotificationSettings settings =
+      await FirebaseMessaging.instance.requestPermission(
     alert: true,
+    announcement: false,
     badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
     sound: true,
   );
+
+  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    print('✅ User granted permission');
+  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    print('✅ User granted provisional permission');
+  } else {
+    print('❌ User declined or has not accepted permission');
+  }
 }
 
 Future<void> _initLocalNotification() async {
@@ -98,6 +108,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _handleDynamicLinks();
+    requestPermissions(); // This is enough now
   }
 
   void _handleDynamicLinks() async {
