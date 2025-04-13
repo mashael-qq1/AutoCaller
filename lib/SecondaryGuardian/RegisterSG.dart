@@ -34,6 +34,10 @@ class _RegisterSecondaryGuardianPageState
 
   bool _isLoading = false;
 
+  final phoneRegExp = RegExp(r'^05[0-9]{8}$');
+  final emailRegExp =
+      RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
   Future<void> _registerSecondaryGuardian() async {
     if (_nameController.text.isEmpty ||
         _phoneController.text.isEmpty ||
@@ -44,6 +48,27 @@ class _RegisterSecondaryGuardianPageState
       return;
     }
 
+    // Phone number validation
+    String phone = _phoneController.text.trim();
+    if (phone.length != 10) {
+      _showSnackBar("Phone number must be 10 digits long.");
+      return;
+    } else if (!RegExp(r'^[0-9]+$').hasMatch(phone)) {
+      _showSnackBar("Phone number must contain only digits.");
+      return;
+    } else if (!phoneRegExp.hasMatch(phone)) {
+      _showSnackBar(
+          "Please enter a valid Saudi phone number starting with 05.");
+      return;
+    }
+
+    // Email validation
+    if (!emailRegExp.hasMatch(_emailController.text.trim())) {
+      _showSnackBar("Please enter a valid email address.");
+      return;
+    }
+
+    // Password match validation
     if (_passwordController.text != _confirmPasswordController.text) {
       _showSnackBar("Passwords do not match.");
       return;
@@ -115,8 +140,7 @@ class _RegisterSecondaryGuardianPageState
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text("Secondary Guardian Registration",
-            style: TextStyle(
-                fontWeight: FontWeight.bold, color: Colors.black)),
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -128,8 +152,9 @@ class _RegisterSecondaryGuardianPageState
           children: [
             _buildInputField("Full Name", "Enter your name", _nameController),
             SizedBox(height: 12),
-            _buildInputField("Phone Number", "Enter phone number",
-                _phoneController, keyboardType: TextInputType.phone),
+            _buildInputField(
+                "Phone Number", "Enter phone number", _phoneController,
+                keyboardType: TextInputType.phone),
             SizedBox(height: 12),
             _buildInputField("Email", "Enter email", _emailController,
                 keyboardType: TextInputType.emailAddress),
@@ -138,7 +163,8 @@ class _RegisterSecondaryGuardianPageState
                 obscureText: true),
             SizedBox(height: 12),
             _buildInputField("Confirm Password", "Re-enter password",
-                _confirmPasswordController, obscureText: true),
+                _confirmPasswordController,
+                obscureText: true),
             SizedBox(height: 20),
             _isLoading
                 ? Center(child: CircularProgressIndicator())
@@ -149,8 +175,8 @@ class _RegisterSecondaryGuardianPageState
     );
   }
 
-  Widget _buildInputField(String label, String hint,
-      TextEditingController controller,
+  Widget _buildInputField(
+      String label, String hint, TextEditingController controller,
       {TextInputType? keyboardType, bool obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,7 +216,9 @@ class _RegisterSecondaryGuardianPageState
         ),
         child: Text("Register",
             style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white)),
       ),
     );
   }

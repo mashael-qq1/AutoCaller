@@ -16,7 +16,6 @@ class AddSecondaryGuardian extends StatefulWidget {
 
 class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
   final TextEditingController _guardianNameController = TextEditingController();
-  final TextEditingController _guardianPhoneController = TextEditingController();
   List<Map<String, dynamic>> children = []; // Stores fetched students
   List<String> selectedChildren = []; // Stores selected child IDs
 
@@ -28,7 +27,8 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
 
   /// **🔹 Fetches students linked to the Primary Guardian**
   Future<void> _fetchChildren() async {
-    debugPrint("🔄 Fetching students for Guardian ID: ${widget.loggedInGuardianId}");
+    debugPrint(
+        "🔄 Fetching students for Guardian ID: ${widget.loggedInGuardianId}");
 
     try {
       DocumentSnapshot guardianDoc = await FirebaseFirestore.instance
@@ -43,7 +43,9 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
 
       var data = guardianDoc.data() as Map<String, dynamic>?;
 
-      if (data == null || !data.containsKey('children') || data['children'] == null) {
+      if (data == null ||
+          !data.containsKey('children') ||
+          data['children'] == null) {
         debugPrint("❌ No 'children' field found in Firestore.");
         return;
       }
@@ -63,7 +65,8 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
         try {
           DocumentReference childRef;
           if (ref is String) {
-            debugPrint("🟡 Warning: Expected DocumentReference, got String: $ref");
+            debugPrint(
+                "🟡 Warning: Expected DocumentReference, got String: $ref");
             childRef = FirebaseFirestore.instance.doc(ref);
           } else {
             childRef = ref as DocumentReference;
@@ -75,7 +78,8 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
             tempChildren.add({
               'id': childDoc.id,
               'name': childDoc['Sname'] ?? "Unknown",
-              'grade': childDoc['gradeLevel'] ?? "N/A", // Fetching only Name & Grade
+              'grade':
+                  childDoc['gradeLevel'] ?? "N/A", // Fetching only Name & Grade
             });
             debugPrint("✅ Loaded student: ${childDoc['Sname']}");
           } else {
@@ -111,11 +115,11 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
 
   /// **🔹 Generates a Dynamic Link and shares it**
   Future<void> _generateAndShareLink() async {
-    if (_guardianNameController.text.isEmpty ||
-        _guardianPhoneController.text.isEmpty ||
-        selectedChildren.isEmpty) {
+    if (_guardianNameController.text.isEmpty || selectedChildren.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter all details and select at least one student.")),
+        const SnackBar(
+            content:
+                Text("Please enter a name and select at least one student.")),
       );
       return;
     }
@@ -136,7 +140,8 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
         automaticallyImplyLeading: false,
         title: const Text(
           "Add Secondary Guardian",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18),
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -148,17 +153,16 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 🔹 Guardian Name Input
-            _buildInputField("Secondary Guardian Name", "Enter Guardian Name", _guardianNameController),
-            const SizedBox(height: 12),
-
-            // 🔹 Guardian Phone Input
-            _buildInputField("Guardian Phone Number", "Enter Phone Number", _guardianPhoneController,
-                keyboardType: TextInputType.phone),
+            _buildInputField("Secondary Guardian Name", "Enter Guardian Name",
+                _guardianNameController),
             const SizedBox(height: 20),
 
             // 🔹 Student Selection Checklist
             const Text("Select Student(s) to Grant Access",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black)),
             const SizedBox(height: 8),
             Expanded(child: _buildStudentList()),
 
@@ -171,16 +175,23 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
       ),
 
       // 🔹 Bottom Navigation Bar
-      bottomNavigationBar: NavBarPG(loggedInGuardianId: widget.loggedInGuardianId, currentIndex: 1),
+      bottomNavigationBar: NavBarPG(
+          loggedInGuardianId: widget.loggedInGuardianId, currentIndex: 1),
     );
   }
 
   /// **🔹 Input Field Builder**
-  Widget _buildInputField(String label, String hint, TextEditingController controller, {TextInputType? keyboardType}) {
+  Widget _buildInputField(
+      String label, String hint, TextEditingController controller,
+      {TextInputType? keyboardType}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+        Text(label,
+            style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -191,8 +202,10 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
             filled: true,
             fillColor: Colors.grey.shade100,
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
           ),
         ),
       ],
@@ -210,7 +223,8 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
       itemBuilder: (context, index) {
         var student = children[index];
         return CheckboxListTile(
-          title: Text("${student['name']} (Grade: ${student['grade']})"), // Name & Grade
+          title: Text(
+              "${student['name']} (Grade: ${student['grade']})"), // Name & Grade
           value: selectedChildren.contains(student['id']),
           onChanged: (bool? value) {
             _toggleChildSelection(student['id']);
@@ -233,7 +247,10 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: const Text("Generate & Share Link",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white)),
       ),
     );
   }
