@@ -1,3 +1,6 @@
+// lib/PrimaryGuardian/login.dart
+// ignore_for_file: prefer_const_constructors
+
 import 'package:autocaller/PrimaryGuardian/signup.dart';
 import 'package:autocaller/firstPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,8 +21,9 @@ class GuardianLoginPage extends StatefulWidget {
 class _GuardianLoginPageState extends State<GuardianLoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
 
   bool _isLoading = false;
   bool _isPasswordVisible = false;
@@ -38,15 +42,11 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
     });
 
     try {
-      // Sign In User
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential userCredential =
+          await _auth.signInWithEmailAndPassword(email: email, password: password);
 
       final userId = userCredential.user!.uid;
 
-      // Check if Primary Guardian Exists
       final guardianSnapshot =
           await _firestore.collection('Primary Guardian').doc(userId).get();
 
@@ -56,19 +56,23 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
         return;
       }
 
-      // Get FCM Token
       String? fcmToken = await FirebaseMessaging.instance.getToken();
 
       if (fcmToken != null) {
-        await _firestore
-            .collection('Primary Guardian')
-            .doc(userId)
-            .update({'fcmToken': fcmToken});
-
+        await _firestore.collection('Primary Guardian').doc(userId).update({
+          'fcmToken': fcmToken,
+        });
         print("✅ FCM Token saved successfully: $fcmToken");
       }
 
-      // Navigate to Primary Guardian Home Page
+      // Auto Refresh Token Listener (Best Practice)
+      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+        await _firestore.collection('Primary Guardian').doc(userId).update({
+          'fcmToken': newToken,
+        });
+        print('🔁 Auto Refreshed Token Saved: $newToken');
+      });
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const GuardianHomePage()),
@@ -116,10 +120,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
                 Image.asset('assets/9-removebg-preview.png', height: 150),
                 const SizedBox(height: 10),
                 const Text('Welcome Back!',
-                    style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black)),
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 8),
                 const Text('Use the form below to access your account.',
                     style: TextStyle(fontSize: 14, color: Color(0xFF57636C))),
@@ -127,12 +128,10 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
 
                 _buildTextField(_emailController, "Email"),
                 const SizedBox(height: 16),
-                _buildTextField(_passwordController, "Password",
-                    isPassword: true),
+                _buildTextField(_passwordController, "Password", isPassword: true),
                 const SizedBox(height: 16),
 
                 _buildActions(),
-
                 const SizedBox(height: 32),
                 _buildSignUpText(),
                 const SizedBox(height: 100),
@@ -161,9 +160,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
-                  _isPasswordVisible
-                      ? Icons.visibility
-                      : Icons.visibility_off,
+                  _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                   color: Colors.grey,
                 ),
                 onPressed: () {
@@ -183,10 +180,8 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
       children: [
         GestureDetector(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ResetPasswordPage()),
-            );
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const ResetPasswordPage()));
           },
           child: const Text('Forgot Password?',
               style: TextStyle(fontSize: 14, color: Color(0xFF57636C))),

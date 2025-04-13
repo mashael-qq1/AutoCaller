@@ -1,3 +1,4 @@
+// lib/main.dart
 // ignore_for_file: prefer_const_constructors
 
 import 'package:autocaller/firstPage.dart';
@@ -10,7 +11,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -19,7 +21,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp();
   await _initLocalNotification();
 
@@ -32,15 +33,7 @@ Future<void> main() async {
 }
 
 Future<void> requestPermissions() async {
-  LocationPermission permission = await Geolocator.requestPermission();
-
-  if (permission == LocationPermission.denied) {
-    print("❌ Location permission denied");
-  } else if (permission == LocationPermission.deniedForever) {
-    print("❌ Location permission permanently denied");
-  } else {
-    print("✅ Location permission granted");
-  }
+  await Geolocator.requestPermission();
 
   NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
     alert: true,
@@ -56,12 +49,15 @@ Future<void> requestPermissions() async {
 }
 
 Future<void> _initLocalNotification() async {
-  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+  const AndroidInitializationSettings androidSettings =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  const InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+  const InitializationSettings initSettings =
+      InitializationSettings(android: androidSettings);
 
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
 
+  // Handle Notification when App is in Foreground
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification?.android;
@@ -71,16 +67,24 @@ Future<void> _initLocalNotification() async {
         notification.hashCode,
         notification.title,
         notification.body,
-        const NotificationDetails(
+        NotificationDetails(
           android: AndroidNotificationDetails(
             'high_importance_channel',
             'High Importance Notifications',
-            importance: Importance.high,
+            channelDescription: 'This channel is used for important notifications.',
+            importance: Importance.max,
             priority: Priority.high,
+            ticker: 'ticker',
           ),
         ),
       );
     }
+  });
+
+  // Handle Token Auto Refresh
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+    print('🔁 Auto Refreshed FCM Token: $newToken');
+    // Optional: Update Firestore here if user is logged in
   });
 }
 
@@ -95,8 +99,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _handleDynamicLinks();
     requestPermissions();
+    _handleDynamicLinks();
   }
 
   void _handleDynamicLinks() async {

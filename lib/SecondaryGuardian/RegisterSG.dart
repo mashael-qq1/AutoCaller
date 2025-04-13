@@ -1,3 +1,4 @@
+// lib/SecondaryGuardian/RegisterSG.dart
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
@@ -48,27 +49,28 @@ class _RegisterSecondaryGuardianPageState
       return;
     }
 
-    // Phone number validation
+    // Phone Validation
     String phone = _phoneController.text.trim();
     if (phone.length != 10) {
-      _showSnackBar("Phone number must be 10 digits long.");
+      _showSnackBar("Phone number must be 10 digits.");
       return;
-    } else if (!RegExp(r'^[0-9]+$').hasMatch(phone)) {
+    }
+    if (!RegExp(r'^[0-9]+$').hasMatch(phone)) {
       _showSnackBar("Phone number must contain only digits.");
       return;
-    } else if (!phoneRegExp.hasMatch(phone)) {
-      _showSnackBar(
-          "Please enter a valid Saudi phone number starting with 05.");
+    }
+    if (!phoneRegExp.hasMatch(phone)) {
+      _showSnackBar("Enter a valid Saudi number starting with 05.");
       return;
     }
 
-    // Email validation
+    // Email Validation
     if (!emailRegExp.hasMatch(_emailController.text.trim())) {
       _showSnackBar("Please enter a valid email address.");
       return;
     }
 
-    // Password match validation
+    // Password Match
     if (_passwordController.text != _confirmPasswordController.text) {
       _showSnackBar("Passwords do not match.");
       return;
@@ -79,6 +81,7 @@ class _RegisterSecondaryGuardianPageState
     });
 
     try {
+      // Register User
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -87,12 +90,10 @@ class _RegisterSecondaryGuardianPageState
 
       String secondaryGuardianID = userCredential.user!.uid;
 
-      await _firestore
-          .collection('Secondary Guardian')
-          .doc(secondaryGuardianID)
-          .set({
+      // Store Secondary Guardian Data
+      await _firestore.collection('Secondary Guardian').doc(secondaryGuardianID).set({
         "FullName": _nameController.text.trim(),
-        "PhoneNum": _phoneController.text.trim(),
+        "PhoneNum": phone,
         "email": _emailController.text.trim(),
         "isAuthorized": true,
         "uid": secondaryGuardianID,
@@ -100,19 +101,20 @@ class _RegisterSecondaryGuardianPageState
         "children": widget.studentIDs,
       });
 
-      await _firestore
-          .collection('Primary Guardian')
+      // Update Primary Guardian with New SG
+      await _firestore.collection('Primary Guardian')
           .doc(widget.primaryGuardianID)
           .update({
         "secondaryGuardiansID": FieldValue.arrayUnion([secondaryGuardianID])
       });
 
+      // Trigger Notification
       await NotificationService.callSecondaryGuardianArrival(
         primaryGuardianID: widget.primaryGuardianID,
         secondaryGuardianName: _nameController.text.trim(),
       );
 
-      _showSnackBar("Registration successful!");
+      _showSnackBar("Registration Successful!");
 
       Navigator.pushReplacement(
         context,
@@ -139,8 +141,11 @@ class _RegisterSecondaryGuardianPageState
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text("Secondary Guardian Registration",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+        title: Text(
+          "Secondary Guardian Registration",
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.black),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -152,8 +157,7 @@ class _RegisterSecondaryGuardianPageState
           children: [
             _buildInputField("Full Name", "Enter your name", _nameController),
             SizedBox(height: 12),
-            _buildInputField(
-                "Phone Number", "Enter phone number", _phoneController,
+            _buildInputField("Phone Number", "Enter phone number", _phoneController,
                 keyboardType: TextInputType.phone),
             SizedBox(height: 12),
             _buildInputField("Email", "Enter email", _emailController,
@@ -162,8 +166,7 @@ class _RegisterSecondaryGuardianPageState
             _buildInputField("Password", "Enter password", _passwordController,
                 obscureText: true),
             SizedBox(height: 12),
-            _buildInputField("Confirm Password", "Re-enter password",
-                _confirmPasswordController,
+            _buildInputField("Confirm Password", "Re-enter password", _confirmPasswordController,
                 obscureText: true),
             SizedBox(height: 20),
             _isLoading
@@ -183,9 +186,7 @@ class _RegisterSecondaryGuardianPageState
       children: [
         Text(label,
             style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black)),
+                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
         SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -196,8 +197,9 @@ class _RegisterSecondaryGuardianPageState
             filled: true,
             fillColor: Colors.grey.shade100,
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
           ),
         ),
       ],
@@ -212,7 +214,8 @@ class _RegisterSecondaryGuardianPageState
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue.shade700,
           padding: EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8)),
         ),
         child: Text("Register",
             style: TextStyle(
