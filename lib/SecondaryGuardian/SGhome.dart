@@ -13,49 +13,62 @@ class SGhome extends StatefulWidget {
 class _SGhomeState extends State<SGhome> {
   List<Map<String, dynamic>> students = [];
   bool isLoading = true;
+  bool? isAuthorized;
 
   @override
   void initState() {
     super.initState();
-    fetchStudents();
+    fetchGuardianAndStudents();
   }
 
-  Future<void> fetchStudents() async {
+  Future<void> fetchGuardianAndStudents() async {
     try {
       final sgDoc = FirebaseFirestore.instance
-          .collection('Secondary Guardian') // corrected collection name
+          .collection('Secondary Guardian')
           .doc(widget.loggedInGuardianId);
 
       final docSnapshot = await sgDoc.get();
 
       if (docSnapshot.exists) {
         final data = docSnapshot.data()!;
-        final List<dynamic>? childrenRefs = data['children'];
-
-        List<Map<String, dynamic>> fetchedStudents = [];
-
-        if (childrenRefs != null) {
-          for (var ref in childrenRefs) {
-            DocumentReference studentRef = ref as DocumentReference;
-            final studentDoc = await studentRef.get();
-
-            if (studentDoc.exists) {
-              fetchedStudents.add(studentDoc.data()! as Map<String, dynamic>);
-            }
-          }
-        }
+        final bool guardianIsAuthorized = data['isAuthorized'] ?? false;
 
         setState(() {
-          students = fetchedStudents;
-          isLoading = false;
+          isAuthorized = guardianIsAuthorized;
         });
+
+        if (guardianIsAuthorized) {
+          final List<dynamic>? childrenRefs = data['children'];
+
+          List<Map<String, dynamic>> fetchedStudents = [];
+
+          if (childrenRefs != null) {
+            for (var ref in childrenRefs) {
+              DocumentReference studentRef = ref as DocumentReference;
+              final studentDoc = await studentRef.get();
+
+              if (studentDoc.exists) {
+                fetchedStudents.add(studentDoc.data()! as Map<String, dynamic>);
+              }
+            }
+          }
+
+          setState(() {
+            students = fetchedStudents;
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+        }
       } else {
         setState(() {
           isLoading = false;
         });
       }
     } catch (e) {
-      print('Error fetching students: $e');
+      print('Error fetching guardian or students: $e');
       setState(() {
         isLoading = false;
       });
@@ -79,50 +92,54 @@ class _SGhomeState extends State<SGhome> {
         elevation: 0,
       ),
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Below is a summary of your activities.',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildSummaryCard('Associated Students',
-                            students.length.toString(), Icons.group),
-                        _buildSummaryCard('Dismissals', '1', Icons.home),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'Confirm Pickup',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    _buildPickupCard(),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Associated Student:',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    _buildStudentList(),
-                  ],
-                ),
-              ),
-      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : (isAuthorized == false
+              ? _accessRevokedMessage()
+              : _buildAuthorizedContent()),
       bottomNavigationBar: NavBarSG(
         loggedInGuardianId: widget.loggedInGuardianId,
         currentIndex: 2,
+      ),
+    );
+  }
+
+  Widget _buildAuthorizedContent() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Below is a summary of your activities.',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildSummaryCard('Associated Students',
+                    students.length.toString(), Icons.group),
+                _buildSummaryCard('Dismissals', '1', Icons.home),
+              ],
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Confirm Pickup',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            _buildPickupCard(),
+            const SizedBox(height: 16),
+            const Text(
+              'Associated Student:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            _buildStudentList(),
+          ],
+        ),
       ),
     );
   }
@@ -230,6 +247,24 @@ class _SGhomeState extends State<SGhome> {
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _accessRevokedMessage() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.block, color: Colors.red, size: 50),
+          SizedBox(height: 10),
+          Text(
+            "You have been disabled by the Primary Guardian,\n you no longer have access to their students.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+        ],
+      ),
     );
   }
 }
