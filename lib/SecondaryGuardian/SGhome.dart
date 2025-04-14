@@ -1,8 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:autocaller/SecondaryGuardian/NavBarSG.dart';
 
-class SGhome extends StatelessWidget {
-  const SGhome({super.key});
+class SGhome extends StatefulWidget {
+  final String loggedInGuardianId;
+  const SGhome({super.key, required this.loggedInGuardianId});
+
+  @override
+  State<SGhome> createState() => _SGhomeState();
+}
+
+class _SGhomeState extends State<SGhome> {
+  List<Map<String, dynamic>> students = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchStudents();
+  }
+
+  Future<void> fetchStudents() async {
+    try {
+      final sgDoc = FirebaseFirestore.instance
+          .collection('Secondary Guardian') // corrected collection name
+          .doc(widget.loggedInGuardianId);
+
+      final docSnapshot = await sgDoc.get();
+
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data()!;
+        final List<dynamic>? childrenRefs = data['children'];
+
+        List<Map<String, dynamic>> fetchedStudents = [];
+
+        if (childrenRefs != null) {
+          for (var ref in childrenRefs) {
+            DocumentReference studentRef = ref as DocumentReference;
+            final studentDoc = await studentRef.get();
+
+            if (studentDoc.exists) {
+              fetchedStudents.add(studentDoc.data()! as Map<String, dynamic>);
+            }
+          }
+        }
+
+        setState(() {
+          students = fetchedStudents;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching students: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,42 +81,47 @@ class SGhome extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Below is a summary of your activities.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Below is a summary of your activities.',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildSummaryCard('Associated Students',
+                            students.length.toString(), Icons.group),
+                        _buildSummaryCard('Dismissals', '1', Icons.home),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Confirm Pickup',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    _buildPickupCard(),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Associated Student:',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    _buildStudentList(),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildSummaryCard('Associated Students', '2', Icons.group),
-                  _buildSummaryCard('Dismissals', '1', Icons.home),
-                ],
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Confirm Pickup',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              _buildPickupCard(),
-              const SizedBox(height: 16),
-              const Text(
-                'Select Student:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              _buildStudentList(),
-            ],
-          ),
-        ),
       ),
-      bottomNavigationBar: const NavBarSG(
-        loggedInGuardianId: "secondary_guardian_id",
+      bottomNavigationBar: NavBarSG(
+        loggedInGuardianId: widget.loggedInGuardianId,
         currentIndex: 2,
       ),
     );
@@ -82,20 +145,16 @@ class SGhome extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      value,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      title,
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
+                    Text(value,
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text(title,
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.grey),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1),
                   ],
                 ),
               ),
@@ -121,14 +180,14 @@ class SGhome extends StatelessWidget {
             padding: const EdgeInsets.all(12.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
+              children: const [
+                Text(
                   'Tuesday, 10:00am',
                   style: TextStyle(fontSize: 16, color: Colors.blue),
                 ),
                 Chip(
-                  label: const Text('In Progress'),
-                  backgroundColor: Colors.grey[400],
+                  label: Text('In Progress'),
+                  backgroundColor: Colors.grey,
                 ),
               ],
             ),
@@ -139,9 +198,13 @@ class SGhome extends StatelessWidget {
   }
 
   Widget _buildStudentList() {
-    List<String> students = ['Hassan Al-Khaled', 'Laila Al-Khaled'];
+    if (students.isEmpty) {
+      return const Text("No associated students.");
+    }
+
     return Column(
       children: students.map((student) {
+        String name = student['Sname'] ?? student['name'] ?? 'Unnamed';
         return Card(
           color: Colors.white,
           elevation: 2,
@@ -151,10 +214,10 @@ class SGhome extends StatelessWidget {
               backgroundColor: Colors.blueAccent,
               child: Icon(Icons.person, color: Colors.white),
             ),
-            title: Text(student, style: const TextStyle(fontSize: 16)),
+            title: Text(name, style: const TextStyle(fontSize: 16)),
             trailing: ElevatedButton(
               onPressed: () {
-                // You can add pickup confirmation logic here
+                // Handle pickup logic
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,

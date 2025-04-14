@@ -49,7 +49,9 @@ class _SecondaryGuardianLoginPageState
       if (guardianSnapshot.exists) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const SGhome()),
+          MaterialPageRoute(
+            builder: (context) => SGhome(loggedInGuardianId: uid),
+          ),
         );
       } else {
         _showError("This account is not authorized as a secondary guardian.");
@@ -136,7 +138,7 @@ class _SecondaryGuardianLoginPageState
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: "Email",
-                          labelStyle: TextStyle(color: Color(0xFF57636C)),
+                          labelStyle: const TextStyle(color: Color(0xFF57636C)),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -153,7 +155,7 @@ class _SecondaryGuardianLoginPageState
                         obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
                           labelText: "Password",
-                          labelStyle: TextStyle(color: Color(0xFF57636C)),
+                          labelStyle: const TextStyle(color: Color(0xFF57636C)),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(

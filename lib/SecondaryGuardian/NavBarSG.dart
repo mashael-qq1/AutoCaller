@@ -39,7 +39,9 @@ class NavBarSG extends StatelessWidget {
         print("Navigating to SGhome");
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => SGhome()),
+          MaterialPageRoute(
+              builder: (context) =>
+                  SGhome(loggedInGuardianId: loggedInGuardianId)),
         );
         break;
       case 3:

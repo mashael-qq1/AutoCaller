@@ -121,7 +121,9 @@ class _RegisterSecondaryGuardianPageState
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => SGhome()),
+        MaterialPageRoute(
+            builder: (context) =>
+                SGhome(loggedInGuardianId: secondaryGuardianID)),
       );
     } catch (e) {
       _showSnackBar("Error: ${e.toString()}");
