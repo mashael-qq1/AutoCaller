@@ -24,36 +24,36 @@ class _StudentListSGState extends State<StudentListSG> {
 
   /// **Fetches Guardian Data (Children References & Authorization Status)**
   Future<void> _fetchGuardianData() async {
-    String? guardianEmail = FirebaseAuth.instance.currentUser?.email;
-
-    if (guardianEmail == null) {
-      debugPrint("❌ No guardian email found");
-      return;
-    }
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
     try {
-      var guardianQuery = await FirebaseFirestore.instance
+      var guardianDoc = await FirebaseFirestore.instance
           .collection('Secondary Guardian')
-          .where('email', isEqualTo: guardianEmail.trim().toLowerCase())
+          .doc(user.uid)
           .get();
 
-      if (guardianQuery.docs.isNotEmpty) {
-        var guardianDoc = guardianQuery.docs.first;
+      if (guardianDoc.exists) {
         bool guardianIsAuthorized = guardianDoc['isAuthorized'] ?? false;
-
         setState(() {
           isAuthorized = guardianIsAuthorized;
           if (guardianIsAuthorized) {
-            // Directly cast the list of references
             List<dynamic>? childrenList = guardianDoc['children'];
             if (childrenList != null) {
               childrenRefs = childrenList.cast<DocumentReference>();
             }
           }
         });
+      } else {
+        setState(() {
+          isAuthorized = false;
+        });
       }
     } catch (e) {
       debugPrint("❌ Error fetching guardian data: $e");
+      setState(() {
+        isAuthorized = false;
+      });
     }
   }
 

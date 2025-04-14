@@ -12,7 +12,8 @@ class SecondaryGuardianProfilePage extends StatefulWidget {
       _SecondaryGuardianProfilePageState();
 }
 
-class _SecondaryGuardianProfilePageState extends State<SecondaryGuardianProfilePage> {
+class _SecondaryGuardianProfilePageState
+    extends State<SecondaryGuardianProfilePage> {
   Map<String, dynamic>? guardianData;
   String? guardianID;
 
@@ -114,9 +115,12 @@ class _SecondaryGuardianProfilePageState extends State<SecondaryGuardianProfileP
                     ),
                   ),
                   const SizedBox(height: 20),
-                  buildInfoRow("Guardian Name:", guardianData!['FullName'] ?? 'Not Available'),
-                  buildInfoRow("Email:", guardianData!['email'] ?? 'Not Available'),
-                  buildInfoRow("Phone Number:", guardianData!['PhoneNum'] ?? 'Not Available'),
+                  buildInfoRow("Guardian Name:",
+                      guardianData!['FullName'] ?? 'Not Available'),
+                  buildInfoRow(
+                      "Email:", guardianData!['email'] ?? 'Not Available'),
+                  buildInfoRow("Phone Number:",
+                      guardianData!['PhoneNum'] ?? 'Not Available'),
                   const SizedBox(height: 20),
                   Divider(thickness: 1, color: Colors.grey.shade400),
                   const SizedBox(height: 10),
@@ -201,12 +205,13 @@ class _SecondaryGuardianProfilePageState extends State<SecondaryGuardianProfileP
               ),
             ),
       bottomNavigationBar: guardianID != null
-          ? NavBarSG(loggedInGuardianId: guardianID!, currentIndex: 2)
+          ? NavBarSG(loggedInGuardianId: guardianID!, currentIndex: 3)
           : null,
     );
   }
 
-  Widget buildInfoRow(String title, String value, {Color color = Colors.black}) {
+  Widget buildInfoRow(String title, String value,
+      {Color color = Colors.black}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Column(
@@ -214,11 +219,15 @@ class _SecondaryGuardianProfilePageState extends State<SecondaryGuardianProfileP
         children: [
           Text(
             title,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Color(0xFF57636C)),
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+                color: Color(0xFF57636C)),
           ),
           Text(
             value,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: color),
+            style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.normal, color: color),
           ),
         ],
       ),
@@ -245,7 +254,10 @@ class _SecondaryGuardianProfilePageState extends State<SecondaryGuardianProfileP
             children: [
               Text(
                 text,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black),
               ),
               Icon(Icons.arrow_forward_ios, color: Colors.black, size: 20),
             ],
