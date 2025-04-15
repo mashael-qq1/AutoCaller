@@ -22,7 +22,7 @@ class _StudentListSGState extends State<StudentListSG> {
     _fetchGuardianData();
   }
 
-  /// **Fetches Guardian Data (Children References & Authorization Status)**
+  /// Fetch guardian data (authorization and student references)
   Future<void> _fetchGuardianData() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -97,7 +97,8 @@ class _StudentListSGState extends State<StudentListSG> {
         : _buildStudentList();
   }
 
-  /// **Displays List of Students**
+  /// Displays the list of students
+  /// Displays the list of students
   Widget _buildStudentList() {
     if (childrenRefs == null || childrenRefs!.isEmpty) {
       return _noChildrenFound();
@@ -123,15 +124,20 @@ class _StudentListSGState extends State<StudentListSG> {
 
             String name = studentData['Sname'] ?? "Unknown";
             String gradeLevel = studentData['gradeLevel'] ?? "N/A";
+            String? photoUrl = studentData['photoUrl'];
 
-            return StudentCard(name: name, gradeLevel: gradeLevel);
+            return StudentCard(
+              name: name,
+              gradeLevel: gradeLevel,
+              photoUrl: photoUrl,
+            );
           },
         );
       },
     );
   }
 
-  /// **Fetch Student Documents**
+  /// Fetch each student document from Firestore
   Future<List<DocumentSnapshot>> _fetchStudentDocuments(
       List<DocumentReference> studentRefs) async {
     List<DocumentSnapshot> studentDocs = [];
@@ -148,7 +154,7 @@ class _StudentListSGState extends State<StudentListSG> {
     return studentDocs;
   }
 
-  /// **Message When No Students Are Found**
+  /// Shown when no students are linked
   Widget _noChildrenFound() {
     return const Center(
       child: Column(
@@ -169,7 +175,7 @@ class _StudentListSGState extends State<StudentListSG> {
     );
   }
 
-  /// **Message When Guardian Is Disabled**
+  /// Shown when the guardian is unauthorized
   Widget _accessRevokedMessage() {
     return const Center(
       child: Column(
@@ -193,12 +199,18 @@ class _StudentListSGState extends State<StudentListSG> {
   }
 }
 
-/// **Student Card UI**
+/// Student card with image and details
 class StudentCard extends StatelessWidget {
   final String name;
   final String gradeLevel;
+  final String? photoUrl;
 
-  const StudentCard({super.key, required this.name, required this.gradeLevel});
+  const StudentCard({
+    super.key,
+    required this.name,
+    required this.gradeLevel,
+    this.photoUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -217,10 +229,12 @@ class StudentCard extends StatelessWidget {
             CircleAvatar(
               radius: 25,
               backgroundColor: Colors.blue.shade100,
-              child: Icon(
-                Icons.person,
-                color: Colors.blue.shade700,
-              ),
+              backgroundImage: photoUrl != null && photoUrl!.isNotEmpty
+                  ? NetworkImage(photoUrl!)
+                  : null,
+              child: photoUrl == null || photoUrl!.isEmpty
+                  ? Icon(Icons.person, color: Colors.blue.shade700)
+                  : null,
             ),
             const SizedBox(width: 12),
             Expanded(
