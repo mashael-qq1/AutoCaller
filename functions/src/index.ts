@@ -3,6 +3,7 @@
 // Export triggers from other files
 export * from "./primaryArrival";
 export * from "./notifySecondary";
+export * from "./pickupTimestampUpdate";
 
 /*
 async function handleGuardianArrival(guardianId: string, guardianType: string) {

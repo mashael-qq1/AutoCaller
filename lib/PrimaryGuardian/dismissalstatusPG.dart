@@ -1,181 +1,129 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'NavBarPG.dart'; // Import the Primary Guardian NavBar
+import 'package:flutter/material.dart';
+import 'dismissal_history.dart';
+import 'NavBarPG.dart';
 
 class DismissalStatusPG extends StatefulWidget {
   const DismissalStatusPG({super.key});
 
   @override
-  _DismissalStatusPGState createState() => _DismissalStatusPGState();
+  State<DismissalStatusPG> createState() => _DismissalStatusPGState();
 }
 
 class _DismissalStatusPGState extends State<DismissalStatusPG> {
-  List<DocumentReference>? childrenRefs;
   String? guardianID;
 
   @override
   void initState() {
     super.initState();
-    _fetchGuardianChildren();
-  }
-
-  Future<void> _fetchGuardianChildren() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    guardianID = user.uid;
-    try {
-      var guardianQuery = await FirebaseFirestore.instance
-          .collection('Primary Guardian')
-          .where('userId', isEqualTo: guardianID)
-          .get();
-
-      if (guardianQuery.docs.isNotEmpty) {
-        var guardianDoc = guardianQuery.docs.first;
-        List<dynamic>? children = guardianDoc['children'];
-
-        if (children != null && children.isNotEmpty) {
-          setState(() {
-            childrenRefs = children.cast<DocumentReference>();
-          });
-        }
-      }
-    } catch (e) {
-      debugPrint("❌ Error fetching children references: $e");
-    }
+    guardianID = FirebaseAuth.instance.currentUser?.uid;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Ensure white background
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Remove back button
+        automaticallyImplyLeading: false,
         title: const Text(
           "My Children's Dismissal Status",
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-            fontSize: 18, // Adjust size as needed
-          ),
+              fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18),
         ),
-        centerTitle: true, // Center title
-        backgroundColor: Colors.white, // White background
-        elevation: 0, // Remove shadow
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: childrenRefs == null
-                ? const Center(child: CircularProgressIndicator())
-                : _buildDismissalStatusList(),
-          ),
-        ],
-      ),
+      body: guardianID == null
+          ? const Center(child: CircularProgressIndicator())
+          : StreamBuilder<DocumentSnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('Primary Guardian')
+                  .doc(guardianID)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                var childrenRefs = snapshot.data!['children'] ?? [];
+
+                if (childrenRefs.isEmpty) {
+                  return const Center(child: Text("No children found."));
+                }
+
+                return FutureBuilder<List<DocumentSnapshot>>(
+                  future: _fetchStudents(childrenRefs),
+                  builder: (context, studentSnapshot) {
+                    if (!studentSnapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    var students = studentSnapshot.data!;
+
+                    return ListView.builder(
+                      padding: const EdgeInsets.all(12),
+                      itemCount: students.length,
+                      itemBuilder: (context, index) {
+                        var data = students[index].data() as Map<String, dynamic>;
+
+                        String name = data['Sname'] ?? "Unknown";
+                        String status = data['dismissalStatus'] ?? "Unknown";
+
+                        String formattedTime = data['pickupTimestamp'] != null
+                            ? _formatTimestamp(data['pickupTimestamp'])
+                            : "------";
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DismissalHistoryPage(
+                                  studentId: students[index].id,
+                                ),
+                              ),
+                            );
+                          },
+                          child: StudentCard(
+                            name: name,
+                            status: status,
+                            dismissalTime: formattedTime,
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
       bottomNavigationBar: guardianID != null
           ? NavBarPG(loggedInGuardianId: guardianID!, currentIndex: 0)
-          : null, //
+          : null,
     );
   }
 
-  Widget _buildDismissalStatusList() {
-    if (childrenRefs == null || childrenRefs!.isEmpty) {
-      return _noChildrenFound();
+  Future<List<DocumentSnapshot>> _fetchStudents(List<dynamic> childrenRefs) async {
+    List<DocumentSnapshot> students = [];
+    for (var ref in childrenRefs) {
+      students.add(await (ref as DocumentReference).get());
     }
-
-    return FutureBuilder<List<DocumentSnapshot>>(
-      future: _fetchStudentDocuments(childrenRefs!),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return _noChildrenFound();
-        }
-
-        var children = snapshot.data!;
-        return ListView.builder(
-          itemCount: children.length,
-          itemBuilder: (context, index) {
-            var studentData =
-                children[index].data() as Map<String, dynamic>? ?? {};
-
-            String name = studentData['Sname'] ?? "Unknown";
-            String status = studentData['dismissalStatus'] ?? "Unknown";
-            String formattedTime = studentData['lastDismissalTime'] != null
-                ? _formatTimestamp(studentData['lastDismissalTime'])
-                : "------";
-
-            return StudentCard(
-              name: name,
-              status: status,
-              dismissalTime: formattedTime,
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Future<List<DocumentSnapshot>> _fetchStudentDocuments(
-      List<DocumentReference> studentRefs) async {
-    List<DocumentSnapshot> studentDocs = [];
-    for (var ref in studentRefs) {
-      try {
-        var doc = await ref.get();
-        if (doc.exists) {
-          studentDocs.add(doc);
-        }
-      } catch (e) {
-        debugPrint("❌ Error fetching student document: $e");
-      }
-    }
-    return studentDocs;
-  }
-
-  Widget _noChildrenFound() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, color: Colors.red, size: 40),
-          SizedBox(height: 10),
-          Text(
-            "No children found",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
-          ),
-        ],
-      ),
-    );
+    return students;
   }
 
   String _formatTimestamp(dynamic timestamp) {
     if (timestamp is Timestamp) {
-      DateTime dateTime = timestamp.toDate();
-      return "${dateTime.day} ${_getMonthName(dateTime.month)} ${dateTime.year}, ${dateTime.hour}:${dateTime.minute}:${dateTime.second}";
+      DateTime dt = timestamp.toDate();
+      return "${dt.day} ${_monthName(dt.month)} ${dt.year}, ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}";
     }
     return "------";
   }
 
-  String _getMonthName(int month) {
-    const List<String> months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec"
+  String _monthName(int month) {
+    const months = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
     return months[month - 1];
   }
@@ -197,68 +145,45 @@ class StudentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white, // Ensure white background
-      elevation: 3, // Remove shadow
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12), // ✅ Match Students Page
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // 🔹 Left: Profile Image
             CircleAvatar(
-              radius: 25, // ✅ Adjusted for consistency
+              radius: 25,
               backgroundColor: Colors.blue.shade100,
-              child: Icon(
-                Icons.person,
-                color: Colors.blue.shade700,
-              ),
+              child: Icon(Icons.person, color: Colors.blue.shade700),
             ),
-            const SizedBox(width: 12), // ✅ Space between image and text
-
-            // 🔹 Center: Name & Status
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                  ),
+                  Text(name,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black)),
                   const SizedBox(height: 4),
-                  Text(
-                    "Status: $status",
-                    style: const TextStyle(color: Colors.black54, fontSize: 14),
-                  ),
+                  Text("Status: $status",
+                      style: const TextStyle(color: Colors.black54, fontSize: 14)),
                 ],
               ),
             ),
-
-            // 🔹 Right: Last Dismissal Time
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const Text(
-                  "Dismissal Time:",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey, // ✅ Distinct color
-                  ),
-                ),
-                Text(
-                  dismissalTime,
-                  style: const TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const Text("Dismissal Time:",
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey)),
+                Text(dismissalTime,
+                    style: const TextStyle(
+                        color: Colors.blue, fontWeight: FontWeight.bold)),
               ],
             ),
           ],

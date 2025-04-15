@@ -42,13 +42,20 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
     });
 
     try {
-      UserCredential userCredential =
-          await _auth.signInWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
       final userId = userCredential.user!.uid;
+      print('🔥 Logged in User ID: $userId');
 
-      final guardianSnapshot =
-          await _firestore.collection('Primary Guardian').doc(userId).get();
+      final guardianSnapshot = await _firestore
+          .collection('Primary Guardian')
+          .doc(userId)
+          .get();
+
+      print('📦 Document Exists in Firestore: ${guardianSnapshot.exists}');
 
       if (!guardianSnapshot.exists) {
         _showError("This account is not authorized as a Primary Guardian.");
@@ -56,16 +63,22 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
         return;
       }
 
-      String? fcmToken = await FirebaseMessaging.instance.getToken();
+      // Try to get FCM Token
+      String? fcmToken;
+      try {
+        fcmToken = await FirebaseMessaging.instance.getToken();
+        print('🔔 Retrieved FCM Token: $fcmToken');
+      } catch (e) {
+        print('⚠️ Could not get FCM Token: $e');
+      }
 
       if (fcmToken != null) {
         await _firestore.collection('Primary Guardian').doc(userId).update({
           'fcmToken': fcmToken,
         });
-        print("✅ FCM Token saved successfully: $fcmToken");
+        print("✅ FCM Token saved successfully.");
       }
 
-      // Auto Refresh Token Listener (Best Practice)
       FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
         await _firestore.collection('Primary Guardian').doc(userId).update({
           'fcmToken': newToken,
@@ -78,6 +91,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
         MaterialPageRoute(builder: (context) => const GuardianHomePage()),
       );
     } catch (e) {
+      print('❌ Login Error: $e');
       _showError("Login failed. Please check your credentials.");
     } finally {
       setState(() {
@@ -89,7 +103,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: const TextStyle(color: Colors.white)),
+        content: Text(message, style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
       ),
     );
@@ -99,7 +113,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
               Color(0xFFFFFFFF),
@@ -113,28 +127,28 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
         ),
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               children: [
-                const SizedBox(height: 80),
+                SizedBox(height: 80),
                 Image.asset('assets/9-removebg-preview.png', height: 150),
-                const SizedBox(height: 10),
-                const Text('Welcome Back!',
+                SizedBox(height: 10),
+                Text('Welcome Back!',
                     style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500)),
-                const SizedBox(height: 8),
-                const Text('Use the form below to access your account.',
+                SizedBox(height: 8),
+                Text('Use the form below to access your account.',
                     style: TextStyle(fontSize: 14, color: Color(0xFF57636C))),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 _buildTextField(_emailController, "Email"),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 _buildTextField(_passwordController, "Password", isPassword: true),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 _buildActions(),
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 _buildSignUpText(),
-                const SizedBox(height: 100),
+                SizedBox(height: 100),
               ],
             ),
           ),
@@ -150,7 +164,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
       obscureText: isPassword ? !_isPasswordVisible : false,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Color(0xFF57636C)),
+        labelStyle: TextStyle(color: Color(0xFF57636C)),
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
@@ -183,7 +197,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const ResetPasswordPage()));
           },
-          child: const Text('Forgot Password?',
+          child: Text('Forgot Password?',
               style: TextStyle(fontSize: 14, color: Color(0xFF57636C))),
         ),
         SizedBox(
@@ -192,13 +206,13 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
           child: ElevatedButton(
             onPressed: _isLoading ? null : _loginGuardian,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF23a8ff),
+              backgroundColor: Color(0xFF23a8ff),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(40)),
             ),
             child: _isLoading
-                ? const CircularProgressIndicator(color: Colors.white)
-                : const Text('Sign In',
+                ? CircularProgressIndicator(color: Colors.white)
+                : Text('Sign In',
                     style: TextStyle(fontSize: 16, color: Colors.white)),
           ),
         ),
@@ -210,11 +224,11 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
     return RichText(
       text: TextSpan(
         text: "Don't have an account? ",
-        style: const TextStyle(fontSize: 14, color: Colors.black),
+        style: TextStyle(fontSize: 14, color: Colors.black),
         children: [
           TextSpan(
             text: "Create one",
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 14, fontWeight: FontWeight.w700, color: Colors.black),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
