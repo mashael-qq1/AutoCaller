@@ -98,9 +98,10 @@ class _DismissalStatusSGState extends State<DismissalStatusSG> {
             return StudentCard(
               name: studentData['Sname'] ?? "Unknown",
               status: studentData['dismissalStatus'] ?? "Unknown",
-              dismissalTime: studentData['lastDismissalTime'] != null
-                  ? _formatTimestamp(studentData['lastDismissalTime'])
+              dismissalTime: studentData['pickupTimestamp'] != null
+                  ? _formatTimestamp(studentData['pickupTimestamp'])
                   : "------",
+              photoUrl: studentData['photoUrl'],
             );
           }).toList(),
         );
@@ -190,12 +191,15 @@ class StudentCard extends StatelessWidget {
   final String name;
   final String status;
   final String dismissalTime;
+  final String? photoUrl;
 
-  const StudentCard(
-      {super.key,
-      required this.name,
-      required this.status,
-      required this.dismissalTime});
+  const StudentCard({
+    super.key,
+    required this.name,
+    required this.status,
+    required this.dismissalTime,
+    this.photoUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -209,33 +213,43 @@ class StudentCard extends StatelessWidget {
         child: Row(
           children: [
             CircleAvatar(
-                radius: 25,
-                backgroundColor: Colors.blue.shade100,
-                child: Icon(Icons.person, color: Colors.blue.shade700)),
+              radius: 25,
+              backgroundColor: Colors.blue.shade100,
+              backgroundImage: photoUrl != null && photoUrl!.isNotEmpty
+                  ? NetworkImage(photoUrl!)
+                  : null,
+              child: photoUrl == null || photoUrl!.isEmpty
+                  ? Icon(Icons.person, color: Colors.blue.shade700)
+                  : null,
+            ),
             const SizedBox(width: 12),
             Expanded(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  Text(name,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black)),
-                  Text("Status: $status",
-                      style:
-                          const TextStyle(color: Colors.black54, fontSize: 14))
-                ])),
-            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              const Text("Dismissal Time:",
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey)),
-              Text(dismissalTime,
-                  style: const TextStyle(
-                      color: Colors.blue, fontWeight: FontWeight.bold))
-            ]),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(name,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black)),
+                    Text("Status: $status",
+                        style: const TextStyle(
+                            color: Colors.black54, fontSize: 14))
+                  ]),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const Text("Dismissal Time:",
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey)),
+                Text(dismissalTime,
+                    style: const TextStyle(
+                        color: Colors.blue, fontWeight: FontWeight.bold))
+              ],
+            ),
           ],
         ),
       ),
