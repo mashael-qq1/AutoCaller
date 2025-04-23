@@ -55,17 +55,17 @@ class _StudentListPGState extends State<StudentListPG> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Removes the back button
+        automaticallyImplyLeading: false,
         title: const Text(
           "Students",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black,
-            fontSize: 18, // Consistent font size
+            fontSize: 18,
           ),
         ),
-        centerTitle: true, // Centers the title
-        backgroundColor: Colors.white, // White background for the AppBar
+        centerTitle: true,
+        backgroundColor: Colors.white,
         elevation: 0,
       ),
       body: childrenRefs == null
@@ -101,8 +101,13 @@ class _StudentListPGState extends State<StudentListPG> {
 
             String name = studentData['Sname'] ?? "Unknown";
             String gradeLevel = studentData['gradeLevel'] ?? "N/A";
+            String? photoUrl = studentData['photoUrl'];
 
-            return StudentCard(name: name, gradeLevel: gradeLevel);
+            return StudentCard(
+              name: name,
+              gradeLevel: gradeLevel,
+              photoUrl: photoUrl,
+            );
           },
         );
       },
@@ -146,39 +151,44 @@ class _StudentListPGState extends State<StudentListPG> {
   }
 }
 
-/// **Updated Student Card UI**
+/// ✅ Updated Student Card UI with photoUrl support
 class StudentCard extends StatelessWidget {
   final String name;
   final String gradeLevel;
+  final String? photoUrl;
 
-  const StudentCard({super.key, required this.name, required this.gradeLevel});
+  const StudentCard({
+    super.key,
+    required this.name,
+    required this.gradeLevel,
+    this.photoUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white,
-      elevation: 3, // ✅ Add shadow for consistency
+      elevation: 3,
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12), // ✅ Match the design
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // 🔹 Profile Picture
             CircleAvatar(
-              radius: 25, // ✅ Keep consistent size
+              radius: 25,
               backgroundColor: Colors.blue.shade100,
-              child: Icon(
-                Icons.person,
-                color: Colors.blue.shade700,
-              ),
+              backgroundImage: (photoUrl != null && photoUrl!.isNotEmpty)
+                  ? NetworkImage(photoUrl!)
+                  : null,
+              child: (photoUrl == null || photoUrl!.isEmpty)
+                  ? Icon(Icons.person, color: Colors.blue.shade700)
+                  : null,
             ),
-            const SizedBox(width: 12), // ✅ Space between image and text
-
-            // 🔹 Name & Grade
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

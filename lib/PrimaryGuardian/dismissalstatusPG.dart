@@ -70,7 +70,7 @@ class _DismissalStatusPGState extends State<DismissalStatusPG> {
 
                         String name = data['Sname'] ?? "Unknown";
                         String status = data['dismissalStatus'] ?? "Unknown";
-
+                        String photoUrl = data['photoUrl'] ?? ''; // ✅ Added Photo URL
                         String formattedTime = data['pickupTimestamp'] != null
                             ? _formatTimestamp(data['pickupTimestamp'])
                             : "------";
@@ -90,6 +90,7 @@ class _DismissalStatusPGState extends State<DismissalStatusPG> {
                             name: name,
                             status: status,
                             dismissalTime: formattedTime,
+                            photoUrl: photoUrl, // ✅ Pass photoUrl
                           ),
                         );
                       },
@@ -133,18 +134,20 @@ class StudentCard extends StatelessWidget {
   final String name;
   final String status;
   final String dismissalTime;
+  final String photoUrl;
 
   const StudentCard({
     super.key,
     required this.name,
     required this.status,
     required this.dismissalTime,
+    required this.photoUrl,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white, // Ensure white background
+      color: Colors.white,
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
@@ -155,7 +158,10 @@ class StudentCard extends StatelessWidget {
             CircleAvatar(
               radius: 25,
               backgroundColor: Colors.blue.shade100,
-              child: Icon(Icons.person, color: Colors.blue.shade700),
+              backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+              child: photoUrl.isEmpty
+                  ? Icon(Icons.person, color: Colors.blue.shade700)
+                  : null,
             ),
             const SizedBox(width: 12),
             Expanded(

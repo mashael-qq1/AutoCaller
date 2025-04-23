@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'NavBarSG.dart';
+import 'dismissal_historySG.dart'; // ✅ Added for dismissal history
 
 class DismissalStatusSG extends StatefulWidget {
   const DismissalStatusSG({super.key});
@@ -95,13 +96,25 @@ class _DismissalStatusSGState extends State<DismissalStatusSG> {
         return ListView(
           children: snapshot.data!.map((doc) {
             var studentData = doc.data() as Map<String, dynamic>? ?? {};
-            return StudentCard(
-              name: studentData['Sname'] ?? "Unknown",
-              status: studentData['dismissalStatus'] ?? "Unknown",
-              dismissalTime: studentData['pickupTimestamp'] != null
-                  ? _formatTimestamp(studentData['pickupTimestamp'])
-                  : "------",
-              photoUrl: studentData['photoUrl'],
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DismissalHistorySG(
+                      studentId: doc.id,
+                    ),
+                  ),
+                );
+              },
+              child: StudentCard(
+                name: studentData['Sname'] ?? "Unknown",
+                status: studentData['dismissalStatus'] ?? "Unknown",
+                dismissalTime: studentData['pickupTimestamp'] != null
+                    ? _formatTimestamp(studentData['pickupTimestamp'])
+                    : "------",
+                photoUrl: studentData['photoUrl'],
+              ),
             );
           }).toList(),
         );
@@ -163,25 +176,15 @@ class _DismissalStatusSGState extends State<DismissalStatusSG> {
   String _formatTimestamp(dynamic timestamp) {
     if (timestamp is Timestamp) {
       DateTime dateTime = timestamp.toDate();
-      return "${dateTime.day} ${_getMonthName(dateTime.month)} ${dateTime.year}, ${dateTime.hour}:${dateTime.minute}:${dateTime.second}";
+      return "${dateTime.day} ${_getMonthName(dateTime.month)} ${dateTime.year}, ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}";
     }
     return "------";
   }
 
   String _getMonthName(int month) {
     const List<String> months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec"
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
     return months[month - 1];
   }

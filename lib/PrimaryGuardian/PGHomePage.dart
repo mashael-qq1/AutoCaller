@@ -1,17 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:autocaller/PrimaryGuardian/NavBarPG.dart';
 
-class GuardianHomePage extends StatelessWidget {
+class GuardianHomePage extends StatefulWidget {
   const GuardianHomePage({super.key});
+
+  @override
+  _GuardianHomePageState createState() => _GuardianHomePageState();
+}
+
+class _GuardianHomePageState extends State<GuardianHomePage> {
+  Map<String, bool> isLoading = {}; // Track loading state for each button
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        
         automaticallyImplyLeading: false,
         title: const Text(
-          'Dashboard',
+          'Home Page',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
@@ -24,148 +32,136 @@ class GuardianHomePage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView( // 
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Below is a summary of your activities.',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
-           Row(
-  mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Reduces space between cards
-  children: [
-    _buildSummaryCard('Associated Students', '3', Icons.group),
-    _buildSummaryCard('Dismissals', '2', Icons.home),
-  ],
-),
-
-            const SizedBox(height: 24),
-            const Text(
-              'Confirm Pickup',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            _buildPickupCard(),
-            const SizedBox(height: 16),
-            const Text(
-              'Select Student:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            _buildStudentList(),
-          ],
-        )
-        ),
-      ),
-      bottomNavigationBar:
-          const NavBarPG(loggedInGuardianId: "guardian_id",currentIndex:2),
-    );
-  }
-
- Widget _buildSummaryCard(String title, String value, IconData icon) {
-  return Expanded( // Ensures both cards take equal space and prevent overflow
-    child: Card(
-      color: Colors.white,
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              backgroundColor: Colors.blue[100],
-              child: Icon(icon, color: Colors.blue, size: 28),
-            ),
-            const SizedBox(width: 8), // Reduced spacing between icon and text
-            Expanded( // Prevents text from causing overflow
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    title,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    overflow: TextOverflow.ellipsis, // Prevents text from overflowing
-                    maxLines: 1,
-                  ),
-                ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              const SizedBox(height: 24),
+              const Text(
+                'Confirm Pickup',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              _buildStudentList(),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
-
-
-
-  Widget _buildPickupCard() {
-    return Card(
-      color: Colors.white, 
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        children: [
-          Image.asset(
-            'assets/Screenshot 2025-02-11 at 2.12.38 PM.png',
-            fit: BoxFit.cover,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-
-                const Text(
-                  'Tuesday, 10:00am',
-                  style: TextStyle(fontSize: 16, color: Colors.blue),
-                ),
-                Chip(
-                  label: const Text('In Progress'),
-                  backgroundColor: Colors.grey[400],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      bottomNavigationBar: const NavBarPG(loggedInGuardianId: "guardian_id", currentIndex: 2),
     );
   }
 
   Widget _buildStudentList() {
-    List<String> students = ['Ali Al-Hassan', 'Khaled Al-Hassan', 'Sara Al-Hassan'];
-    return Column(
-      children: students.map((student) {
-        return Card(
-          color: Colors.white, 
-          elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          child: ListTile(
-            leading: const CircleAvatar(
-              backgroundColor: Colors.blueAccent,
-              child: Icon(Icons.person, color: Colors.white),
-            ),
-            title: Text(student, style: const TextStyle(fontSize: 16)),
-            trailing: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: const Text('Confirm Pickup', style: TextStyle(color: Colors.white)),
-            ),
-          ),
+    String guardianId = FirebaseAuth.instance.currentUser?.uid ?? "";
+
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('Primary Guardian')
+          .doc(guardianId)
+          .snapshots(), // Real-time updates
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return const Center(child: Text('Error fetching data.'));
+        }
+
+        if (!snapshot.hasData || !snapshot.data!.exists) {
+          return const Center(child: Text('Guardian data not found.'));
+        }
+
+        List<dynamic> children = snapshot.data!['children'] ?? [];
+        return Column(
+          children: children.map<Widget>((childRef) {
+            return StreamBuilder<DocumentSnapshot>(
+              stream: childRef.snapshots(), // Real-time updates for each student
+              builder: (context, studentSnapshot) {
+                if (studentSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (studentSnapshot.hasError) {
+                  return const Center(child: Text('Error fetching student data.'));
+                }
+
+                if (!studentSnapshot.hasData || studentSnapshot.data == null) {
+                  return const Center(child: Text('Student not found.'));
+                }
+
+                var studentData = studentSnapshot.data!;
+                String studentName = studentData['Sname'] ?? 'Unknown';
+                String studentPhotoUrl = studentData['photoUrl'] ?? '';
+                String studentId = studentData['StudentID'];
+                String dismissalStatus = studentData['dismissalStatus'] ?? 'waiting'; // Get dismissalStatus
+
+                bool loading = isLoading[studentId] ?? false;
+
+                return Card(
+                  color: Colors.white,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blueAccent,
+                      backgroundImage: studentPhotoUrl.isNotEmpty
+                          ? NetworkImage(studentPhotoUrl)
+                          : const AssetImage('assets/default_avatar.png') as ImageProvider,
+                    ),
+                    title: Text(studentName, style: const TextStyle(fontSize: 16)),
+                    trailing: ElevatedButton(
+                      onPressed: () {
+                        if (dismissalStatus != 'picked up') {
+                          setState(() {
+                            isLoading[studentId] = true; // Show loading spinner
+                          });
+                          _updateDismissalStatus(studentId);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: loading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                              dismissalStatus == 'picked up' ? 'Picked Up' : 'Confirm Pickup',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                    ),
+                  ),
+                );
+              },
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
-}
 
+  Future<void> _updateDismissalStatus(String studentId) async {
+    String guardianId = FirebaseAuth.instance.currentUser?.uid ?? "";
+
+    DocumentReference studentRef = FirebaseFirestore.instance.collection('Student').doc(studentId);
+setState(() {
+        isLoading[studentId] = false; // Hide the loading spinner after operation is completed
+      });
+    // Update the dismissalStatus to 'picked up' and set the timestamp
+    await studentRef.update({
+      'dismissalStatus': 'picked up',
+      'pickupTimestamp': FieldValue.serverTimestamp(),
+    });
+
+    // After updating, set a delay of 1 minute to reset dismissal status
+    Future.delayed(Duration(hours: 20), () async {
+      await studentRef.update({
+        'dismissalStatus': 'waiting',
+        'pickupTimestamp': FieldValue.serverTimestamp(),
+      });
+
+      
+    });
+  }
+}
