@@ -1,5 +1,4 @@
 import 'package:autocaller/PrimaryGuardian/signup.dart';
-import 'package:autocaller/SchoolAdmin/AddStudent.dart';
 import 'package:flutter/material.dart';
 import 'AdminHomePage.dart';
 import 'DismissalStatus.dart';
@@ -19,21 +18,13 @@ class NavBarAdmin extends StatelessWidget {
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const DismissalStatus()));
         break;
+      
+      
       case 1:
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AddStudentPage()));
-        break;
-      case 2:
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => SchoolAdminHomePage()));
-        break;
-      case 3:
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => StudentsPage()));
         break;
-      case 4:
+      case 2:
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => SchoolProfilePage()));
         break;
@@ -48,9 +39,8 @@ class NavBarAdmin extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildNavItem(Icons.access_time, 0, context), // Dismissal Status
-          _buildNavItem(Icons.person_add, 1, context), // Add Guardian
-          _buildNavItem(Icons.group, 3, context), // Students
-          _buildNavItem(Icons.account_circle, 4, context), // Profile
+          _buildNavItem(Icons.group, 1, context), // Students
+          _buildNavItem(Icons.account_circle, 2, context), // Profile
         ],
       ),
     );

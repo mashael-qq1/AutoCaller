@@ -118,18 +118,20 @@ class _SecondaryGuardianLoginPageState
                       Image.asset('assets/9-removebg-preview.png', height: 150),
                       const SizedBox(height: 10),
                       const Text(
-                        'Welcome Secondary Guardian!',
+                        'Welcome Back! ',
                         style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w500,
                             color: Colors.black),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Use the form below to access your account.',
-                        style:
-                            TextStyle(fontSize: 14, color: Color(0xFF57636C)),
-                      ),
+                     Center(
+  child: const Text(
+    'Use the form below to access your account as Secondary Guardian .',
+    style: TextStyle(fontSize: 14, color: Color(0xFF57636C)),
+    textAlign: TextAlign.center, // Ensures the text is centered
+  ),
+),
                       const SizedBox(height: 24),
 
                       // Email Input Field

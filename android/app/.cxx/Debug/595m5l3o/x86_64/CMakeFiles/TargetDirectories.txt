@@ -1,0 +1,2 @@
+/Users/mshalalqbany/Developer/AutoCaller2/android/app/.cxx/Debug/595m5l3o/x86_64/CMakeFiles/edit_cache.dir
+/Users/mshalalqbany/Developer/AutoCaller2/android/app/.cxx/Debug/595m5l3o/x86_64/CMakeFiles/rebuild_cache.dir

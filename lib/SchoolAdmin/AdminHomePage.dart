@@ -136,22 +136,7 @@ class SchoolAdminHomePage extends StatelessWidget {
                                         },
                                       ),
                                       const SizedBox(width: 20),
-                                      _createNavCard(
-                                        context,
-                                        'Add Guardian',
-                                        Icons.people,
-                                        Colors.blue.shade600,
-                                        () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const PrimaryGuardianSignUpPage(),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                      const SizedBox(width: 20),
+                                      
                                     ],
                                   ),
                                 ),

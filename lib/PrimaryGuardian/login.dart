@@ -1,11 +1,7 @@
-// lib/PrimaryGuardian/login.dart
-// ignore_for_file: prefer_const_constructors
-
 import 'package:autocaller/PrimaryGuardian/signup.dart';
 import 'package:autocaller/firstPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '/SchoolAdmin/ResetPassword.dart';
@@ -15,25 +11,39 @@ class GuardianLoginPage extends StatefulWidget {
   const GuardianLoginPage({super.key});
 
   @override
-  State<GuardianLoginPage> createState() => _GuardianLoginPageState();
+  _GuardianLoginPageState createState() => _GuardianLoginPageState();
 }
 
 class _GuardianLoginPageState extends State<GuardianLoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  final _auth = FirebaseAuth.instance;
-  final _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   bool _isLoading = false;
   bool _isPasswordVisible = false;
+  void _loginGuardian() async {
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
 
-  Future<void> _loginGuardian() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-
-    if (email.isEmpty || password.isEmpty) {
-      _showError("Please enter both email and password.");
+    if (email.isEmpty) {
+      _showError("Please enter an email.");
+      return;
+    }
+    if (password.isEmpty) {
+      _showError("Please enter a password.");
+      return;
+    }
+    if (email.contains(' ')) {
+      _showError("Spaces are not allowed in email.");
+      return;
+    }
+    if (password.contains(' ')) {
+      _showError("Spaces are not allowed in passwords.");
+      return;
+    }
+    if (!RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email)) {
+      _showError("Please enter a valid email e.g: Autocaller@gmail.com");
       return;
     }
 
@@ -42,57 +52,42 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
     });
 
     try {
+      // Attempt to sign in with email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      final userId = userCredential.user!.uid;
-      print('🔥 Logged in User ID: $userId');
-
-      final guardianSnapshot = await _firestore
+      // Check if the user is a guardian by querying the Firestore database
+      DocumentSnapshot guardianSnapshot = await _firestore
           .collection('Primary Guardian')
-          .doc(userId)
+          .doc(userCredential.user!.uid)
           .get();
 
-      print('📦 Document Exists in Firestore: ${guardianSnapshot.exists}');
+      if (guardianSnapshot.exists) {
+        // Show success message first
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text("Login Success!", style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.green,
+          ),
+        );
 
-      if (!guardianSnapshot.exists) {
-        _showError("This account is not authorized as a Primary Guardian.");
+        // Wait for a short moment to let the user read it (optional but nice UX)
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        // Navigate to the home page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const GuardianHomePage()),
+        );
+      } else {
+        _showError("This account is not authorized as a guardian.");
         await _auth.signOut();
-        return;
       }
-
-      // Try to get FCM Token
-      String? fcmToken;
-      try {
-        fcmToken = await FirebaseMessaging.instance.getToken();
-        print('🔔 Retrieved FCM Token: $fcmToken');
-      } catch (e) {
-        print('⚠️ Could not get FCM Token: $e');
-      }
-
-      if (fcmToken != null) {
-        await _firestore.collection('Primary Guardian').doc(userId).update({
-          'fcmToken': fcmToken,
-        });
-        print("✅ FCM Token saved successfully.");
-      }
-
-      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-        await _firestore.collection('Primary Guardian').doc(userId).update({
-          'fcmToken': newToken,
-        });
-        print('🔁 Auto Refreshed Token Saved: $newToken');
-      });
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const GuardianHomePage()),
-      );
     } catch (e) {
-      print('❌ Login Error: $e');
-      _showError("Login failed. Please check your credentials.");
+      _showError("Login failed, the supplied credentials is incorrect.");
     } finally {
       setState(() {
         _isLoading = false;
@@ -103,7 +98,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(color: Colors.white)),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
       ),
     );
@@ -113,133 +108,194 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        height: MediaQuery.of(context).size.height,
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFFFFFFFF),
-              Color(0xFFFFFFFF),
-              Color.fromARGB(255, 96, 178, 245),
+              Color(0xFFFFFFFF), // Pure white at the top
+              Color.fromARGB(255, 255, 255, 255), // Light blue transition
+              Color.fromARGB(255, 96, 178, 245), // Deeper blue at the bottom
             ],
-            stops: [0.0, 0.3, 1.0],
+            stops: [0.0, 0.3, 1.0], // Adjust stops to give white more space
             begin: Alignment.topCenter,
             end: Alignment.bottomLeft,
           ),
         ),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              children: [
-                SizedBox(height: 80),
-                Image.asset('assets/9-removebg-preview.png', height: 150),
-                SizedBox(height: 10),
-                Text('Welcome Back!',
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500)),
-                SizedBox(height: 8),
-                Text('Use the form below to access your account.',
-                    style: TextStyle(fontSize: 14, color: Color(0xFF57636C))),
-                SizedBox(height: 24),
-
-                _buildTextField(_emailController, "Email"),
-                SizedBox(height: 16),
-                _buildTextField(_passwordController, "Password", isPassword: true),
-                SizedBox(height: 16),
-
-                _buildActions(),
-                SizedBox(height: 32),
-                _buildSignUpText(),
-                SizedBox(height: 100),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label,
-      {bool isPassword = false}) {
-    return TextField(
-      controller: controller,
-      obscureText: isPassword ? !_isPasswordVisible : false,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Color(0xFF57636C)),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(40),
-          borderSide: BorderSide.none,
-        ),
-        suffixIcon: isPassword
-            ? IconButton(
-                icon: Icon(
-                  _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                  color: Colors.grey,
-                ),
+        child: Stack(
+          children: [
+            Positioned(
+              top: 40,
+              left: 16,
+              child: IconButton(
+                icon:
+                    const Icon(Icons.arrow_back, color: Colors.black, size: 30),
                 onPressed: () {
-                  setState(() {
-                    _isPasswordVisible = !_isPasswordVisible;
-                  });
+                  // Navigate to the first page (e.g., HomePage or any specific page)
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const WelcomeScreen(), // Replace with your first page widget
+                    ),
+                  );
                 },
-              )
-            : null,
-      ),
-    );
-  }
-
-  Widget _buildActions() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const ResetPasswordPage()));
-          },
-          child: Text('Forgot Password?',
-              style: TextStyle(fontSize: 14, color: Color(0xFF57636C))),
-        ),
-        SizedBox(
-          width: 130,
-          height: 50,
-          child: ElevatedButton(
-            onPressed: _isLoading ? null : _loginGuardian,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF23a8ff),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40)),
+              ),
             ),
-            child: _isLoading
-                ? CircularProgressIndicator(color: Colors.white)
-                : Text('Sign In',
-                    style: TextStyle(fontSize: 16, color: Colors.white)),
-          ),
-        ),
-      ],
-    );
-  }
+            Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/9-removebg-preview.png',
+                        height: 150,
+                      ),
 
-  Widget _buildSignUpText() {
-    return RichText(
-      text: TextSpan(
-        text: "Don't have an account? ",
-        style: TextStyle(fontSize: 14, color: Colors.black),
-        children: [
-          TextSpan(
-            text: "Create one",
-            style: TextStyle(
-                fontSize: 14, fontWeight: FontWeight.w700, color: Colors.black),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const PrimaryGuardianSignUpPage()),
-                );
-              },
-          ),
-        ],
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Welcome Back!',
+                        style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w500,
+                            color: Color.fromARGB(255, 0, 0, 0)),
+                      ),
+                      const SizedBox(height: 8),
+                     Center(
+  child: const Text(
+    'Use the form below to access your account as primary guardian.',
+    style: TextStyle(fontSize: 14, color: Color(0xFF57636C)),
+    textAlign: TextAlign.center, // Ensures the text is centered
+  ),
+),
+                      const SizedBox(height: 24),
+
+                      // Email Input Field
+                      TextField(
+                        key: Key('emailField'),
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: "Email",
+                          labelStyle: TextStyle(color: Color(0xFF57636C)),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(40),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Password Input Field
+                      TextField(
+                        key: Key('passwordField'),
+                        controller: _passwordController,
+                        obscureText: !_isPasswordVisible,
+                        decoration: InputDecoration(
+                          labelText: "Password",
+                          labelStyle: TextStyle(color: Color(0xFF57636C)),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(40),
+                            borderSide: BorderSide.none,
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.grey,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Forgot Password and Sign In Button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ResetPasswordPage()));
+                            },
+                            child: const Text('Forgot Password?',
+                                style: TextStyle(
+                                    fontSize: 14, color: Color(0xFF57636C))),
+                          ),
+                          SizedBox(
+                            width: 130,
+                            height: 50,
+                            child: ElevatedButton(
+                              key: Key('signInButton'),
+                              onPressed: _isLoading ? null : _loginGuardian,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF23a8ff),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(40)),
+                              ),
+                              child: _isLoading
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white)
+                                  : const Text('Sign In',
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.white)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 32),
+                      RichText(
+                        text: TextSpan(
+                          text: "Don't have an account? ",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: const Color.fromARGB(255, 0, 0, 0),
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "Create one",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                                fontWeight: FontWeight.w700,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PrimaryGuardianSignUpPage(),
+                                    ),
+                                  );
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Give space before the bottom
+                    ],
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -6,9 +6,12 @@ import 'package:autocaller/SecondaryGuardian/RegisterSG.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import 'GeofenceManager.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -21,9 +24,25 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+       options: const FirebaseOptions(
+        apiKey: "AIzaSyAzoP9b--fAARxjc8QbG6km5Yuy3Bzrg-k",
+        authDomain: "autocaller-196cc.firebaseapp.com",
+        projectId: "autocaller-196cc",
+        storageBucket: "autocaller-196cc.firebasestorage.app",
+        messagingSenderId: "132580101106",
+        appId: "1:132580101106:web:46fcaedc08f6f8a82cb96b",
+      ),
+    );
+  }else{
+  // Initialize Firebase for mobile platforms
   await Firebase.initializeApp();
+  
+  await requestPermissions();
+   GeofenceManager.startGeofenceMonitoring();
+  }
   await _initLocalNotification();
-
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   String? fcmToken = await FirebaseMessaging.instance.getToken();
@@ -34,7 +53,15 @@ Future<void> main() async {
 
 Future<void> requestPermissions() async {
   await Geolocator.requestPermission();
-
+// Request location permission on mobile
+  LocationPermission permission = await Geolocator.requestPermission();
+  if (permission == LocationPermission.denied) {
+    print("❌ Location permission denied");
+  } else if (permission == LocationPermission.deniedForever) {
+    print("❌ Location permissions are permanently denied. Enable them from app settings.");
+  } else {
+    print("✅ Location permission granted");
+  }
   NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
     alert: true,
     badge: true,
@@ -99,8 +126,10 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    if (!kIsWeb) {
     requestPermissions();
     _handleDynamicLinks();
+    }
   }
 
   void _handleDynamicLinks() async {

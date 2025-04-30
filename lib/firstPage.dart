@@ -76,16 +76,17 @@ class WelcomeScreen extends StatelessWidget {
                 context, 'Primary Guardian', Colors.blue, GuardianLoginPage()),
 
             const SizedBox(height: 15.0),
-
+             // 🔹 Secondary Guardian Button (✅ FIXED ✅)
+            _buildLoginButton(context, 'Secondary Guardian', Colors.blue,
+                SecondaryGuardianLoginPage()),
+ const SizedBox(height: 15.0),
             // 🔹 School Admin Button
             _buildLoginButton(
                 context, 'School Admin', Colors.blue, SchoolAdminLoginPage()),
 
             const SizedBox(height: 15.0),
 
-            // 🔹 Secondary Guardian Button (✅ FIXED ✅)
-            _buildLoginButton(context, 'Secondary Guardian', Colors.blue,
-                SecondaryGuardianLoginPage()),
+           
 
             const SizedBox(height: 20.0),
           ],

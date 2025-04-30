@@ -10,21 +10,20 @@ class StudentsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Removes back button
+        automaticallyImplyLeading: false,
         title: const Text(
           'Students',
           style: TextStyle(
-            fontWeight: FontWeight.bold, // Ensures consistency
+            fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: Colors.black, // Matches other pages
+            color: Colors.black,
           ),
         ),
-        centerTitle: true, // Centers the title
-        backgroundColor: Colors.white, // White background
-        elevation: 0, // Removes shadow
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
-      bottomNavigationBar:
-          const NavBarAdmin(currentIndex: 3), // Set index 3 for Students
+      bottomNavigationBar: const NavBarAdmin(currentIndex: 3),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: StreamBuilder(
@@ -46,6 +45,7 @@ class StudentsPage extends StatelessWidget {
                 final student = students[index];
                 final name = student['Sname'] ?? 'Unknown';
                 final gradeLevel = student['gradeLevel'] ?? 'N/A';
+                final photoUrl = student['photoUrl'];
 
                 return Card(
                   color: Colors.white,
@@ -56,11 +56,11 @@ class StudentsPage extends StatelessWidget {
                   ),
                   child: ListTile(
                     leading: CircleAvatar(
+                      radius: 25,
                       backgroundColor: Colors.blue.shade100,
-                      child: Icon(
-                        Icons.person,
-                        color: Colors.blue.shade700,
-                      ),
+                      backgroundImage: (photoUrl != null && photoUrl.toString().isNotEmpty)
+                          ? NetworkImage(photoUrl)
+                          : const AssetImage('assets/images/default_student.png') as ImageProvider,
                     ),
                     title: Text(
                       name,
