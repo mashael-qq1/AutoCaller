@@ -8,13 +8,13 @@ class SGhome extends StatefulWidget {
   const SGhome({super.key, required this.loggedInGuardianId});
 
   @override
-  _GuardianHomePageState createState() => _GuardianHomePageState();
+  _SGhomeState createState() => _SGhomeState();
 }
 
-class _GuardianHomePageState extends State<SGhome> {
-  Map<String, bool> isLoading = {};
+class _SGhomeState extends State<SGhome> {
   bool? isAuthorized;
   List<dynamic>? children;
+  Set<String> selectedStudentIds = {};
 
   @override
   void initState() {
@@ -30,12 +30,9 @@ class _GuardianHomePageState extends State<SGhome> {
           .get();
 
       if (doc.exists) {
-        bool authorized = doc['isAuthorized'] ?? false;
         setState(() {
-          isAuthorized = authorized;
-          if (authorized) {
-            children = doc['children'] ?? [];
-          }
+          isAuthorized = doc['isAuthorized'] ?? false;
+          if (isAuthorized == true) children = doc['children'] ?? [];
         });
       }
     } catch (e) {
@@ -46,21 +43,25 @@ class _GuardianHomePageState extends State<SGhome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        centerTitle: true,
         title: const Text(
           'Home Page',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 24,
+            fontSize: 18,
             color: Colors.black,
           ),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      backgroundColor: Colors.white,
-      body: _buildBody(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: _buildBody(),
+      ),
       bottomNavigationBar: NavBarSG(
         loggedInGuardianId: widget.loggedInGuardianId,
         currentIndex: 2,
@@ -75,25 +76,19 @@ class _GuardianHomePageState extends State<SGhome> {
     if (!isAuthorized!) {
       return _accessRevokedMessage();
     }
-    if (children == null) {
-      return const Center(child: CircularProgressIndicator());
+    if (children == null || children!.isEmpty) {
+      return const Center(child: Text('No students assigned.'));
     }
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 24),
-            const Text(
-              'Confirm Pickup',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            _buildStudentList(),
-          ],
-        ),
-      ),
+
+    return FutureBuilder<List<DocumentSnapshot>>(
+      future:
+          Future.wait(children!.map((ref) => (ref as DocumentReference).get())),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData)
+          return const Center(child: CircularProgressIndicator());
+        var students = snapshot.data!;
+        return _buildStudentListUI(students);
+      },
     );
   }
 
@@ -105,88 +100,166 @@ class _GuardianHomePageState extends State<SGhome> {
           Icon(Icons.block, color: Colors.red, size: 50),
           SizedBox(height: 10),
           Text(
-            "You have been disabled by the Primary Guardian,\n you no longer have access to their students.",
+            "You have been disabled by the Primary Guardian,\nyou no longer have access to their students.",
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStudentList() {
-    return Column(
-      children: children!.map<Widget>((childRef) {
-        return StreamBuilder<DocumentSnapshot>(
-          stream: childRef.snapshots(),
-          builder: (context, studentSnapshot) {
-            if (studentSnapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (studentSnapshot.hasError) {
-              return const Center(child: Text('Error fetching student data.'));
-            }
-            if (!studentSnapshot.hasData || studentSnapshot.data == null) {
-              return const Center(child: Text('Student not found.'));
-            }
-
-            var studentData = studentSnapshot.data!;
-            String studentName = studentData['Sname'] ?? 'Unknown';
-            String studentPhotoUrl = studentData['photoUrl'] ?? '';
-            String studentId = studentData['StudentID'];
-            String dismissalStatus =
-                studentData['dismissalStatus'] ?? 'waiting';
-
-            bool loading = isLoading[studentId] ?? false;
-
-            return Card(
+  Widget _buildStudentListUI(List<DocumentSnapshot> students) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 24),
+          const Text(
+            'Confirm Pickup',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 25,
+              color: Colors.blue,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Container(
+            decoration: BoxDecoration(
               color: Colors.white,
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Colors.blueAccent,
-                  backgroundImage: studentPhotoUrl.isNotEmpty
-                      ? NetworkImage(studentPhotoUrl)
-                      : const AssetImage('assets/default_avatar.png')
-                          as ImageProvider,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  spreadRadius: 2,
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
                 ),
-                title: Text(studentName, style: const TextStyle(fontSize: 16)),
-                trailing: ElevatedButton(
-                  onPressed: () {
-                    if (dismissalStatus != 'picked up') {
-                      setState(() {
-                        isLoading[studentId] = true;
-                      });
-                      _updateDismissalStatus(studentId);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 8.0, bottom: 8),
+                  child: Text(
+                    'Select Student:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
                     ),
                   ),
-                  child: loading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(
-                          dismissalStatus == 'picked up'
-                              ? 'Picked Up'
-                              : 'Confirm Pickup',
-                          style: const TextStyle(color: Colors.white),
+                ),
+                ...students.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  var student = entry.value;
+                  String studentId = student['StudentID'];
+                  String studentName = student['Sname'];
+                  String photoUrl = student['photoUrl'] ?? '';
+                  String dismissalStatus =
+                      student['dismissalStatus'] ?? 'waiting';
+                  bool isSelected = selectedStudentIds.contains(studentId);
+
+                  return Column(
+                    children: [
+                      InkWell(
+                        onTap: dismissalStatus == 'picked up'
+                            ? null
+                            : () {
+                                setState(() {
+                                  isSelected
+                                      ? selectedStudentIds.remove(studentId)
+                                      : selectedStudentIds.add(studentId);
+                                });
+                              },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12.0, horizontal: 8),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: Colors.blueAccent,
+                                backgroundImage: photoUrl.isNotEmpty
+                                    ? NetworkImage(photoUrl)
+                                    : const AssetImage(
+                                            'assets/default_avatar.png')
+                                        as ImageProvider,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  studentName,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              dismissalStatus == 'picked up'
+                                  ? const Text(
+                                      'Picked Up',
+                                      style: TextStyle(
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : Icon(
+                                      isSelected
+                                          ? Icons.radio_button_checked
+                                          : Icons.radio_button_unchecked,
+                                      color: Colors.blue,
+                                    ),
+                            ],
+                          ),
                         ),
+                      ),
+                      if (index < students.length - 1)
+                        const Divider(
+                          color: Colors.grey,
+                          thickness: 0.5,
+                          indent: 8,
+                          endIndent: 8,
+                        ),
+                    ],
+                  );
+                }),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Center(
+            child: ElevatedButton(
+              onPressed: selectedStudentIds.isEmpty
+                  ? null
+                  : () async {
+                      for (String studentId in selectedStudentIds) {
+                        await _updateDismissalStatus(studentId);
+                      }
+                      setState(() => selectedStudentIds.clear());
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
                 ),
               ),
-            );
-          },
-        );
-      }).toList(),
+              child: const Text(
+                'Confirm Pickup',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -200,10 +273,6 @@ class _GuardianHomePageState extends State<SGhome> {
       'pickedUpBy': FirebaseAuth.instance.currentUser!.uid,
     });
 
-    setState(() {
-      isLoading[studentId] = false;
-    });
-
     Future.delayed(const Duration(hours: 20), () async {
       await studentRef.update({
         'dismissalStatus': 'waiting',
@@ -212,3 +281,4 @@ class _GuardianHomePageState extends State<SGhome> {
     });
   }
 }
+
