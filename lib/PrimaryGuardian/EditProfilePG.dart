@@ -1,4 +1,3 @@
-// EditProfilePG.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +5,11 @@ class EditProfilePage extends StatefulWidget {
   final String userId;
   final Map<String, dynamic>? guardianData;
 
-  const EditProfilePage({Key? key, required this.userId, required this.guardianData}) : super(key: key);
+  const EditProfilePage({
+    super.key,
+    required this.userId,
+    required this.guardianData,
+  });
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -22,9 +25,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    _editableGuardianData = widget.guardianData != null
-        ? Map.from(widget.guardianData!)
-        : {};
+    _editableGuardianData =
+        widget.guardianData != null ? Map.from(widget.guardianData!) : {};
     _loadUserData();
   }
 
@@ -55,9 +57,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   String? _validateName(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return "Name cannot be empty or only spaces";
-    }
+    if (value == null || value.trim().isEmpty) return "Name cannot be empty";
     if (!RegExp(r"^[a-zA-Z\s]+$").hasMatch(value)) {
       return "Only letters and spaces allowed";
     }
@@ -65,18 +65,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Email cannot be empty";
-    }
-    if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value)) {
-      return "Enter a valid email address";
+    if (value == null || value.isEmpty) return "Email cannot be empty";
+    if (!RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(value)) {
+      return "Enter a valid email";
     }
     return null;
   }
 
   void _saveChanges() async {
     if (_formKey.currentState!.validate()) {
-      bool confirm = await _showConfirmationDialog("Confirm Changes", "Are you sure you want to save changes?");
+      bool confirm = await _showConfirmationDialog(
+        "Confirm Changes",
+        "Are you sure you want to save changes?",
+      );
       if (confirm) {
         await FirebaseFirestore.instance
             .collection('Primary Guardian')
@@ -85,140 +86,159 @@ class _EditProfilePageState extends State<EditProfilePage> {
           'fullName': _nameController.text.trim(),
           'email': _emailController.text.trim(),
         });
-        Navigator.pop(context, true); // Pass true back to the previous screen
+        Navigator.pop(context, true);
       }
     }
   }
 
   void _cancelChanges() async {
-    bool confirm = await _showConfirmationDialog("Discard Changes?", "Are you sure you want to discard your changes?");
-    if (confirm) {
-      Navigator.pop(context);
-    }
+    bool confirm = await _showConfirmationDialog(
+      "Discard Changes?",
+      "Are you sure you want to discard your changes?",
+    );
+    if (confirm) Navigator.pop(context);
   }
 
   Future<bool> _showConfirmationDialog(String title, String message) async {
-    bool? result = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(title),
-            content: Text(message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text("No"),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: Text("Yes"),
-              ),
-            ],
-          ),
-        );
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text("No")),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text("Yes")),
+        ],
+      ),
+    );
     return result ?? false;
+  }
+
+  InputDecoration _fieldDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: const Color.fromARGB(255, 244, 244, 244),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30),
+        borderSide: BorderSide.none,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text("Edit Profile"),
-        automaticallyImplyLeading: false,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Icon(
-                    Icons.account_circle,
-                    size: 100,
-                    color: Colors.grey,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(), // Dismiss keyboard
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: const Text(
+            "Edit Profile",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  const Icon(Icons.account_circle,
+                      size: 100, color: Colors.grey),
+                  const SizedBox(height: 20),
+                  _buildLabeledField(
+                      "Your Name", _nameController, _validateName),
+                  const SizedBox(height: 16),
+                  _buildLabeledField(
+                      "Your Email", _emailController, _validateEmail),
+                  const SizedBox(height: 16),
+                  _buildLabeledField(
+                    "Your Phone",
+                    _phoneController,
+                    null,
+                    readOnly: true,
                   ),
-                ),
-                SizedBox(height: 20),
-                Text("Your Name", style: TextStyle(fontWeight: FontWeight.bold)),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    hintText: "Enter your name",
-                    hintStyle: TextStyle(
-                      color: Colors.grey[400],
-                      fontStyle: FontStyle.italic,
-                    ),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: _validateName,
-                  onChanged: (value) {
-                    _editableGuardianData['fullName'] = value;
-                  },
-                ),
-                SizedBox(height: 10),
-                Text("Your Email", style: TextStyle(fontWeight: FontWeight.bold)),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    hintText: "Enter your email",
-                    hintStyle: TextStyle(
-                      color: Colors.grey[400],
-                      fontStyle: FontStyle.italic,
-                    ),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: _validateEmail,
-                  onChanged: (value) {
-                    _editableGuardianData['email'] = value;
-                  },
-                ),
-                SizedBox(height: 10),
-                Text("Your Phone", style: TextStyle(fontWeight: FontWeight.bold)),
-                TextFormField(
-                  controller: _phoneController,
-                  decoration: InputDecoration(
-                    hintText: "Your phone number",
-                    hintStyle: TextStyle(
-                      color: Colors.grey[400],
-                      fontStyle: FontStyle.italic,
-                    ),
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                  ),
-                  readOnly: true,
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      onPressed: _saveChanges,
-                      child: Text("Save Changes", style: TextStyle(color: Colors.white)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF23a8ff),
-                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: _saveChanges,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: const Text('Save Changes',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 16)),
                       ),
-                    ),
-                    ElevatedButton(
-                      onPressed: _cancelChanges,
-                      child: Text("Cancel", style: TextStyle(color: Colors.black)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
-                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      const SizedBox(width: 16),
+                      ElevatedButton(
+                        onPressed: _cancelChanges,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 2,
+                        ),
+                        child: const Text('Cancel',
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 16)),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLabeledField(
+    String label,
+    TextEditingController controller,
+    String? Function(String?)? validator, {
+    bool readOnly = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          readOnly: readOnly,
+          validator: validator,
+          decoration: _fieldDecoration("Enter $label"),
+        ),
+      ],
     );
   }
 }
