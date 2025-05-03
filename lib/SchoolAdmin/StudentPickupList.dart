@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_tts/flutter_tts.dart'; // Add this import for
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 //import 'NavBarAdmin.dart';
 class StudentPickupList extends StatefulWidget {
@@ -232,8 +233,16 @@ class _StudentPickupListState extends State<StudentPickupList> {
     });
   }
 
+  Stream<DateTime> _timeStream() async* {
+    while (true) {
+      await Future.delayed(const Duration(seconds: 1));
+      yield DateTime.now();
+    }
+  }
+
   Widget _buildSchoolSelector() {
-    return Expanded(
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(vertical: 32.0, horizontal: 16.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -259,7 +268,7 @@ class _StudentPickupListState extends State<StudentPickupList> {
           ),
           const SizedBox(height: 32),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               decoration: BoxDecoration(
@@ -276,18 +285,13 @@ class _StudentPickupListState extends State<StudentPickupList> {
               child: StreamBuilder<QuerySnapshot>(
                 stream: _firestore.collection('School').snapshots(),
                 builder: (context, snapshot) {
-                  if (snapshot.hasError) {
+                  if (snapshot.hasError)
                     return const Text('Error loading schools');
-                  }
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+                  if (snapshot.connectionState == ConnectionState.waiting)
                     return const CircularProgressIndicator();
-                  }
 
                   final schools = snapshot.data?.docs ?? [];
-
-                  if (schools.isEmpty) {
-                    return const Text('No schools found');
-                  }
+                  if (schools.isEmpty) return const Text('No schools found');
 
                   return DropdownButton<String>(
                     value: selectedSchoolId,
@@ -299,10 +303,7 @@ class _StudentPickupListState extends State<StudentPickupList> {
                       final data = school.data() as Map<String, dynamic>;
                       return DropdownMenuItem<String>(
                         value: school.id,
-                        child: Text(
-                          data['name'] ?? 'Unnamed School',
-                          style: const TextStyle(fontSize: 16),
-                        ),
+                        child: Text(data['name'] ?? 'Unnamed School'),
                       );
                     }).toList(),
                     onChanged: (String? newValue) {
@@ -321,6 +322,28 @@ class _StudentPickupListState extends State<StudentPickupList> {
               ),
             ),
           ),
+          const SizedBox(height: 24),
+          TextButton.icon(
+            onPressed: () async {
+              final Uri emailLaunchUri = Uri(
+                scheme: 'mailto',
+                path: 'autocaller@zohomail.sa',
+                query: Uri.encodeFull(
+                    'subject=Support Request&body=Hello AutoCaller Support,'),
+              );
+              if (await canLaunchUrl(emailLaunchUri)) {
+                await launchUrl(emailLaunchUri);
+              } else {
+                debugPrint('❌ Could not launch email client');
+              }
+            },
+            icon: const Icon(Icons.support_agent, color: Colors.blue),
+            label: const Text(
+              'Need Help? Contact Support',
+              style: TextStyle(color: Colors.blue),
+            ),
+          ),
+          const SizedBox(height: 12),
         ],
       ),
     );
@@ -432,12 +455,19 @@ class _StudentPickupListState extends State<StudentPickupList> {
                         children: [
                           const Icon(Icons.access_time, size: 20),
                           const SizedBox(width: 4),
-                          Text(
-                            DateFormat('hh:mm a').format(DateTime.now()),
-                            style: const TextStyle(fontSize: 16),
+                          StreamBuilder<DateTime>(
+                            stream: _timeStream(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) return const Text('--:--');
+                              return Text(
+                                DateFormat('hh:mm a').format(snapshot.data!),
+                                style: const TextStyle(fontSize: 16),
+                              );
+                            },
                           ),
                         ],
                       ),
+
                       const SizedBox(width: 16),
                       // Pickup Zone Status
                       Container(
