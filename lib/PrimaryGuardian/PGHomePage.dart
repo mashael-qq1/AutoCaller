@@ -17,20 +17,21 @@ class _GuardianHomePageState extends State<GuardianHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: const Text(
-          'Home Page',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-            color: Colors.black,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
+     appBar: AppBar(
+  automaticallyImplyLeading: false,
+  centerTitle: true,
+  title: const Text(
+    'Home Page',
+    style: TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 18, // Match StudentListPG
+      color: Colors.black,
+    ),
+  ),
+  backgroundColor: Colors.white,
+  elevation: 0,
+),
+
       backgroundColor: const Color(0xFFF7F8FC),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
