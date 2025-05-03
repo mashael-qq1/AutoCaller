@@ -246,7 +246,12 @@ class _StudentPickupListState extends State<StudentPickupList> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.school, color: Colors.blue, size: 64),
+          Image.asset(
+            'assets/autoCallerLogoWithoutName.png',
+            width: 140,
+            height: 140,
+            fit: BoxFit.contain,
+          ),
           const SizedBox(height: 16),
           const Text(
             'Welcome to the Student Pickup Screen',
@@ -337,7 +342,7 @@ class _StudentPickupListState extends State<StudentPickupList> {
                 debugPrint('❌ Could not launch email client');
               }
             },
-            icon: const Icon(Icons.support_agent, color: Colors.blue),
+            icon: const Icon(Icons.support_agent, color: Color(0xFF2196F3)),
             label: const Text(
               'Need Help? Contact Support',
               style: TextStyle(color: Colors.blue),
