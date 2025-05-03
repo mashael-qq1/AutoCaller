@@ -70,13 +70,17 @@ class _DismissalStatusPGState extends State<DismissalStatusPG> {
 
                         String name = data['Sname'] ?? "Unknown";
                         String status = data['dismissalStatus'] ?? "Unknown";
-                        String photoUrl = data['photoUrl'] ?? ''; // ✅ Added Photo URL
+                        String photoUrl = data['photoUrl'] ?? '';
                         String formattedTime = data['pickupTimestamp'] != null
                             ? _formatTimestamp(data['pickupTimestamp'])
                             : "------";
 
-                        return GestureDetector(
-                          onTap: () {
+                        return StudentCard(
+                          name: name,
+                          status: status,
+                          dismissalTime: formattedTime,
+                          photoUrl: photoUrl,
+                          onShowHistory: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -86,12 +90,6 @@ class _DismissalStatusPGState extends State<DismissalStatusPG> {
                               ),
                             );
                           },
-                          child: StudentCard(
-                            name: name,
-                            status: status,
-                            dismissalTime: formattedTime,
-                            photoUrl: photoUrl, // ✅ Pass photoUrl
-                          ),
                         );
                       },
                     );
@@ -135,6 +133,7 @@ class StudentCard extends StatelessWidget {
   final String status;
   final String dismissalTime;
   final String photoUrl;
+  final VoidCallback onShowHistory;
 
   const StudentCard({
     super.key,
@@ -142,18 +141,20 @@ class StudentCard extends StatelessWidget {
     required this.status,
     required this.dismissalTime,
     required this.photoUrl,
+    required this.onShowHistory,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white,
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
               radius: 25,
@@ -176,21 +177,31 @@ class StudentCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text("Status: $status",
                       style: const TextStyle(color: Colors.black54, fontSize: 14)),
+                  const SizedBox(height: 4),
+                  Text("Dismissal Time: $dismissalTime",
+                      style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey)),
+                  const SizedBox(height: 6),
+                  TextButton.icon(
+                    onPressed: onShowHistory,
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.blue,
+                      backgroundColor: Colors.blue.withOpacity(0.08),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    icon: const Icon(Icons.history, size: 18),
+                    label: const Text(
+                      "Show History",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  )
                 ],
               ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const Text("Dismissal Time:",
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey)),
-                Text(dismissalTime,
-                    style: const TextStyle(
-                        color: Colors.blue, fontWeight: FontWeight.bold)),
-              ],
             ),
           ],
         ),

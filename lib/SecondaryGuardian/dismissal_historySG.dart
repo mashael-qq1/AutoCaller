@@ -5,7 +5,7 @@ class DismissalHistorySG extends StatelessWidget {
   final String studentId;
 
   const DismissalHistorySG({super.key, required this.studentId});
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,29 +41,33 @@ class DismissalHistorySG extends StatelessWidget {
             return const Center(child: Text("Student data is empty."));
           }
 
-          List<dynamic> history = studentData.entries
-              .firstWhere(
-                  (e) => e.key.trim() == 'dismissalHistory',
-                  orElse: () => const MapEntry('dismissalHistory', []))
-              .value;
+          List<dynamic> history = studentData['dismissalHistory'] ?? [];
 
           if (history.isEmpty) {
             return const Center(child: Text("No dismissal history available."));
           }
+
+          // Sort by timestamp descending
+          history.sort((a, b) {
+            final tsA = (a['timestamp'] as Timestamp).toDate();
+            final tsB = (b['timestamp'] as Timestamp).toDate();
+            return tsB.compareTo(tsA);
+          });
 
           return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: history.length,
             itemBuilder: (context, index) {
               var entry = history[index];
-              DateTime time =
-                  (entry['timestamp'] as Timestamp).toDate();
-              String status = entry['status'];
+              final time = (entry['timestamp'] as Timestamp).toDate();
+              final status = entry['status'] ?? 'Unknown';
+              final pickedUpBy = entry['pickedUpBy'] ?? 'Unknown';
 
               return Card(
                 color: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 elevation: 2,
                 margin: const EdgeInsets.symmetric(vertical: 6),
                 child: ListTile(
@@ -75,14 +79,27 @@ class DismissalHistorySG extends StatelessWidget {
                     child: Icon(Icons.history, color: Colors.blue.shade700),
                   ),
                   title: Text(
-                      "${time.day}/${time.month}/${time.year} - ${time.hour}:${time.minute.toString().padLeft(2, '0')}",
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: Colors.black)),
-                  subtitle: Text("Status: $status",
-                      style: const TextStyle(
-                          fontSize: 13, color: Colors.black54)),
+                    "${time.day}/${time.month}/${time.year} - ${time.hour}:${time.minute.toString().padLeft(2, '0')}",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.black),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Status: $status",
+                        style: const TextStyle(
+                            fontSize: 13, color: Colors.black54),
+                      ),
+                      Text(
+                        "Picked Up By: $pickedUpBy",
+                        style: const TextStyle(
+                            fontSize: 13, color: Colors.black87),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },

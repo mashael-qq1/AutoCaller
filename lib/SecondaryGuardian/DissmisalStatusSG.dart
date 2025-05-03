@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'NavBarSG.dart';
-import 'dismissal_historySG.dart'; // ✅ Added for dismissal history
+import 'dismissal_historySG.dart';
 
 class DismissalStatusSG extends StatefulWidget {
   const DismissalStatusSG({super.key});
@@ -94,10 +94,17 @@ class _DismissalStatusSGState extends State<DismissalStatusSG> {
           return _noChildrenFound();
         }
         return ListView(
+          padding: const EdgeInsets.all(12),
           children: snapshot.data!.map((doc) {
             var studentData = doc.data() as Map<String, dynamic>? ?? {};
-            return GestureDetector(
-              onTap: () {
+            return StudentCard(
+              name: studentData['Sname'] ?? "Unknown",
+              status: studentData['dismissalStatus'] ?? "Unknown",
+              dismissalTime: studentData['pickupTimestamp'] != null
+                  ? _formatTimestamp(studentData['pickupTimestamp'])
+                  : "------",
+              photoUrl: studentData['photoUrl'],
+              onShowHistory: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -107,14 +114,6 @@ class _DismissalStatusSGState extends State<DismissalStatusSG> {
                   ),
                 );
               },
-              child: StudentCard(
-                name: studentData['Sname'] ?? "Unknown",
-                status: studentData['dismissalStatus'] ?? "Unknown",
-                dismissalTime: studentData['pickupTimestamp'] != null
-                    ? _formatTimestamp(studentData['pickupTimestamp'])
-                    : "------",
-                photoUrl: studentData['photoUrl'],
-              ),
             );
           }).toList(),
         );
@@ -195,6 +194,7 @@ class StudentCard extends StatelessWidget {
   final String status;
   final String dismissalTime;
   final String? photoUrl;
+  final VoidCallback onShowHistory;
 
   const StudentCard({
     super.key,
@@ -202,18 +202,20 @@ class StudentCard extends StatelessWidget {
     required this.status,
     required this.dismissalTime,
     this.photoUrl,
+    required this.onShowHistory,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white,
-      elevation: 3,
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
               radius: 25,
@@ -228,30 +230,41 @@ class StudentCard extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.black)),
-                    Text("Status: $status",
-                        style: const TextStyle(
-                            color: Colors.black54, fontSize: 14))
-                  ]),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const Text("Dismissal Time:",
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey)),
-                Text(dismissalTime,
-                    style: const TextStyle(
-                        color: Colors.blue, fontWeight: FontWeight.bold))
-              ],
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black)),
+                  const SizedBox(height: 4),
+                  Text("Status: $status",
+                      style: const TextStyle(color: Colors.black54, fontSize: 14)),
+                  const SizedBox(height: 4),
+                  Text("Dismissal Time: $dismissalTime",
+                      style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey)),
+                  const SizedBox(height: 6),
+                  TextButton.icon(
+                    onPressed: onShowHistory,
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.blue,
+                      backgroundColor: Colors.blue.withOpacity(0.08),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    icon: const Icon(Icons.history, size: 18),
+                    label: const Text(
+                      "Show History",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
             ),
           ],
         ),

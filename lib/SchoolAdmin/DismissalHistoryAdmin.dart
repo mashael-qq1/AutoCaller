@@ -22,7 +22,10 @@ class DismissalHistoryAdminPage extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection('Student').doc(studentId).get(),
+        future: FirebaseFirestore.instance
+            .collection('Student')
+            .doc(studentId)
+            .get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -44,13 +47,21 @@ class DismissalHistoryAdminPage extends StatelessWidget {
             return const Center(child: Text("No dismissal history available."));
           }
 
+          // Sort by timestamp descending
+          history.sort((a, b) {
+            final tsA = (a['timestamp'] as Timestamp).toDate();
+            final tsB = (b['timestamp'] as Timestamp).toDate();
+            return tsB.compareTo(tsA);
+          });
+
           return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: history.length,
             itemBuilder: (context, index) {
               var entry = history[index];
-              DateTime time = (entry['timestamp'] as Timestamp).toDate();
-              String status = entry['status'];
+              final time = (entry['timestamp'] as Timestamp).toDate();
+              final status = entry['status'] ?? 'Unknown';
+              final pickedUpBy = entry['pickedUpBy'] ?? 'Unknown';
 
               return Card(
                 color: Colors.white,
@@ -60,8 +71,8 @@ class DismissalHistoryAdminPage extends StatelessWidget {
                 elevation: 2,
                 margin: const EdgeInsets.symmetric(vertical: 6),
                 child: ListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10, horizontal: 15),
                   leading: CircleAvatar(
                     radius: 20,
                     backgroundColor: Colors.blue.shade100,
@@ -70,12 +81,24 @@ class DismissalHistoryAdminPage extends StatelessWidget {
                   title: Text(
                     "${time.day}/${time.month}/${time.year} - ${time.hour}:${time.minute.toString().padLeft(2, '0')}",
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.black),
                   ),
-                  subtitle: Text(
-                    "Status: $status",
-                    style: const TextStyle(
-                        fontSize: 13, color: Colors.black54),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Status: $status",
+                        style: const TextStyle(
+                            fontSize: 13, color: Colors.black54),
+                      ),
+                      Text(
+                        "Picked Up By: $pickedUpBy",
+                        style: const TextStyle(
+                            fontSize: 13, color: Colors.black87),
+                      ),
+                    ],
                   ),
                 ),
               );

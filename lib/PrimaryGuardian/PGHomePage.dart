@@ -229,20 +229,51 @@ class _GuardianHomePageState extends State<GuardianHomePage> {
     );
   }
 
-  Future<void> _updateDismissalStatus(String studentId) async {
-    DocumentReference studentRef =
-        FirebaseFirestore.instance.collection('Student').doc(studentId);
+ // Add this helper function above _updateDismissalStatus
+Future<String> getGuardianName() async {
+  String? guardianId = FirebaseAuth.instance.currentUser?.uid;
+  if (guardianId == null) return 'Unknown Guardian';
 
+  // Try Primary Guardian
+  var primaryDoc = await FirebaseFirestore.instance
+      .collection('Primary Guardian')
+      .doc(guardianId)
+      .get();
+
+  if (primaryDoc.exists && primaryDoc.data()!.containsKey('fullName')) {
+    return primaryDoc['fullName'];
+  }
+
+  // Try Secondary Guardian
+  var secondaryDoc = await FirebaseFirestore.instance
+      .collection('Secondary Guardian')
+      .doc(guardianId)
+      .get();
+
+  if (secondaryDoc.exists && secondaryDoc.data()!.containsKey('FullName')) {
+    return secondaryDoc['FullName'];
+  }
+
+  return 'Unknown Guardian';
+}
+
+Future<void> _updateDismissalStatus(String studentId) async {
+  String? guardianUid = FirebaseAuth.instance.currentUser?.uid;
+  if (guardianUid == null) return;
+
+  DocumentReference studentRef =
+      FirebaseFirestore.instance.collection('Student').doc(studentId);
+
+  await studentRef.update({
+    'dismissalStatus': 'picked up',
+    'pickupTimestamp': FieldValue.serverTimestamp(),
+    'pickedUpBy': guardianUid, // ✅ store UID, not full name
+  });
+
+  Future.delayed(const Duration(hours: 20), () async {
     await studentRef.update({
-      'dismissalStatus': 'picked up',
+      'dismissalStatus': 'waiting',
       'pickupTimestamp': FieldValue.serverTimestamp(),
     });
-
-    Future.delayed(const Duration(hours: 20), () async {
-      await studentRef.update({
-        'dismissalStatus': 'waiting',
-        'pickupTimestamp': FieldValue.serverTimestamp(),
-      });
-    });
-  }
-}
+  });
+}}

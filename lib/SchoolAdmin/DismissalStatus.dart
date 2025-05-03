@@ -22,10 +22,7 @@ class _DismissalStatusState extends State<DismissalStatus> {
 
   Future<void> _fetchAdminSchoolID() async {
     String? adminEmail = FirebaseAuth.instance.currentUser?.email;
-    if (adminEmail == null) {
-      debugPrint("❌ No admin email found");
-      return;
-    }
+    if (adminEmail == null) return;
 
     try {
       var adminQuery = await FirebaseFirestore.instance
@@ -39,13 +36,10 @@ class _DismissalStatusState extends State<DismissalStatus> {
           setState(() {
             schoolRef = schoolReference;
           });
-          debugPrint("✅ SchoolRef ID: ${schoolRef?.id}");
         }
-      } else {
-        debugPrint("❌ Admin not found in Firestore");
       }
     } catch (e) {
-      debugPrint("❌ Error fetching schoolID: $e");
+      debugPrint("❌ Error fetching admin school ID: $e");
     }
   }
 
@@ -58,37 +52,23 @@ class _DismissalStatusState extends State<DismissalStatus> {
         title: const Text(
           "Dismissal Status",
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: Colors.black,
-          ),
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.black),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: _buildDismissalStatusList(),
-          ),
-        ],
-      ),
+      body: _buildDismissalStatusList(),
       bottomNavigationBar: const NavBarAdmin(currentIndex: 0),
     );
   }
 
   Widget _buildDismissalStatusList() {
-    // ✅ TEMP: Fetch all students regardless of school
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('Student').snapshots(),
-
-      // 🔒 ORIGINAL QUERY: Use this later once schoolID values are confirmed and consistent
-      // stream: FirebaseFirestore.instance
-      //     .collection('Student')
-      //     .where('schoolID', isEqualTo: '/School/${schoolRef!.id}')
-      //     .snapshots(),
-
+      // 🔒 Later: .where('schoolID', isEqualTo: '/School/${schoolRef!.id}')
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -100,35 +80,25 @@ class _DismissalStatusState extends State<DismissalStatus> {
         var students = snapshot.data!.docs;
 
         return ListView.builder(
+          padding: const EdgeInsets.all(12),
           itemCount: students.length,
           itemBuilder: (context, index) {
-            var student = students[index];
-            var studentData = student.data() as Map<String, dynamic>;
+            var student = students[index].data() as Map<String, dynamic>;
 
-            debugPrint("📦 Student: ${studentData['Sname']} | schoolID: ${studentData['schoolID']}");
-
-            String name = studentData['Sname'] ?? "Unknown";
-            String status = studentData['dismissalStatus'] ?? "Unknown";
-            String photoUrl = studentData['photoUrl'] ?? "";
-            String formattedTime =
-                _formatTimestamp(studentData['pickupTimestamp']);
-
-            return GestureDetector(
-              onTap: () {
+            return StudentCard(
+              name: student['Sname'] ?? 'Unknown',
+              status: student['dismissalStatus'] ?? 'Unknown',
+              dismissalTime: _formatTimestamp(student['pickupTimestamp']),
+              photoUrl: student['photoUrl'] ?? '',
+              onShowHistory: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        DismissalHistoryAdminPage(studentId: student.id),
+                        DismissalHistoryAdminPage(studentId: students[index].id),
                   ),
                 );
               },
-              child: StudentCard(
-                name: name,
-                status: status,
-                dismissalTime: formattedTime,
-                photoUrl: photoUrl,
-              ),
             );
           },
         );
@@ -146,10 +116,7 @@ class _DismissalStatusState extends State<DismissalStatus> {
           Text(
             "No students found",
             style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
           ),
         ],
       ),
@@ -158,14 +125,14 @@ class _DismissalStatusState extends State<DismissalStatus> {
 
   String _formatTimestamp(dynamic timestamp) {
     if (timestamp is Timestamp) {
-      DateTime dateTime = timestamp.toDate();
-      return "${dateTime.day} ${_getMonthName(dateTime.month)} ${dateTime.year}, ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}";
+      DateTime dt = timestamp.toDate();
+      return "${dt.day} ${_monthName(dt.month)} ${dt.year}, ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}";
     }
     return "------";
   }
 
-  String _getMonthName(int month) {
-    const List<String> months = [
+  String _monthName(int month) {
+    const months = [
       "Jan", "Feb", "Mar", "Apr", "May", "Jun",
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
@@ -178,6 +145,7 @@ class StudentCard extends StatelessWidget {
   final String status;
   final String dismissalTime;
   final String photoUrl;
+  final VoidCallback onShowHistory;
 
   const StudentCard({
     super.key,
@@ -185,6 +153,7 @@ class StudentCard extends StatelessWidget {
     required this.status,
     required this.dismissalTime,
     required this.photoUrl,
+    required this.onShowHistory,
   });
 
   @override
@@ -192,13 +161,12 @@ class StudentCard extends StatelessWidget {
     return Card(
       color: Colors.white,
       elevation: 3,
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
               radius: 25,
@@ -214,42 +182,41 @@ class StudentCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                  ),
+                  Text(name,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black)),
                   const SizedBox(height: 4),
-                  Text(
-                    "Status: $status",
-                    style:
-                        const TextStyle(color: Colors.black54, fontSize: 14),
+                  Text("Status: $status",
+                      style: const TextStyle(
+                          color: Colors.black54, fontSize: 14)),
+                  const SizedBox(height: 4),
+                  Text("Dismissal Time: $dismissalTime",
+                      style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey)),
+                  const SizedBox(height: 6),
+                  TextButton.icon(
+                    onPressed: onShowHistory,
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.blue,
+                      backgroundColor: Colors.blue.withOpacity(0.08),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    icon: const Icon(Icons.history, size: 18),
+                    label: const Text(
+                      "Show History",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const Text(
-                  "Dismissal Time:",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
-                ),
-                Text(
-                  dismissalTime,
-                  style: const TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
             ),
           ],
         ),

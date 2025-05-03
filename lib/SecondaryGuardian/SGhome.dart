@@ -197,6 +197,7 @@ class _GuardianHomePageState extends State<SGhome> {
     await studentRef.update({
       'dismissalStatus': 'picked up',
       'pickupTimestamp': FieldValue.serverTimestamp(),
+      'pickedUpBy': FirebaseAuth.instance.currentUser!.uid,
     });
 
     setState(() {
