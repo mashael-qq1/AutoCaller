@@ -17,22 +17,21 @@ class _GuardianHomePageState extends State<GuardianHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     appBar: AppBar(
-  automaticallyImplyLeading: false,
-  centerTitle: true,
-  title: const Text(
-    'Home Page',
-    style: TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 18, // Match StudentListPG
-      color: Colors.black,
-    ),
-  ),
-  backgroundColor: Colors.white,
-  elevation: 0,
-),
-
-      backgroundColor: const Color(0xFFF7F8FC),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        title: const Text(
+          'Home Page',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18, // Match StudentListPG
+            color: Colors.black,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _buildStudentList(),
@@ -103,6 +102,14 @@ class _GuardianHomePageState extends State<GuardianHomePage> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2), // Light shadow
+                  spreadRadius: 2,
+                  blurRadius: 6,
+                  offset: Offset(0, 3), // Shadow position
+                ),
+              ],
             ),
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
             child: Column(
@@ -125,7 +132,8 @@ class _GuardianHomePageState extends State<GuardianHomePage> {
                   String studentId = student['StudentID'];
                   String studentName = student['Sname'];
                   String photoUrl = student['photoUrl'] ?? '';
-                  String dismissalStatus = student['dismissalStatus'] ?? 'waiting';
+                  String dismissalStatus =
+                      student['dismissalStatus'] ?? 'waiting';
                   bool isSelected = selectedStudentIds.contains(studentId);
 
                   return Column(
@@ -151,7 +159,8 @@ class _GuardianHomePageState extends State<GuardianHomePage> {
                                 backgroundColor: Colors.blueAccent,
                                 backgroundImage: photoUrl.isNotEmpty
                                     ? NetworkImage(photoUrl)
-                                    : const AssetImage('assets/default_avatar.png')
+                                    : const AssetImage(
+                                            'assets/default_avatar.png')
                                         as ImageProvider,
                               ),
                               const SizedBox(width: 12),
@@ -191,7 +200,7 @@ class _GuardianHomePageState extends State<GuardianHomePage> {
                         ),
                     ],
                   );
-                }).toList(),
+                }),
               ],
             ),
           ),
@@ -210,7 +219,8 @@ class _GuardianHomePageState extends State<GuardianHomePage> {
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -230,51 +240,52 @@ class _GuardianHomePageState extends State<GuardianHomePage> {
     );
   }
 
- // Add this helper function above _updateDismissalStatus
-Future<String> getGuardianName() async {
-  String? guardianId = FirebaseAuth.instance.currentUser?.uid;
-  if (guardianId == null) return 'Unknown Guardian';
+  // Add this helper function above _updateDismissalStatus
+  Future<String> getGuardianName() async {
+    String? guardianId = FirebaseAuth.instance.currentUser?.uid;
+    if (guardianId == null) return 'Unknown Guardian';
 
-  // Try Primary Guardian
-  var primaryDoc = await FirebaseFirestore.instance
-      .collection('Primary Guardian')
-      .doc(guardianId)
-      .get();
+    // Try Primary Guardian
+    var primaryDoc = await FirebaseFirestore.instance
+        .collection('Primary Guardian')
+        .doc(guardianId)
+        .get();
 
-  if (primaryDoc.exists && primaryDoc.data()!.containsKey('fullName')) {
-    return primaryDoc['fullName'];
+    if (primaryDoc.exists && primaryDoc.data()!.containsKey('fullName')) {
+      return primaryDoc['fullName'];
+    }
+
+    // Try Secondary Guardian
+    var secondaryDoc = await FirebaseFirestore.instance
+        .collection('Secondary Guardian')
+        .doc(guardianId)
+        .get();
+
+    if (secondaryDoc.exists && secondaryDoc.data()!.containsKey('FullName')) {
+      return secondaryDoc['FullName'];
+    }
+
+    return 'Unknown Guardian';
   }
 
-  // Try Secondary Guardian
-  var secondaryDoc = await FirebaseFirestore.instance
-      .collection('Secondary Guardian')
-      .doc(guardianId)
-      .get();
+  Future<void> _updateDismissalStatus(String studentId) async {
+    String? guardianUid = FirebaseAuth.instance.currentUser?.uid;
+    if (guardianUid == null) return;
 
-  if (secondaryDoc.exists && secondaryDoc.data()!.containsKey('FullName')) {
-    return secondaryDoc['FullName'];
-  }
+    DocumentReference studentRef =
+        FirebaseFirestore.instance.collection('Student').doc(studentId);
 
-  return 'Unknown Guardian';
-}
-
-Future<void> _updateDismissalStatus(String studentId) async {
-  String? guardianUid = FirebaseAuth.instance.currentUser?.uid;
-  if (guardianUid == null) return;
-
-  DocumentReference studentRef =
-      FirebaseFirestore.instance.collection('Student').doc(studentId);
-
-  await studentRef.update({
-    'dismissalStatus': 'picked up',
-    'pickupTimestamp': FieldValue.serverTimestamp(),
-    'pickedUpBy': guardianUid, // ✅ store UID, not full name
-  });
-
-  Future.delayed(const Duration(hours: 20), () async {
     await studentRef.update({
-      'dismissalStatus': 'waiting',
+      'dismissalStatus': 'picked up',
       'pickupTimestamp': FieldValue.serverTimestamp(),
+      'pickedUpBy': guardianUid, // ✅ store UID, not full name
     });
-  });
-}}
+
+    Future.delayed(const Duration(hours: 20), () async {
+      await studentRef.update({
+        'dismissalStatus': 'waiting',
+        'pickupTimestamp': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+}
