@@ -6,9 +6,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:autocaller/firstPage.dart';
 import 'NavBarAdmin.dart'; // Import the NavBarAdmin
+import 'ResetPassword.dart';
 
 class SchoolProfilePage extends StatefulWidget {
-  const SchoolProfilePage({super.key});
+  final bool showResetWarning;
+
+  const SchoolProfilePage({Key? key, this.showResetWarning = false})
+      : super(key: key);
 
   @override
   _SchoolProfilePageState createState() => _SchoolProfilePageState();
@@ -20,9 +24,23 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
   String? adminID;
 
   @override
+  @override
   void initState() {
     super.initState();
     fetchAdminData();
+
+    if (widget.showResetWarning) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await FirebaseFirestore.instance
+              .collection('Admin')
+              .doc(user.uid)
+              .update({'needsPasswordReset': false});
+        }
+        _showResetPasswordPopup();
+      });
+    }
   }
 
   Future<void> fetchAdminData() async {
@@ -64,6 +82,43 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
     } catch (e) {
       debugPrint("Error fetching school data: $e");
     }
+  }
+
+  void _showResetPasswordPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: const Color(0xFFF1EAF7),
+          title: const Text(
+            'Reset Required',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            'As this is your first login, you are required to reset your password for security reasons.',
+            style: TextStyle(color: Colors.black87),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop(); // dismiss dialog
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                        'You can reset your password from the profile section.'),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+              },
+              child: const Text('OK', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _confirmLogout(BuildContext context) async {
@@ -129,18 +184,38 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
                       children: [
                         const SizedBox(height: 20),
                         Center(
-                          child: schoolData!['logo'] != null
-                              ? Image.network(
-                                  schoolData!['logo'],
-                                  height: 100,
-                                  width: 100,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(Icons.school,
-                                          size: 100, color: Colors.grey),
-                                )
-                              : Icon(Icons.school,
-                                  size: 100, color: Colors.grey),
+                          child: Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: schoolData!['logo'] != null &&
+                                    schoolData!['logo'].isNotEmpty
+                                ? Image.network(
+                                    schoolData!['logo'],
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      debugPrint(
+                                          '❌ Error loading school logo: $error');
+                                      return const Icon(Icons.school,
+                                          size: 48, color: Colors.grey);
+                                    },
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      );
+                                    },
+                                  )
+                                : const Icon(Icons.school,
+                                    size: 48, color: Colors.grey),
+                          ),
                         ),
                         const SizedBox(height: 20),
                         buildInfoRow("School Name:",
