@@ -84,42 +84,35 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
     }
   }
 
-  void _showResetPasswordPopup() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          backgroundColor: const Color(0xFFF1EAF7),
-          title: const Text(
-            'Reset Required',
-            style: TextStyle(fontWeight: FontWeight.bold),
+ void _showResetPasswordPopup() {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: const Color(0xFFF1EAF7),
+        title: const Text(
+          'Reset Required',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: const Text(
+          'As this is your first login, you are required to reset your password for security reasons.',
+          style: TextStyle(color: Colors.black87),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // ✅ Just dismiss, no snackbar
+            },
+            child: const Text('OK', style: TextStyle(color: Colors.red)),
           ),
-          content: const Text(
-            'As this is your first login, you are required to reset your password for security reasons.',
-            style: TextStyle(color: Colors.black87),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop(); // dismiss dialog
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                        'You can reset your password from the profile section.'),
-                    backgroundColor: Colors.orange,
-                  ),
-                );
-              },
-              child: const Text('OK', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
-    );
-  }
+        ],
+      );
+    },
+  );
+}
+
 
   Future<void> _confirmLogout(BuildContext context) async {
     return showDialog<void>(
