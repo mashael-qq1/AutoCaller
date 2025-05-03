@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:autocaller/dynamic_link_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'NavBarPG.dart';
 
 class AddSecondaryGuardian extends StatefulWidget {
@@ -200,12 +199,13 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
             hintText: hint,
             hintStyle: TextStyle(color: Colors.grey.shade500),
             filled: true,
-            fillColor: Colors.grey.shade100,
+            fillColor: const Color.fromARGB(255, 244, 244, 244),
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none),
+              borderRadius: BorderRadius.circular(30), // ✅ rounded like reset
+              borderSide: BorderSide.none,
+            ),
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           ),
         ),
       ],
@@ -234,20 +234,21 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
   }
 
   Widget _buildShareButton() {
-    return SizedBox(
-      width: double.infinity,
+    return Center(
       child: ElevatedButton(
         onPressed: _generateAndShareLink,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue.shade700,
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          backgroundColor: Colors.blue,
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
         ),
-        child: const Text("Generate & Share Link",
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white)),
+        child: const Text(
+          'Generate & Share Link',
+          style: TextStyle(
+              color: Color.fromARGB(255, 247, 245, 245), fontSize: 16),
+        ),
       ),
     );
   }
