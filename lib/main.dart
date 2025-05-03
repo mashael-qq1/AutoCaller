@@ -10,7 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
+import 'package:autocaller/SchoolAdmin/StudentPickupList.dart';
 import 'GeofenceManager.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -26,7 +26,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     await Firebase.initializeApp(
-       options: const FirebaseOptions(
+      options: const FirebaseOptions(
         apiKey: "AIzaSyAzoP9b--fAARxjc8QbG6km5Yuy3Bzrg-k",
         authDomain: "autocaller-196cc.firebaseapp.com",
         projectId: "autocaller-196cc",
@@ -35,12 +35,12 @@ Future<void> main() async {
         appId: "1:132580101106:web:46fcaedc08f6f8a82cb96b",
       ),
     );
-  }else{
-  // Initialize Firebase for mobile platforms
-  await Firebase.initializeApp();
-  
-  await requestPermissions();
-   GeofenceManager.startGeofenceMonitoring();
+  } else {
+    // Initialize Firebase for mobile platforms
+    await Firebase.initializeApp();
+
+    await requestPermissions();
+    GeofenceManager.startGeofenceMonitoring();
   }
   await _initLocalNotification();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -58,11 +58,13 @@ Future<void> requestPermissions() async {
   if (permission == LocationPermission.denied) {
     print("❌ Location permission denied");
   } else if (permission == LocationPermission.deniedForever) {
-    print("❌ Location permissions are permanently denied. Enable them from app settings.");
+    print(
+        "❌ Location permissions are permanently denied. Enable them from app settings.");
   } else {
     print("✅ Location permission granted");
   }
-  NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+  NotificationSettings settings =
+      await FirebaseMessaging.instance.requestPermission(
     alert: true,
     badge: true,
     sound: true,
@@ -98,7 +100,8 @@ Future<void> _initLocalNotification() async {
           android: AndroidNotificationDetails(
             'high_importance_channel',
             'High Importance Notifications',
-            channelDescription: 'This channel is used for important notifications.',
+            channelDescription:
+                'This channel is used for important notifications.',
             importance: Importance.max,
             priority: Priority.high,
             ticker: 'ticker',
@@ -127,8 +130,8 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     if (!kIsWeb) {
-    requestPermissions();
-    _handleDynamicLinks();
+      requestPermissions();
+      _handleDynamicLinks();
     }
   }
 
@@ -166,7 +169,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      home: WelcomeScreen(),
+      home: kIsWeb ? StudentPickupList() : WelcomeScreen(),
     );
   }
 }
