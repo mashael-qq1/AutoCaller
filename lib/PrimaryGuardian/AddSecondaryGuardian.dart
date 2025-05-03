@@ -143,15 +143,21 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text(
           "Add Secondary Guardian",
           style: TextStyle(
-              fontWeight: FontWeight.bold, color: Colors.black, fontSize: 18),
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            fontSize: 18,
+          ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
