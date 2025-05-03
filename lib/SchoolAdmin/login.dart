@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '/SchoolAdmin/ResetPassword.dart';
-import '/SchoolAdmin/AdminHomePage.dart';
 
 class SchoolAdminLoginPage extends StatefulWidget {
   const SchoolAdminLoginPage({super.key});
@@ -42,7 +41,6 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
       return;
     }
     if (!RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email)) {
-
       _showError("Please enter a valid email e.g: Autocaller@gmail.com");
       return;
     }
@@ -63,11 +61,18 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
           .get();
 
       if (adminSnapshot.exists) {
+        final adminData = adminSnapshot.data() as Map<String, dynamic>;
+        final needsReset = adminData['needsPasswordReset'] as bool? ?? false;
+
         _showSuccess("Login Success!");
         await Future.delayed(const Duration(milliseconds: 500));
+
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => SchoolProfilePage()),
+          MaterialPageRoute(
+            builder: (context) =>
+                SchoolProfilePage(showResetWarning: needsReset),
+          ),
         );
       } else {
         _showError("This account is not authorized as an admin.");
@@ -144,13 +149,15 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                             color: Color.fromARGB(255, 0, 0, 0)),
                       ),
                       const SizedBox(height: 8),
-                     Center(
-  child: const Text(
-    'Use the form below to access your account as school admin.',
-    style: TextStyle(fontSize: 14, color: Color(0xFF57636C)),
-    textAlign: TextAlign.center, // Ensures the text is centered
-  ),
-),
+                      Center(
+                        child: const Text(
+                          'Use the form below to access your account as school admin.',
+                          style:
+                              TextStyle(fontSize: 14, color: Color(0xFF57636C)),
+                          textAlign:
+                              TextAlign.center, // Ensures the text is centered
+                        ),
+                      ),
                       const SizedBox(height: 24),
                       TextField(
                         controller: _emailController,
