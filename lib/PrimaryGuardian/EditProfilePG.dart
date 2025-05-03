@@ -236,6 +236,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           controller: controller,
           readOnly: readOnly,
           validator: validator,
+          style: TextStyle(
+            color: readOnly ? Colors.grey[600] : Colors.black,
+          ),
           decoration: _fieldDecoration("Enter $label"),
         ),
       ],
