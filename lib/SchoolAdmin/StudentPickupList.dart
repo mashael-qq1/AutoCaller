@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 //import 'NavBarAdmin.dart';
 class StudentPickupList extends StatefulWidget {
-  const StudentPickupList({Key? key}) : super(key: key);
+  const StudentPickupList({super.key});
   @override
   State<StudentPickupList> createState() => _StudentPickupListState();
 }
@@ -26,7 +25,7 @@ class _StudentPickupListState extends State<StudentPickupList> {
 
   List<dynamic> _voices = [];
   String? _selectedVoice;
-  String _selectedLocale = 'en-GB'; // Default Arabic locale
+  final String _selectedLocale = 'en-GB'; // Default Arabic locale
 
   @override
   void initState() {
@@ -160,7 +159,7 @@ class _StudentPickupListState extends State<StudentPickupList> {
       debugPrint('📝 Total students in collection: ${snapshot.docs.length}');
 
       for (var doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         debugPrint('\n👤 Student Details:');
         debugPrint('   ID: ${doc.id}');
         debugPrint('   Name: ${data['Sname']}');
@@ -171,7 +170,7 @@ class _StudentPickupListState extends State<StudentPickupList> {
       }
 
       final schoolStudents = snapshot.docs.where((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         final studentSchoolRef = data['schoolID'] as DocumentReference?;
         final matchesSchool = studentSchoolRef?.id == selectedSchoolId;
 
@@ -190,7 +189,7 @@ class _StudentPickupListState extends State<StudentPickupList> {
       lateCount = 0;
 
       final filteredStudents = schoolStudents.where((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         final dismissalStatus = data['dismissalStatus'] as String? ?? '';
         final isWaitingOrLate = dismissalStatus.toLowerCase() == 'waiting' ||
             dismissalStatus.toLowerCase() == 'late';
@@ -223,11 +222,11 @@ class _StudentPickupListState extends State<StudentPickupList> {
 
       // 🔊 Speak all names in order
       List<String> studentNames = filteredStudents.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         return data['Sname']?.toString() ?? '';
       }).toList();
 
-      _speakStudentListLoop(studentNames); // 🔁 Repeat TTS names
+      _speakStudentList(studentNames); // ✅ NEW
 
       return filteredStudents;
     });
@@ -290,10 +289,12 @@ class _StudentPickupListState extends State<StudentPickupList> {
               child: StreamBuilder<QuerySnapshot>(
                 stream: _firestore.collection('School').snapshots(),
                 builder: (context, snapshot) {
-                  if (snapshot.hasError)
+                  if (snapshot.hasError) {
                     return const Text('Error loading schools');
-                  if (snapshot.connectionState == ConnectionState.waiting)
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
+                  }
 
                   final schools = snapshot.data?.docs ?? [];
                   if (schools.isEmpty) return const Text('No schools found');
@@ -356,20 +357,24 @@ class _StudentPickupListState extends State<StudentPickupList> {
 
   int _currentStudentIndex = 0;
   bool _isSpeaking = false;
+  List<String> _latestNames = [];
 
-  void _speakStudentListLoop(List<String> names) async {
-    if (_isSpeaking || names.isEmpty) return;
+  Future<void> _speakStudentList(List<String> names) async {
+    _latestNames = names;
+
+    if (_isSpeaking) return; // already looping
+
     _isSpeaking = true;
 
-    while (mounted) {
-      final nameToSpeak = names[_currentStudentIndex];
-      await flutterTts.speak(nameToSpeak);
-      await Future.delayed(const Duration(seconds: 3)); // pause between names
-
-      _currentStudentIndex++;
-      if (_currentStudentIndex >= names.length) {
-        _currentStudentIndex = 0; // start over
+    while (mounted && _isSpeaking) {
+      for (final name in _latestNames) {
+        if (!mounted) break;
+        await flutterTts.speak(name);
+        await Future.delayed(const Duration(seconds: 3));
       }
+
+      // optional pause before repeating
+      await Future.delayed(const Duration(seconds: 2));
     }
 
     _isSpeaking = false;
