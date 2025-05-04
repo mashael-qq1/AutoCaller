@@ -61,7 +61,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         FocusScope.of(context).unfocus(); // Dismiss keyboard focus on tap
       },
       child: Scaffold(
-       backgroundColor: Colors.white
+       backgroundColor: Colors.white,
         appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.transparent,
