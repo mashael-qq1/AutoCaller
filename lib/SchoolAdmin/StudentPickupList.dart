@@ -63,7 +63,6 @@ class _StudentPickupListState extends State<StudentPickupList> {
             debugPrint('🔊 Arabic Voice Found: ${voice['name']}');
           }
         }
-
         if (_selectedVoice == null && _voices.isNotEmpty) {
 //If no arabic voice is found, set to the first available
 
@@ -84,7 +83,6 @@ class _StudentPickupListState extends State<StudentPickupList> {
       debugPrint('❌ TTS: Error setting voice: $e');
     }
   }
-
   Future<void> _speak(String text) async {
     try {
       await flutterTts.speak(text);

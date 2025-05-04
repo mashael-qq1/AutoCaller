@@ -15,6 +15,8 @@ class _SGhomeState extends State<SGhome> {
   bool? isAuthorized;
   List<dynamic>? children;
   Set<String> selectedStudentIds = {};
+  bool isArrived = false;
+  
 
   @override
   void initState() {
@@ -32,6 +34,7 @@ class _SGhomeState extends State<SGhome> {
       if (doc.exists) {
         setState(() {
           isAuthorized = doc['isAuthorized'] ?? false;
+           isArrived = doc['arrived'] ?? false;
           if (isAuthorized == true) children = doc['children'] ?? [];
         });
       }
@@ -230,34 +233,47 @@ class _SGhomeState extends State<SGhome> {
             ),
           ),
           const SizedBox(height: 24),
-          Center(
-            child: ElevatedButton(
-              onPressed: selectedStudentIds.isEmpty
-                  ? null
-                  : () async {
-                      for (String studentId in selectedStudentIds) {
-                        await _updateDismissalStatus(studentId);
-                      }
-                      setState(() => selectedStudentIds.clear());
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: const Text(
-                'Confirm Pickup',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
+         Column(
+  children: [
+    ElevatedButton(
+      onPressed: (!isArrived || selectedStudentIds.isEmpty)
+          ? null
+          : () async {
+              for (String studentId in selectedStudentIds) {
+                await _updateDismissalStatus(studentId);
+              }
+              setState(() {
+                selectedStudentIds.clear();
+              });
+            },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+      ),
+      child: const Text(
+        'Confirm Pickup',
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+    ),
+    const SizedBox(height: 8),
+    if (!isArrived || selectedStudentIds.isEmpty)
+      const Text(
+        'The button is disabled until you are in the school zone and a student is selected.',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Color.fromARGB(255, 131, 124, 124),
+          fontSize: 13,
+        ),
+      ),
+  ],
+),
         ],
       ),
     );
