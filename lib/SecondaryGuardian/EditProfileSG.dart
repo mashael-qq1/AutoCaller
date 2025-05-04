@@ -105,8 +105,12 @@ class _EditProfileSGState extends State<EditProfileSG> {
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text("No")),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: Text("Yes")),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text("No")),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text("Yes")),
         ],
       ),
     );
@@ -171,63 +175,82 @@ class _EditProfileSGState extends State<EditProfileSG> {
           ),
           centerTitle: true,
         ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  const Icon(Icons.account_circle,
-                      size: 100, color: Colors.grey),
-                  const SizedBox(height: 20),
-                  _buildLabeledField("Your Name", _nameController, _validateName),
-                  const SizedBox(height: 16),
-                  _buildLabeledField("Your Email", _emailController, _validateEmail),
-                  const SizedBox(height: 16),
-                  _buildLabeledField("Your Phone", _phoneController, null, readOnly: true),
-                  const SizedBox(height: 30),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: _saveChanges,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 20),
+                    child: Form(
+                      key: _formKey,
+                      child: IntrinsicHeight(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: 20),
+                            const Icon(Icons.account_circle,
+                                size: 100, color: Colors.grey),
+                            const SizedBox(height: 20),
+                            _buildLabeledField(
+                                "Your Name", _nameController, _validateName),
+                            const SizedBox(height: 16),
+                            _buildLabeledField(
+                                "Your Email", _emailController, _validateEmail),
+                            const SizedBox(height: 16),
+                            _buildLabeledField(
+                                "Your Phone", _phoneController, null,
+                                readOnly: true),
+                            const Spacer(),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: _saveChanges,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 15),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                    ),
+                                    child: const Text('Save Changes',
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 16)),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: _cancelChanges,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 15),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      elevation: 2,
+                                    ),
+                                    child: const Text('Cancel',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 16)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                        child: const Text('Save Changes',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 16)),
                       ),
-                      const SizedBox(width: 16),
-                      ElevatedButton(
-                        onPressed: _cancelChanges,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          elevation: 2,
-                        ),
-                        child: const Text('Cancel',
-                            style:
-                                TextStyle(color: Colors.black, fontSize: 16)),
-                      ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
