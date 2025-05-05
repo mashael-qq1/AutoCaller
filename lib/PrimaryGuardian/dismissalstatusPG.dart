@@ -71,14 +71,10 @@ class _DismissalStatusPGState extends State<DismissalStatusPG> {
                         String name = data['Sname'] ?? "Unknown";
                         String status = data['dismissalStatus'] ?? "Unknown";
                         String photoUrl = data['photoUrl'] ?? '';
-                        String formattedTime = data['pickupTimestamp'] != null
-                            ? _formatTimestamp(data['pickupTimestamp'])
-                            : "------";
 
                         return StudentCard(
                           name: name,
                           status: status,
-                          dismissalTime: formattedTime,
                           photoUrl: photoUrl,
                           onShowHistory: () {
                             Navigator.push(
@@ -110,28 +106,11 @@ class _DismissalStatusPGState extends State<DismissalStatusPG> {
     }
     return students;
   }
-
-  String _formatTimestamp(dynamic timestamp) {
-    if (timestamp is Timestamp) {
-      DateTime dt = timestamp.toDate();
-      return "${dt.day} ${_monthName(dt.month)} ${dt.year}, ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}";
-    }
-    return "------";
-  }
-
-  String _monthName(int month) {
-    const months = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ];
-    return months[month - 1];
-  }
 }
 
 class StudentCard extends StatelessWidget {
   final String name;
   final String status;
-  final String dismissalTime;
   final String photoUrl;
   final VoidCallback onShowHistory;
 
@@ -139,7 +118,6 @@ class StudentCard extends StatelessWidget {
     super.key,
     required this.name,
     required this.status,
-    required this.dismissalTime,
     required this.photoUrl,
     required this.onShowHistory,
   });
@@ -177,12 +155,6 @@ class StudentCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text("Status: $status",
                       style: const TextStyle(color: Colors.black54, fontSize: 14)),
-                  const SizedBox(height: 4),
-                  Text("Dismissal Time: $dismissalTime",
-                      style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey)),
                   const SizedBox(height: 6),
                   TextButton.icon(
                     onPressed: onShowHistory,

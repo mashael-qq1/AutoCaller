@@ -100,9 +100,6 @@ class _DismissalStatusSGState extends State<DismissalStatusSG> {
             return StudentCard(
               name: studentData['Sname'] ?? "Unknown",
               status: studentData['dismissalStatus'] ?? "Unknown",
-              dismissalTime: studentData['pickupTimestamp'] != null
-                  ? _formatTimestamp(studentData['pickupTimestamp'])
-                  : "------",
               photoUrl: studentData['photoUrl'],
               onShowHistory: () {
                 Navigator.push(
@@ -171,28 +168,11 @@ class _DismissalStatusSGState extends State<DismissalStatusSG> {
       ),
     );
   }
-
-  String _formatTimestamp(dynamic timestamp) {
-    if (timestamp is Timestamp) {
-      DateTime dateTime = timestamp.toDate();
-      return "${dateTime.day} ${_getMonthName(dateTime.month)} ${dateTime.year}, ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}";
-    }
-    return "------";
-  }
-
-  String _getMonthName(int month) {
-    const List<String> months = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ];
-    return months[month - 1];
-  }
 }
 
 class StudentCard extends StatelessWidget {
   final String name;
   final String status;
-  final String dismissalTime;
   final String? photoUrl;
   final VoidCallback onShowHistory;
 
@@ -200,7 +180,6 @@ class StudentCard extends StatelessWidget {
     super.key,
     required this.name,
     required this.status,
-    required this.dismissalTime,
     this.photoUrl,
     required this.onShowHistory,
   });
@@ -240,12 +219,6 @@ class StudentCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text("Status: $status",
                       style: const TextStyle(color: Colors.black54, fontSize: 14)),
-                  const SizedBox(height: 4),
-                  Text("Dismissal Time: $dismissalTime",
-                      style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey)),
                   const SizedBox(height: 6),
                   TextButton.icon(
                     onPressed: onShowHistory,

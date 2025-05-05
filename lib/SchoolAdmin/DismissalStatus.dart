@@ -68,7 +68,6 @@ class _DismissalStatusState extends State<DismissalStatus> {
   Widget _buildDismissalStatusList() {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('Student').snapshots(),
-      // 🔒 Later: .where('schoolID', isEqualTo: '/School/${schoolRef!.id}')
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -88,7 +87,6 @@ class _DismissalStatusState extends State<DismissalStatus> {
             return StudentCard(
               name: student['Sname'] ?? 'Unknown',
               status: student['dismissalStatus'] ?? 'Unknown',
-              dismissalTime: _formatTimestamp(student['pickupTimestamp']),
               photoUrl: student['photoUrl'] ?? '',
               onShowHistory: () {
                 Navigator.push(
@@ -122,28 +120,11 @@ class _DismissalStatusState extends State<DismissalStatus> {
       ),
     );
   }
-
-  String _formatTimestamp(dynamic timestamp) {
-    if (timestamp is Timestamp) {
-      DateTime dt = timestamp.toDate();
-      return "${dt.day} ${_monthName(dt.month)} ${dt.year}, ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}";
-    }
-    return "------";
-  }
-
-  String _monthName(int month) {
-    const months = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ];
-    return months[month - 1];
-  }
 }
 
 class StudentCard extends StatelessWidget {
   final String name;
   final String status;
-  final String dismissalTime;
   final String photoUrl;
   final VoidCallback onShowHistory;
 
@@ -151,7 +132,6 @@ class StudentCard extends StatelessWidget {
     super.key,
     required this.name,
     required this.status,
-    required this.dismissalTime,
     required this.photoUrl,
     required this.onShowHistory,
   });
@@ -191,12 +171,6 @@ class StudentCard extends StatelessWidget {
                   Text("Status: $status",
                       style: const TextStyle(
                           color: Colors.black54, fontSize: 14)),
-                  const SizedBox(height: 4),
-                  Text("Dismissal Time: $dismissalTime",
-                      style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey)),
                   const SizedBox(height: 6),
                   TextButton.icon(
                     onPressed: onShowHistory,
