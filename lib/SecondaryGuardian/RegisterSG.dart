@@ -48,7 +48,6 @@ class _RegisterSecondaryGuardianPageState
       return;
     }
 
-    // Phone number validation
     String phone = _phoneController.text.trim();
     if (phone.length != 10) {
       _showSnackBar("Phone number must be 10 digits long.");
@@ -62,13 +61,11 @@ class _RegisterSecondaryGuardianPageState
       return;
     }
 
-    // Email validation
     if (!emailRegExp.hasMatch(_emailController.text.trim())) {
       _showSnackBar("Please enter a valid email address.");
       return;
     }
 
-    // Password match validation
     if (_passwordController.text != _confirmPasswordController.text) {
       _showSnackBar("Passwords do not match.");
       return;
@@ -87,7 +84,6 @@ class _RegisterSecondaryGuardianPageState
 
       String secondaryGuardianID = userCredential.user!.uid;
 
-      // Convert student IDs to DocumentReferences
       List<DocumentReference> studentRefs = widget.studentIDs
           .map((id) => _firestore.collection('Student').doc(id))
           .toList();
@@ -152,7 +148,7 @@ class _RegisterSecondaryGuardianPageState
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +168,7 @@ class _RegisterSecondaryGuardianPageState
             _buildInputField("Confirm Password", "Re-enter password",
                 _confirmPasswordController,
                 obscureText: true),
-            SizedBox(height: 20),
+            SizedBox(height: 24),
             _isLoading
                 ? Center(child: CircularProgressIndicator())
                 : _buildRegisterButton(),
@@ -212,20 +208,24 @@ class _RegisterSecondaryGuardianPageState
   }
 
   Widget _buildRegisterButton() {
-    return SizedBox(
-      width: double.infinity,
+    return Center(
       child: ElevatedButton(
         onPressed: _registerSecondaryGuardian,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue.shade700,
-          padding: EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          backgroundColor: Colors.blue,
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
         ),
-        child: Text("Register",
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white)),
+        child: const Text(
+          'Register',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
