@@ -33,7 +33,7 @@ class _SecondaryGuardianProfilePageState
 
       var guardianDoc = await FirebaseFirestore.instance
           .collection('Secondary Guardian')
-          .doc(guardianID) // ✅ Fetch document directly
+          .doc(guardianID)
           .get();
 
       if (guardianDoc.exists) {
@@ -81,6 +81,84 @@ class _SecondaryGuardianProfilePageState
     );
   }
 
+  Widget _buildProfileAvatar() {
+    return Center(
+      child: guardianData?['photoUrl'] != null &&
+              guardianData!['photoUrl'].toString().isNotEmpty
+          ? CircleAvatar(
+              radius: 50,
+              backgroundImage:
+                  NetworkImage(guardianData!['photoUrl']),
+            )
+          : CircleAvatar( // Wrap the Icon with CircleAvatar
+                      radius: 50,
+                          backgroundColor: Colors.blue.shade100, // Choose your desired background color
+    child: Icon(
+                  Icons.person,
+                  size: 80,
+                  color: Colors.blue.shade700,
+                ),
+              ),
+    );
+  }
+
+  Widget buildInfoRow(String title, String value,
+      {Color color = Colors.black}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+                color: Color(0xFF57636C)),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.normal, color: color),
+          ),
+        ],
+      ),
+    );
+  } 
+Widget buildProfileButton(String text, VoidCallback onPressed) {
+    return Center(
+      child: SizedBox(
+        width: 400,
+        height: 50,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            elevation: 2,
+            shadowColor: const Color.fromARGB(255, 200, 199, 199),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                text,
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black),
+              ),
+              const Icon(Icons.arrow_forward_ios,
+                  color: Colors.black, size: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,13 +185,7 @@ class _SecondaryGuardianProfilePageState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-                  Center(
-                    child: Icon(
-                      Icons.account_circle,
-                      size: 100,
-                      color: Colors.grey,
-                    ),
-                  ),
+                  _buildProfileAvatar(),
                   const SizedBox(height: 20),
                   buildInfoRow("Guardian Name:",
                       guardianData!['FullName'] ?? 'Not Available'),
@@ -139,15 +211,16 @@ class _SecondaryGuardianProfilePageState
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           elevation: 2,
-                          shadowColor: const Color.fromARGB(255, 200, 199, 199),
+                          shadowColor:
+                              const Color.fromARGB(255, 200, 199, 199),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
+                          children: const [
+                            Text(
                               "Reset Password",
                               style: TextStyle(
                                 fontSize: 16,
@@ -161,7 +234,7 @@ class _SecondaryGuardianProfilePageState
                         ),
                       ),
                     ),
-                  ),
+),
                   const SizedBox(height: 10),
                   buildProfileButton("Edit Profile", () async {
                     final result = await Navigator.push(
@@ -207,63 +280,6 @@ class _SecondaryGuardianProfilePageState
       bottomNavigationBar: guardianID != null
           ? NavBarSG(loggedInGuardianId: guardianID!, currentIndex: 3)
           : null,
-    );
-  }
-
-  Widget buildInfoRow(String title, String value,
-      {Color color = Colors.black}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: Color(0xFF57636C)),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.normal, color: color),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildProfileButton(String text, VoidCallback onPressed) {
-    return Center(
-      child: SizedBox(
-        width: 400,
-        height: 50,
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            elevation: 2,
-            shadowColor: const Color.fromARGB(255, 200, 199, 199),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                text,
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black),
-              ),
-              Icon(Icons.arrow_forward_ios, color: Colors.black, size: 20),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

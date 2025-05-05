@@ -107,6 +107,7 @@ class _PrimaryGuardianProfilePageState
                 children: [
                   const SizedBox(height: 20),
                   Center(
+                    
                     child: guardianData!['profilePhotoUrl'] != null &&
                             guardianData!['profilePhotoUrl'].toString().isNotEmpty
                         ? CircleAvatar(
@@ -114,11 +115,15 @@ class _PrimaryGuardianProfilePageState
                             backgroundImage: NetworkImage(
                                 guardianData!['profilePhotoUrl']),
                           )
-                        : const Icon(
-                            Icons.account_circle,
-                            size: 100,
-                            color: Colors.grey,
-                          ),
+                        : CircleAvatar( // Wrap the Icon with CircleAvatar
+                      radius: 50,
+                          backgroundColor: Colors.blue.shade100, // Choose your desired background color
+    child: Icon(
+                  Icons.person,
+                  size: 80,
+                  color: Colors.blue.shade700,
+                ),
+              ),
                   ),
                   const SizedBox(height: 20),
                   buildInfoRow("Guardian Name:",
@@ -172,12 +177,12 @@ class _PrimaryGuardianProfilePageState
                   const SizedBox(height: 10),
                   buildProfileButton("Edit Profile", () async {
                     final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
+                      context, 
+MaterialPageRoute(
                         builder: (context) => EditProfilePage(
                             userId: guardianID!, guardianData: guardianData!),
-                      ), 
-);
+                      ),
+                    );
 
                     if (result == true) {
                       _fetchGuardianData(); // Refresh the profile data

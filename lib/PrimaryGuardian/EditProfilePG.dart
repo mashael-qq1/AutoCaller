@@ -101,7 +101,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   String? _validateName(String? value) {
-    if (value == null || value.trim().isEmpty) return "Name cannot be empty";
+    if (value == null  || value.trim().isEmpty) return "Name cannot be empty";
     if (!RegExp(r"^[a-zA-Z\s]+$").hasMatch(value)) {
       return "Only letters and spaces allowed";
     }
@@ -109,7 +109,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return "Email cannot be empty";
+    if (value == null  || value.isEmpty) return "Email cannot be empty";
     if (!RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(value)) {
       return "Enter a valid email";
     }
@@ -233,11 +233,15 @@ if (context.mounted) {
         backgroundImage: NetworkImage(_profilePhotoUrl!),
       );
     } else {
-      avatar = const CircleAvatar(
-        radius: 50,
-        child: Icon(Icons.account_circle, size: 80, color: Colors.grey),
-        backgroundColor: Color.fromARGB(255, 230, 230, 230),
-      );
+      avatar =CircleAvatar( // Wrap the Icon with CircleAvatar
+                      radius: 50,
+                          backgroundColor: Colors.blue.shade100, // Choose your desired background color
+    child: Icon(
+                  Icons.person,
+                  size: 80,
+                  color: Colors.blue.shade700,
+                ),
+              );
     }
 
     return Column(

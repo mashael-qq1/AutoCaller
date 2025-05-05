@@ -47,6 +47,16 @@ class _SecondaryGuardianLoginPageState
           await _firestore.collection('Secondary Guardian').doc(uid).get();
 
       if (guardianSnapshot.exists) {
+  if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+                  Text("Login Success!", style: TextStyle(color: Colors.white)),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -73,9 +83,8 @@ class _SecondaryGuardianLoginPageState
         backgroundColor: Colors.red,
       ),
     );
-  }
-
-  @override
+  } 
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -149,9 +158,8 @@ class _SecondaryGuardianLoginPageState
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
-
-                      // Password Input Field
+                      const SizedBox(height: 16), 
+// Password Input Field
                       TextField(
                         controller: _passwordController,
                         obscureText: !_isPasswordVisible,
