@@ -26,9 +26,7 @@ class _PrimaryGuardianProfilePageState
   Future<void> _fetchGuardianData() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        return;
-      }
+      if (user == null) return;
 
       guardianID = user.uid;
 
@@ -81,24 +79,23 @@ class _PrimaryGuardianProfilePageState
         );
       },
     );
-  }
-
-  @override
+  } 
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Removes the back button
+        automaticallyImplyLeading: false,
         title: const Text(
           'Guardian Profile',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black,
-            fontSize: 20, // Adjust font size if needed
+            fontSize: 20,
           ),
         ),
-        centerTitle: true, // Centers the title
-        backgroundColor: Colors.white, // White background for the AppBar
+        centerTitle: true,
+        backgroundColor: Colors.white,
         elevation: 0,
       ),
       body: guardianData == null
@@ -110,11 +107,18 @@ class _PrimaryGuardianProfilePageState
                 children: [
                   const SizedBox(height: 20),
                   Center(
-                    child: Icon(
-                      Icons.account_circle,
-                      size: 100,
-                      color: Colors.grey,
-                    ),
+                    child: guardianData!['profilePhotoUrl'] != null &&
+                            guardianData!['profilePhotoUrl'].toString().isNotEmpty
+                        ? CircleAvatar(
+                            radius: 50,
+                            backgroundImage: NetworkImage(
+                                guardianData!['profilePhotoUrl']),
+                          )
+                        : const Icon(
+                            Icons.account_circle,
+                            size: 100,
+                            color: Colors.grey,
+                          ),
                   ),
                   const SizedBox(height: 20),
                   buildInfoRow("Guardian Name:",
@@ -141,15 +145,16 @@ class _PrimaryGuardianProfilePageState
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           elevation: 2,
-                          shadowColor: const Color.fromARGB(255, 200, 199, 199),
+                          shadowColor:
+                              const Color.fromARGB(255, 200, 199, 199),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
+                          children: const [
+                            Text(
                               "Reset Password",
                               style: TextStyle(
                                 fontSize: 16,
@@ -171,15 +176,14 @@ class _PrimaryGuardianProfilePageState
                       MaterialPageRoute(
                         builder: (context) => EditProfilePage(
                             userId: guardianID!, guardianData: guardianData!),
-                      ),
-                    );
+                      ), 
+);
 
                     if (result == true) {
                       _fetchGuardianData(); // Refresh the profile data
                     }
                   }),
                   const SizedBox(height: 30),
-                  const SizedBox(height: 10),
                   Center(
                     child: SizedBox(
                       width: 200,
@@ -222,7 +226,7 @@ class _PrimaryGuardianProfilePageState
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
                 color: Color(0xFF57636C)),
@@ -257,13 +261,14 @@ class _PrimaryGuardianProfilePageState
             children: [
               Text(
                 text,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   color: Colors.black,
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, color: Colors.black, size: 20),
+              const Icon(Icons.arrow_forward_ios,
+                  color: Colors.black, size: 20),
             ],
           ),
         ),

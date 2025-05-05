@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String userId;
@@ -12,15 +16,19 @@ class EditProfilePage extends StatefulWidget {
   });
 
   @override
-  _EditProfilePageState createState() => _EditProfilePageState();
+  State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+
   late Map<String, dynamic> _editableGuardianData;
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  String? _profilePhotoUrl;
+  File? _newProfileImage;
+  bool _removePhoto = false;
 
   @override
   void initState() {
@@ -30,30 +38,66 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _loadUserData();
   }
 
-  void _loadUserData() {
+  void _loadUserData() async {
     if (widget.guardianData != null) {
-      setState(() {
-        _editableGuardianData = Map.from(widget.guardianData!);
-        _nameController.text = _editableGuardianData['fullName'] ?? '';
-        _emailController.text = _editableGuardianData['email'] ?? '';
-        _phoneController.text = _editableGuardianData['phone'] ?? '';
-      });
+      _setUserFields(widget.guardianData!);
     } else {
-      FirebaseFirestore.instance
+      final doc = await FirebaseFirestore.instance
           .collection('Primary Guardian')
           .doc(widget.userId)
-          .get()
-          .then((userDoc) {
-        if (userDoc.exists) {
-          setState(() {
-            _editableGuardianData = userDoc.data() as Map<String, dynamic>;
-            _nameController.text = _editableGuardianData['fullName'] ?? '';
-            _emailController.text = _editableGuardianData['email'] ?? '';
-            _phoneController.text = _editableGuardianData['phone'] ?? '';
-          });
-        }
+          .get();
+      if (doc.exists) {
+        _setUserFields(doc.data()!);
+      }
+    }
+  }
+
+  void _setUserFields(Map<String, dynamic> data) {
+    setState(() {
+      _editableGuardianData = data;
+      _nameController.text = data['fullName'] ?? '';
+      _emailController.text = data['email'] ?? '';
+      _phoneController.text = data['phone'] ?? '';
+      _profilePhotoUrl = data['profilePhotoUrl'];
+    });
+  }
+
+  Future<void> _pickImage() async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        _newProfileImage = File(picked.path);
+        _removePhoto = false;
       });
     }
+  }
+
+  Future<String?> _uploadImage(File image) async {
+    final storageRef = FirebaseStorage.instance
+        .ref()
+        .child('profile_photos')
+        .child('${widget.userId}.jpg');
+
+    await storageRef.putFile(image);
+    return await storageRef.getDownloadURL();
+  }
+
+  Future<void> _removeProfileImage() async {
+    try {
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('profile_photos')
+          .child('${widget.userId}.jpg');
+      await storageRef.delete();
+    } catch (e) {
+      // ignore if photo doesn't exist
+    }
+
+    setState(() {
+      _profilePhotoUrl = null;
+      _newProfileImage = null;
+      _removePhoto = true;
+    });
   }
 
   String? _validateName(String? value) {
@@ -72,26 +116,45 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return null;
   }
 
-  void _saveChanges() async {
+  Future<void> _saveChanges() async {
     if (_formKey.currentState!.validate()) {
       bool confirm = await _showConfirmationDialog(
         "Confirm Changes",
         "Are you sure you want to save changes?",
       );
-      if (confirm) {
-        await FirebaseFirestore.instance
-            .collection('Primary Guardian')
-            .doc(widget.userId)
-            .update({
-          'fullName': _nameController.text.trim(),
-          'email': _emailController.text.trim(),
-        });
+      if (!confirm) return;
+
+      String? photoUrl = _profilePhotoUrl;
+
+      if (_removePhoto) {
+        await _removeProfileImage();
+        photoUrl = null;
+      } else if (_newProfileImage != null) {
+        photoUrl = await _uploadImage(_newProfileImage!);
+      }
+
+      await FirebaseFirestore.instance
+          .collection('Primary Guardian')
+          .doc(widget.userId)
+          .update({
+        'fullName': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'profilePhotoUrl': photoUrl,
+      }); 
+if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:    Text("Profile updated successfully!", style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.green,
+            //behavior: SnackBarBehavior.floating,
+          ),
+        );
         Navigator.pop(context, true);
       }
     }
   }
 
-  void _cancelChanges() async {
+  Future<void> _cancelChanges() async {
     bool confirm = await _showConfirmationDialog(
       "Discard Changes?",
       "Are you sure you want to discard your changes?",
@@ -108,10 +171,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text("No")),
+              child: const Text("No")),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: Text("Yes")),
+              child: const Text("Yes")),
         ],
       ),
     );
@@ -131,19 +194,88 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  @override
+  Widget _buildLabeledField(
+    String label,
+    TextEditingController controller,
+    String? Function(String?)? validator, {
+    bool readOnly = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          readOnly: readOnly,
+          validator: validator,
+          style: TextStyle(
+            color: readOnly ? Colors.grey[600] : Colors.black,
+          ),
+          decoration: _fieldDecoration("Enter $label"),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfilePhoto() {
+    Widget avatar;
+
+    if (_newProfileImage != null) {
+      avatar = CircleAvatar(
+        radius: 50,
+        backgroundImage: FileImage(_newProfileImage!),
+      );
+    } else if (_profilePhotoUrl != null && _profilePhotoUrl!.isNotEmpty) {
+      avatar = CircleAvatar(
+        radius: 50,
+        backgroundImage: NetworkImage(_profilePhotoUrl!),
+      );
+    } else {
+      avatar = const CircleAvatar(
+        radius: 50,
+        child: Icon(Icons.account_circle, size: 80, color: Colors.grey),
+        backgroundColor: Color.fromARGB(255, 230, 230, 230),
+      );
+    }
+
+    return Column(
+      children: [
+        Stack(
+          alignment: Alignment.bottomRight,
+          children: [
+            avatar,
+            GestureDetector(
+              onTap: _pickImage,
+              child: const CircleAvatar(
+                radius: 16,
+                backgroundColor: Colors.white,
+                child: Icon(Icons.edit, size: 18, color: Colors.black),
+              ),
+            ),
+          ],
+        ),
+        if (_profilePhotoUrl != null || _newProfileImage != null)
+          TextButton.icon(
+            onPressed: _removeProfileImage,
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            label: const Text("Remove Photo",
+                style: TextStyle(color: Colors.red)),
+          ),
+      ],
+    );
+  } 
+@override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(), // Dismiss keyboard
+      onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           elevation: 0,
           backgroundColor: Colors.transparent,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
-          ),
           title: const Text(
             "Edit Profile",
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
@@ -166,14 +298,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             const SizedBox(height: 20),
-                            const Icon(Icons.account_circle,
-                                size: 100, color: Colors.grey),
+                            Center(child: _buildProfilePhoto()),
                             const SizedBox(height: 20),
                             _buildLabeledField(
                                 "Your Name", _nameController, _validateName),
                             const SizedBox(height: 16),
-                            _buildLabeledField(
-                                "Your Email", _emailController, _validateEmail),
+                            _buildLabeledField("Your Email", _emailController,
+                                _validateEmail),
                             const SizedBox(height: 16),
                             _buildLabeledField(
                               "Your Phone",
@@ -215,8 +346,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       elevation: 2,
                                     ),
                                     child: const Text('Cancel',
-                                        style: TextStyle(
-                                            color: Colors.black, fontSize: 16)),
+                                        style: TextStyle( 
+color: Colors.black, fontSize: 16)),
                                   ),
                                 ),
                               ],
@@ -234,30 +365,4 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     );
   }
-
-  Widget _buildLabeledField(
-    String label,
-    TextEditingController controller,
-    String? Function(String?)? validator, {
-    bool readOnly = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          readOnly: readOnly,
-          validator: validator,
-          style: TextStyle(
-            color: readOnly ? Colors.grey[600] : Colors.black,
-          ),
-          decoration: _fieldDecoration("Enter $label"),
-        ),
-      ],
-    );
-  }
 }
-
