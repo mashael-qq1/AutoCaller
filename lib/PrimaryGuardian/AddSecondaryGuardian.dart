@@ -117,8 +117,9 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
     if (!nameRegex.hasMatch(name)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text(
-                "Invalid name. Use 1–20 characters, no special symbols, and not only numbers.")),
+          content: Text(
+              "Invalid name. Use 1–20 characters, no special symbols, and not only numbers."),
+        ),
       );
       return;
     }
@@ -135,7 +136,16 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
       selectedChildren.join(","),
     );
 
-    Share.share('You’ve been invited as a guardian. Click here: $link');
+    await Share.share(
+      "Hello! 👋\n"
+      "You've been invited by the primary guardian to register as a Secondary Guardian in AutoCaller. "
+      "Download the app and complete the registration:\n\n$link",
+    );
+
+    // ✅ Confirmation message after sharing
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Invitation link shared successfully!")),
+    );
   }
 
   @override
@@ -207,7 +217,7 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
             filled: true,
             fillColor: const Color.fromARGB(255, 244, 244, 244),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30), // ✅ rounded like reset
+              borderRadius: BorderRadius.circular(30),
               borderSide: BorderSide.none,
             ),
             contentPadding:
