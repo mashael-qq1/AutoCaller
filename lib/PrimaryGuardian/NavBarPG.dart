@@ -7,51 +7,64 @@ import 'signup.dart'; // Add Guardian (Unfunctional for now)
 import 'StudentListPG.dart';
 import 'AddSecondaryGuardian.dart';
 import 'ManageSG.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class NavBarPG extends StatelessWidget {
   final String loggedInGuardianId;
   final int currentIndex;
 
-  const NavBarPG(
-      {super.key,
-      required this.loggedInGuardianId,
-      required this.currentIndex});
+  const NavBarPG({
+    super.key,
+    required this.loggedInGuardianId,
+    required this.currentIndex,
+  });
 
   void _onItemTapped(BuildContext context, int index) {
-    print("Tapped on index: $index"); // Debugging output
+    print("Tapped on index: $index");
 
     if (index == currentIndex) return;
 
     switch (index) {
       case 0:
         print("Navigating to DismissalStatusPG");
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => DismissalStatusPG()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DismissalStatusPG()),
+        );
         break;
       case 1:
-        print("Navigating to ManageSG"); // ✅ Debugging output
+        print("Navigating to ManageSG");
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    ManageSG(loggedInGuardianId: loggedInGuardianId)));
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                ManageSG(loggedInGuardianId: loggedInGuardianId),
+          ),
+        );
         break;
       case 2:
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => GuardianHomePage()));
+        print("Navigating to GuardianHomePage");
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const GuardianHomePage()),
+        );
         break;
       case 3:
+        print("Navigating to StudentListPG");
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    StudentListPG(loggedInGuardianId: loggedInGuardianId)));
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                StudentListPG(loggedInGuardianId: loggedInGuardianId),
+          ),
+        );
         break;
       case 4:
+        print("Navigating to PrimaryGuardianProfilePage");
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => PrimaryGuardianProfilePage()));
+          context,
+          MaterialPageRoute(builder: (context) => PrimaryGuardianProfilePage()),
+        );
         break;
     }
   }
@@ -76,7 +89,7 @@ class NavBarPG extends StatelessWidget {
   Widget _buildNavItem(IconData icon, int index, BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print("Button pressed: Index $index"); // ✅ Add debug print
+        print("Button pressed: Index $index");
         _onItemTapped(context, index);
       },
       child: Icon(
