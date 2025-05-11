@@ -117,6 +117,7 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
     if (!nameRegex.hasMatch(name)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
+          backgroundColor: Colors.red,
           content: Text(
               "Invalid name. Use 1–20 characters, no special symbols, and not only numbers."),
         ),
@@ -126,7 +127,10 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
 
     if (selectedChildren.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select at least one student.")),
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("Please select at least one student."),
+        ),
       );
       return;
     }
@@ -142,7 +146,6 @@ class _AddSecondaryGuardianState extends State<AddSecondaryGuardian> {
       "Download the app and complete the registration:\n\n$link",
     );
 
-    // ✅ Confirmation message after sharing
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Invitation link shared successfully!")),
     );
