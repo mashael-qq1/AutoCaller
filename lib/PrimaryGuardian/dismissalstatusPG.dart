@@ -47,10 +47,12 @@ class _DismissalStatusPGState extends State<DismissalStatusPG> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                var childrenRefs = snapshot.data!['children'] ?? [];
+                var data = snapshot.data!.data() as Map<String, dynamic>;
+var childrenRefs = data.containsKey('children') ? data['children'] : [];
+
 
                 if (childrenRefs.isEmpty) {
-                  return const Center(child: Text("No children found."));
+                  return const Center(child: Text("No students found."));
                 }
 
                 return FutureBuilder<List<DocumentSnapshot>>(

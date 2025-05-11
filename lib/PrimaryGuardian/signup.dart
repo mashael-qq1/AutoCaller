@@ -236,8 +236,20 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
       _showError("Passwords do not match.");return; }
     setState(() {
       _isLoading = true;});
-    try {UserCredential userCredential = await _auth
+
+    try {
+      UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
+          String uid = userCredential.user!.uid;
+          // ✅ Find students with matching PGphone
+    QuerySnapshot studentSnapshot = await _firestore
+        .collection('Student')
+        .where('PGphone', isEqualTo: phone)
+        .get();
+
+    List<DocumentReference> childrenRefs = studentSnapshot.docs
+        .map((doc) => doc.reference)
+        .toList();
       await _firestore
           .collection('Primary Guardian')
           .doc(userCredential.user!.uid)
@@ -245,7 +257,8 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
         'fullName': fullName,
         'email': email,
         'phone': phone,
-        'userId': userCredential.user!.uid, });
+        'userId': uid, 
+        'children': childrenRefs, });
       _showSuccessMessage("Signed up Successfully!");
       _clearFormFields();
        Navigator.pushReplacement(

@@ -44,45 +44,56 @@ class _GuardianHomePageState extends State<GuardianHomePage> {
   }
 
   Widget _buildStudentList() {
-    String guardianId = FirebaseAuth.instance.currentUser?.uid ?? "";
+  String? guardianUid = FirebaseAuth.instance.currentUser?.uid;
 
-    return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('Primary Guardian')
-          .doc(guardianId)
-          .snapshots(),
-      builder: (context, guardianSnapshot) {
-        if (!guardianSnapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        isArrived = guardianSnapshot.data!['arrived'] ?? false;
-        List<dynamic> childrenRefs = guardianSnapshot.data!['children'] ?? [];
-
-        if (childrenRefs.isEmpty) {
-          return const Center(child: Text('No students linked.'));
-        }
-
-        return StreamBuilder<List<DocumentSnapshot>>(
-          stream: Stream.fromFuture(
-            Future.wait(
-              childrenRefs.map((ref) => (ref as DocumentReference).get()),
-            ),
-          ),
-          builder: (context, studentsSnapshot) {
-            if (!studentsSnapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            List<DocumentSnapshot> students = studentsSnapshot.data!;
-            return _buildStudentListUI(students);
-          },
-        );
-      },
-    );
+  if (guardianUid == null) {
+    return const Center(child: Text("User not logged in."));
   }
 
+  return FutureBuilder<DocumentSnapshot>(
+    future: FirebaseFirestore.instance
+        .collection('Primary Guardian')
+        .doc(guardianUid)
+        .get(),
+    builder: (context, guardianSnapshot) {
+      if (guardianSnapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      if (!guardianSnapshot.hasData || !guardianSnapshot.data!.exists) {
+        return const Center(child: Text("Guardian data not found."));
+      }
+
+      String? guardianPhone = guardianSnapshot.data!.get('phone');
+
+      if (guardianPhone == null || guardianPhone.isEmpty) {
+        return const Center(child: Text("Guardian phone number missing."));
+      }
+
+      return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Student')
+            .where('PGphone', isEqualTo: guardianPhone)
+            .snapshots(),
+        builder: (context, studentSnapshot) {
+          if (studentSnapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          List<DocumentSnapshot> students = studentSnapshot.data?.docs ?? [];
+
+        // ❗️ Pass the student list even if it's empty
+    return _buildStudentListUI(students);
+        },
+      );
+    },
+  );
+}
+
+
+
   Widget _buildStudentListUI(List<DocumentSnapshot> students) {
+   
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -126,7 +137,24 @@ class _GuardianHomePageState extends State<GuardianHomePage> {
                     ),
                   ),
                 ),
-                ...students.asMap().entries.map((entry) {
+                if (students.isEmpty)
+  const Padding(
+    padding: EdgeInsets.symmetric(vertical: 12.0),
+    child: Center(
+      child: Text(
+        "No students found.",
+        
+      ),
+    ),
+  )
+else
+               
+  ...students
+      .where((student) => !(student['absent'] ?? false)) // ✅ filter out absent == true
+      .toList()
+      .asMap()
+      .entries
+      .map((entry) {
                   int index = entry.key;
                   var student = entry.value;
                   String studentId = student['StudentID'];

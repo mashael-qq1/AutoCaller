@@ -83,8 +83,15 @@ class GeofenceManager {
       "arrived": arrived,
       "timestamp": FieldValue.serverTimestamp(),
     });
+final data = guardianSnapshot.data() as Map<String, dynamic>?;
 
-    List<dynamic> children = guardianSnapshot["children"] ?? [];
+List<dynamic> children = [];
+if (data != null && data.containsKey('children')) {
+  children = data['children'] ?? [];
+}
+
+
+    
     for (var childRef in children) {
       if (childRef is DocumentReference) {
         print("🧒 Updating child document: \${childRef.path}");

@@ -156,7 +156,13 @@ class _SGhomeState extends State<SGhome> {
                     ),
                   ),
                 ),
-                ...students.asMap().entries.map((entry) {
+               
+  ...students
+      .where((student) => !(student['absent'] ?? false)) // ✅ filter out absent == true
+      .toList()
+      .asMap()
+      .entries
+      .map((entry) {
                   int index = entry.key;
                   var student = entry.value;
                   String studentId = student['StudentID'];

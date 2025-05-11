@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,33 +23,52 @@ class _StudentListPGState extends State<StudentListPG> {
   }
 
   Future<void> _fetchGuardianChildren() async {
-    String? guardianEmail = FirebaseAuth.instance.currentUser?.email;
+  String? guardianUid = FirebaseAuth.instance.currentUser?.uid;
 
-    if (guardianEmail == null) {
-      debugPrint("❌ No guardian email found");
-      return;
-    }
+  if (guardianUid == null) {
+    debugPrint("❌ No guardian UID found");
+    return;
+  }
 
-    try {
-      var guardianQuery = await FirebaseFirestore.instance
-          .collection('Primary Guardian')
-          .where('email', isEqualTo: guardianEmail.trim().toLowerCase())
-          .get();
+  try {
+    var guardianDoc = await FirebaseFirestore.instance
+        .collection('Primary Guardian')
+        .doc(guardianUid)
+        .get();
 
-      if (guardianQuery.docs.isNotEmpty) {
-        var guardianDoc = guardianQuery.docs.first;
-        List<dynamic>? children = guardianDoc['children'];
+    if (guardianDoc.exists) {
+      var data = guardianDoc.data() as Map<String, dynamic>;
 
-        if (children != null && children.isNotEmpty) {
+      if (data.containsKey('children')) {
+        List<dynamic> children = data['children'] ?? [];
+        List<DocumentReference> refs = children.cast<DocumentReference>();
+
+        // ✅ Only set state once
+        if (!listEquals(childrenRefs, refs)) {
           setState(() {
-            childrenRefs = children.cast<DocumentReference>();
+            childrenRefs = refs;
           });
         }
+      } else {
+        debugPrint("ℹ️ No 'children' field found in guardian doc.");
+        setState(() {
+          childrenRefs = [];
+        });
       }
-    } catch (e) {
-      debugPrint("❌ Error fetching children references: $e");
+    } else {
+      debugPrint("❌ Guardian document not found.");
+      setState(() {
+        childrenRefs = [];
+      });
     }
+  } catch (e) {
+    debugPrint("❌ Error fetching children references: $e");
+    setState(() {
+      childrenRefs = [];
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -135,15 +155,10 @@ class _StudentListPGState extends State<StudentListPG> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, color: Colors.red, size: 40),
           SizedBox(height: 10),
           Text(
             "No students found",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
+            
           ),
         ],
       ),
