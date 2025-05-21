@@ -35,6 +35,8 @@ Future<void> main() async {
         appId: "1:132580101106:web:46fcaedc08f6f8a82cb96b",
       ),
     );
+
+ 
   } else {
     // Initialize Firebase for mobile platforms
     await Firebase.initializeApp();

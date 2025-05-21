@@ -50,49 +50,56 @@ class _GuardianHomePageState extends State<GuardianHomePage> {
     return const Center(child: Text("User not logged in."));
   }
 
-  return FutureBuilder<DocumentSnapshot>(
-    future: FirebaseFirestore.instance
-        .collection('Primary Guardian')
-        .doc(guardianUid)
-        .get(),
-    builder: (context, guardianSnapshot) {
-      if (guardianSnapshot.connectionState == ConnectionState.waiting) {
-        return const Center(child: CircularProgressIndicator());
-      }
+  return StreamBuilder<DocumentSnapshot>(
+  stream: FirebaseFirestore.instance
+      .collection('Primary Guardian')
+      .doc(guardianUid)
+      .snapshots(), // ✅ live stream
+  builder: (context, guardianSnapshot) {
+    if (guardianSnapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-      if (!guardianSnapshot.hasData || !guardianSnapshot.data!.exists) {
-        return const Center(child: Text("Guardian data not found."));
-      }
+    if (!guardianSnapshot.hasData || !guardianSnapshot.data!.exists) {
+      return const Center(child: Text("Guardian data not found."));
+    }
 
-      String? guardianPhone = guardianSnapshot.data!.get('phone');
+    final data = guardianSnapshot.data!.data() as Map<String, dynamic>;
+    final String? guardianPhone = data['phone'];
+    final bool guardianArrived = data['arrived'] ?? false;
 
-      if (guardianPhone == null || guardianPhone.isEmpty) {
-        return const Center(child: Text("Guardian phone number missing."));
-      }
+    if (guardianPhone == null || guardianPhone.isEmpty) {
+      return const Center(child: Text("Guardian phone number missing."));
+    }
 
-      return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('Student')
-            .where('PGphone', isEqualTo: guardianPhone)
-            .snapshots(),
-        builder: (context, studentSnapshot) {
-          if (studentSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          List<DocumentSnapshot> students = studentSnapshot.data?.docs ?? [];
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('Student')
+          .where('PGphone', isEqualTo: guardianPhone)
+          .snapshots(),
+      builder: (context, studentSnapshot) {
+        if (studentSnapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-        // ❗️ Pass the student list even if it's empty
-    return _buildStudentListUI(students);
-        },
-      );
-    },
-  );
+        List<DocumentSnapshot> students = studentSnapshot.data?.docs ?? [];
+
+        return StatefulBuilder(
+          builder: (context, localSetState) {
+            return _buildStudentListUI(students, localSetState, guardianArrived);
+          },
+        );
+      },
+    );
+  },
+);
+
 }
 
 
 
-  Widget _buildStudentListUI(List<DocumentSnapshot> students) {
-   
+  Widget _buildStudentListUI(List<DocumentSnapshot> students, void Function(void Function()) localSetState, bool guardianArrived)
+{
 
     return SingleChildScrollView(
       child: Column(
@@ -168,16 +175,16 @@ else
                     children: [
                       InkWell(
                         onTap: dismissalStatus == 'picked up'
-                            ? null
-                            : () {
-                                setState(() {
-                                  if (isSelected) {
-                                    selectedStudentIds.remove(studentId);
-                                  } else {
-                                    selectedStudentIds.add(studentId);
-                                  }
-                                });
-                              },
+    ? null
+    : () {
+        localSetState(() {
+          if (isSelected) {
+            selectedStudentIds.remove(studentId);
+          } else {
+            selectedStudentIds.add(studentId);
+          }
+        });
+      },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 12.0, horizontal: 8),
@@ -236,7 +243,7 @@ else
           Column(
             children: [
               ElevatedButton(
-                onPressed: (!isArrived || selectedStudentIds.isEmpty)
+                onPressed: (!guardianArrived || selectedStudentIds.isEmpty)
                     ? null
                     : () async {
                         for (String studentId in selectedStudentIds) {
@@ -264,7 +271,7 @@ else
                 ),
               ),
               const SizedBox(height: 8),
-              if (!isArrived || selectedStudentIds.isEmpty)
+              if (!guardianArrived || selectedStudentIds.isEmpty)
                 const Text(
                   'The button is disabled until you are in the school zone and a student is selected.',
                   textAlign: TextAlign.center,
