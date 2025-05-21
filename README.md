@@ -75,7 +75,7 @@ Watch a short video demo here: [AutoCaller Demo](https://youtu.be/jxDsLSj3528?fe
 
 ## Team Members
 
-- Mashael Alqabbani,
+- Mashael Alqabbani
 - Noura Alhumaid  
 - Batool Alfouzan  
 - Rama Alayed  
