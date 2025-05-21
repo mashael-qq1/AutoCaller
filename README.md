@@ -23,7 +23,7 @@ Watch a short video demo here: [AutoCaller Demo](https://youtu.be/jxDsLSj3528?fe
 
 ## Technologies Used
 
-- **Flutter** (Frontend)
+- **Flutter** 
 - **Firebase** (Authentication, Firestore, Cloud Messaging)
 - **Raspberry Pi** (IoT Display)
 - **Geolocator** & **TTS plugins**
