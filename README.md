@@ -44,7 +44,7 @@ Watch a short video demo here: [AutoCaller Demo](https://youtu.be/jxDsLSj3528?fe
    ```
 
 3. **Firebase Setup**
-   - Add your `google-services.json` (Android) and `GoogleService-Info.plist` (iOS) files.
+   - Add your `google-services.json` (Android) 
    - Configure Firebase authentication and Firestore collections as described in the documentation.
 
 4. **Run the app**
