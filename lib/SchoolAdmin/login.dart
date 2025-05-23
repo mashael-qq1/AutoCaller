@@ -214,7 +214,7 @@ class _SchoolAdminLoginPageState extends State<SchoolAdminLoginPage> {
                             },
                             child: const Text('Forgot Password?',
                                 style: TextStyle(
-                                    fontSize: 14, color: Color(0xFF57636C))),
+                                    fontSize: 14, color: Color(0xFF57636C),decoration: TextDecoration.underline,)),
                           ),
                           SizedBox(
                             width: 130,

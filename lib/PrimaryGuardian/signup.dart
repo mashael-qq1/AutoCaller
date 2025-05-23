@@ -46,7 +46,21 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
           : false,
       keyboardType: keyboardType,
       decoration: InputDecoration(
-        labelText: label,
+        label: RichText(
+        text: TextSpan(
+          text: label,
+          style: TextStyle(
+            color: Color(0xFF57636C),
+            fontSize: 16,
+          ),
+          children: [
+            TextSpan(
+              text: ' *',
+              style: TextStyle(color: Colors.red),
+            ),
+          ],
+        ),
+      ),
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
@@ -131,7 +145,23 @@ class _PrimaryGuardianSignUpPageState extends State<PrimaryGuardianSignUpPage> {
           });
         },
         decoration: InputDecoration(
-          labelText: "Password",
+         label: RichText(
+            text: TextSpan(
+              text: 'Password',
+              style: TextStyle(
+                color: Color(0xFF57636C),
+                fontSize: 16,
+              ),
+              children: [
+                TextSpan(
+                  text: ' *',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
+          ),
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(

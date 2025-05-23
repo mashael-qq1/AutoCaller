@@ -23,7 +23,7 @@ class StudentsPage extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      bottomNavigationBar: const NavBarAdmin(currentIndex: 3),
+      bottomNavigationBar: const NavBarAdmin(currentIndex: 1),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: StreamBuilder(

@@ -8,48 +8,46 @@ class NavBarSG extends StatelessWidget {
   final String loggedInGuardianId;
   final int currentIndex;
 
-  const NavBarSG(
-      {super.key,
-      required this.loggedInGuardianId,
-      required this.currentIndex});
+  const NavBarSG({
+    super.key,
+    required this.loggedInGuardianId,
+    required this.currentIndex,
+  });
 
   void _onItemTapped(BuildContext context, int index) {
-    print("Tapped on index: $index");
-
     if (index == currentIndex) return;
 
     switch (index) {
       case 0:
-        print("Navigating to DismissalStatusSG");
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => DismissalStatusSG()),
         );
         break;
       case 1:
-        print("Navigating to SGStudentList");
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  StudentListSG(loggedInGuardianId: loggedInGuardianId)),
+            builder: (context) =>
+                StudentListSG(loggedInGuardianId: loggedInGuardianId),
+          ),
         );
         break;
       case 2:
-        print("Navigating to SGhome");
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  SGhome(loggedInGuardianId: loggedInGuardianId)),
+            builder: (context) =>
+                SGhome(loggedInGuardianId: loggedInGuardianId),
+          ),
         );
         break;
       case 3:
-        print("Navigating to SGProfile");
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => SecondaryGuardianProfilePage()),
+            builder: (context) => SecondaryGuardianProfilePage(),
+          ),
         );
         break;
     }
@@ -59,28 +57,53 @@ class NavBarSG extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomAppBar(
       color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(Icons.access_time, 0, context), // Dismissal Status
-          _buildNavItem(Icons.groups, 1, context), // View Students
-          _buildNavItem(Icons.home, 2, context), // Home (Centered)
-          _buildNavItem(Icons.person, 3, context), // View Profile
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavItem(Icons.access_time, "Status", 0, context),
+            _buildNavItem(Icons.groups, "Students", 1, context),
+            _buildNavItem(Icons.home, "Home", 2, context),
+            _buildNavItem(Icons.person, "Profile", 3, context),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, int index, BuildContext context) {
+  Widget _buildNavItem(
+    IconData icon,
+    String label,
+    int index,
+    BuildContext context,
+  ) {
+    final isSelected = currentIndex == index;
+
     return GestureDetector(
-      onTap: () {
-        print("Button pressed: Index $index");
-        _onItemTapped(context, index);
-      },
-      child: Icon(
-        icon,
-        color: currentIndex == index ? Colors.blue : Colors.grey,
-        size: 28,
+      onTap: () => _onItemTapped(context, index),
+      child: SizedBox(
+        height: 56,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.blue : Colors.grey,
+              size: 24,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: isSelected ? Colors.blue : Colors.grey,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

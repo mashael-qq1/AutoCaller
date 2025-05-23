@@ -11,22 +11,26 @@ class NavBarAdmin extends StatelessWidget {
   const NavBarAdmin({super.key, required this.currentIndex});
 
   void _onItemTapped(BuildContext context, int index) {
-    if (index == currentIndex) return; // Avoid unnecessary navigation
+    if (index == currentIndex) return;
 
     switch (index) {
       case 0:
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const DismissalStatus()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const DismissalStatus()),
+        );
         break;
-      
-      
       case 1:
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => StudentsPage()));
+          context,
+          MaterialPageRoute(builder: (context) => StudentsPage()),
+        );
         break;
       case 2:
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => SchoolProfilePage()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SchoolProfilePage()),
+        );
         break;
     }
   }
@@ -35,24 +39,52 @@ class NavBarAdmin extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomAppBar(
       color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(Icons.access_time, 0, context), // Dismissal Status
-          _buildNavItem(Icons.group, 1, context), // Students
-          _buildNavItem(Icons.account_circle, 2, context), // Profile
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavItem(Icons.access_time, "Status", 0, context),
+            _buildNavItem(Icons.group, "Students", 1, context),
+            _buildNavItem(Icons.account_circle, "Profile", 2, context),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, int index, BuildContext context) {
+  Widget _buildNavItem(
+    IconData icon,
+    String label,
+    int index,
+    BuildContext context,
+  ) {
+    final isSelected = currentIndex == index;
+
     return GestureDetector(
       onTap: () => _onItemTapped(context, index),
-      child: Icon(
-        icon,
-        color: currentIndex == index ? Colors.blue : Colors.grey,
-        size: 28, // Adjust size if needed
+      child: SizedBox(
+        height: 56,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.blue : Colors.grey,
+              size: 24,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: isSelected ? Colors.blue : Colors.grey,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

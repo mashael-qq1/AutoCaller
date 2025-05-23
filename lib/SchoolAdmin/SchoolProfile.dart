@@ -292,7 +292,7 @@ class _SchoolProfilePageState extends State<SchoolProfilePage> {
                     ),
                   ),
           ),
-          NavBarAdmin(currentIndex: 4), // Add the navbar here
+          NavBarAdmin(currentIndex: 2), // Add the navbar here
         ],
       ),
     );

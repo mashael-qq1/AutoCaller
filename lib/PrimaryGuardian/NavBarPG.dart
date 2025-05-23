@@ -69,34 +69,56 @@ class NavBarPG extends StatelessWidget {
     }
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
       color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(Icons.access_time, 0, context), // Dismissal Status
-          _buildNavItem(Icons.person_add, 1, context), // Add Guardian
-          _buildNavItem(Icons.home, 2, context), // Home
-          _buildNavItem(Icons.groups, 3, context), // Students
-          _buildNavItem(Icons.person, 4, context), // Profile
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavItem(Icons.access_time, "Status", 0, context),
+            _buildNavItem(Icons.person_add, "Guardians", 1, context),
+            _buildNavItem(Icons.home, "Home", 2, context),
+            _buildNavItem(Icons.groups, "Students", 3, context),
+            _buildNavItem(Icons.person, "Profile", 4, context),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, int index, BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        print("Button pressed: Index $index");
-        _onItemTapped(context, index);
-      },
-      child: Icon(
-        icon,
-        color: currentIndex == index ? Colors.blue : Colors.grey,
-        size: 28,
+  Widget _buildNavItem(
+    IconData icon, String label, int index, BuildContext context) {
+  final isSelected = currentIndex == index;
+
+  return GestureDetector(
+    onTap: () {
+      _onItemTapped(context, index);
+    },
+    child: SizedBox(
+      height: 56, // Adjust this if needed
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? Colors.blue : Colors.grey,
+            size: 24,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              color: isSelected ? Colors.blue : Colors.grey,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ],
       ),
-    );
-  }
-}
+    ),
+  );
+    }}
