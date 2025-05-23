@@ -271,7 +271,7 @@ class _GuardianLoginPageState extends State<GuardianLoginPage> {
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: const Color.fromARGB(255, 0, 0, 0),
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w700,decoration: TextDecoration.underline,
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
